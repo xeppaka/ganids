@@ -1,0 +1,4 @@
+alert tcp 192.168.0.* * -> *.*.*.* 79-81 {pcre:"len11233ta.ru"}
+alert tcp 192.168.0.* * -> *.*.*.* 80 {content:"ATR-72"}
+alert tcp 192.168.0.* * -> *.*.*.* 80 {content:"Microsoft"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important"}
