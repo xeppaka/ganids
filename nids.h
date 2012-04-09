@@ -27,6 +27,15 @@ using std::queue;
 #define DEF_PACKET_BUFFER_SIZE 65536
 #define DEF_TIME_FLUSH_BUFFER 1000
 
+enum LOG_LEVEL {
+    TRACE,
+    DEBUG,
+    INFO,
+    WARNING,
+    ERROR,
+    FATAL
+};
+
 enum NIDS_STATE {
     IDLE = 0,
     RUNNING
@@ -86,6 +95,7 @@ public:
                                      int *task_buffer,
                                      int *out_buffer,
                                      int tasks);
+    void set_log_level(LOG_LEVEL level);
 
     // pcap handle
     pcap_t *handle;
@@ -112,6 +122,7 @@ public:
     vector<int> regex_dfa_offset;
 
     // CPU processing
+    boost::thread **cpu_exec_threads;
     queue<Packet *> packets_queue;
 
     // packets number semaphore

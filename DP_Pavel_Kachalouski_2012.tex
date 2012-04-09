@@ -11,7 +11,7 @@
 % \usepackage[cp1250]{inputenc} % LaTeX source encoded as Windows-1250
 
 \usepackage{graphicx} %graphics files inclusion
-% \usepackage{subfig} %subfigures
+\usepackage{algorithmic} %subfigures
 % \usepackage{amsmath} %advanced maths
 % \usepackage{amssymb} %additional math symbols
 
@@ -19,6 +19,11 @@
 % \usepackage[acronym,nonumberlist,toc,numberedsection=autolabel]{glossaries}
 % \iflanguage{czech}{\renewcommand*{\acronymname}{Seznam pou{\v z}it{\' y}ch zkratek}}{}
 % \makeglossaries
+
+% \usepackage{listings}
+% \usepackage{color}
+
+% \definecolor{textbg}{RGB}{195,195,195}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % EDIT THIS
@@ -49,7 +54,7 @@
 First major malicious internet-based attack was introduced in 1988 when one of the first Internet worms was released. Referred to as "The Morris Worm", it was written by Robert Tappan Morris and caused major interruptions across large parts of the Internet. Since 1988 Internet has greatly evolved and as a result increased number of internet-based attacks and network security became a really important issue. As an attempt to overcome this problem Intrusion Detection systems were developed. Such systems allow to monitor and possibly prevent attempts to intrude into or compromise the network resources.
 
 In short it works as follows: you have a computer system. Your computer system is attached to the network and may be even to the Internet. You are willing to allow access from the network, by authorized people, but you are not however willing to allow unauthorized access to the system by anyone else. Typically, a firewall or authentication system is used to prevent unauthorised access. However, sometimes authentication systems and firewalling can be broken. Intrusion Detection is a set of mechanisms that are helps to detect unauthorised access to the system. Also Intrusion Detection systems may take some steps to deny access for intruders. Such systems are placed between firewall and system being secured and provide an extra layer of protection to that system.
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[scale=0.5]{images/Typical_NIDS.png}
 \caption{Typical NIDS scenario.}
@@ -65,7 +70,7 @@ There are also more recent type of intrusion detection system which reside in th
 
 Most modern network intrusion detection and prevention systems use a set of rules that are compared to incoming and outcoming packets. Usually, a rule consists of a filter based on packet header information, a data that should be contained in the packet payload and an associated action that is taken in case filter and payload matching conditions are met.
 Matching payload signatures is a resource-intensive process, accounting for about 75\% of the total CPU processing time of modern Network Intrusion Detection systems. The reason why is it so intensive is in the fact that most of the time, every byte of every network packet should be processed as a part of data searching algorithm that searches for matches along a large set of rules that apply for particular packet. As an example, most widely used open-source NIDS Snort has rule set with about 10000 strings. Searching every packet for all of this strings needs a lot of resources. With increasing number of internet-based attacks rules datasets grow every year creating additional load on NIDS systems. In the figure 1.2 is shown a general trend of the number of web-based attacks on web servers taken from Symantec Corporation report[TODO:add number].
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[scale=0.3]{images/web-attacks.png}
 \caption{Average Web-based attacks per day, by month, 2009-2010. Source: Symantec Corporation.}
@@ -104,79 +109,28 @@ In additional, the software should fulfill the following requirements:
 \item Open source. The application should be developed under the terms of open source software.
 \item Application should be developed in C/C++ and C for CUDA languages.
 \item Easy to use. Application should be easy to use for the users. NIDS rules should have easy format.
+\item Application will analyze only TCP/IP traffic due to simplifications on the packet decomposition level.
 \item Logging and offline analysis. Application should be able to store traffic for the future analysis in offline mode.
 \end{itemize}
 
 \section{Project overview}
 
-The architecture of the application is summarized in the figure 1.3.
-\begin{figure}
+\begin{figure}[h]
 \centering
-\includegraphics[scale=0.5]{images/app_architecture.png}
-\caption{Application architecture.}
+\includegraphics[scale=0.4]{images/workflow.png}
+\caption{Application workflow.}
 \end{figure}
 
-The main components of the application:
+The general application workflow is shown in the figure [TODO: add number].
+The main stages of the workflow:
 \begin{itemize}
-\item \textbf{GUI}. Component which implements user interactions with a program. Application has simple window-based interface which allows to perform all major manipulations with the application like starting capturing traffic, stop capturing, switching analyzing mode, saving traffic into the file, etc.
-\item \textbf{Network packet capturing library}. Application itself doesn't capture packet from the network, because it is not a trivial task. Instead, program uses external library for packet capturing. 
-\item \textbf{NIDS}. The main component of the system. Uses all others modules to read rules, start capturing and analysing of packets. Stores results of analyzing into a database and updates counters.
-\item \textbf{Regular expressions module}. This module is used to compile regular expression obtained from rules. Regular expressions are compiled to DFA for loading into CUDA device later.
-\item \textbf{Aho-Corasick module}. This module is used to create DFA for all simple content strings that are read from rules. Application uses Aho-Corasick algorithm for fast string searching within network packets.
-\item \textbf{CUDA module}. Code that runs on a GPU and performs analysis of packets against rules.
-\item \textbf{Database module}. Makes logging for matched rules into the database.
+\item \textbf{Packet capture}. Application captures traffic on one of the network interfaces for later analysis. Raw packet should be obtained from network for full analysis of route information on the next stage.
+\item \textbf{Route information analysis}. Every packet is analyzed by means of type of the protocols used on network and transport layers and also destination and source IP address. If packet route information matches to any rule from the dataset it transported to the next stage of the workflow.
+\item \textbf{Payload analysis}. Application looks for a string or regex in the packet payload.
+\item \textbf{Writing result to a database}. On this stage all matched packets from the previous stage are written to a database with a message obtained from rule with which packet was matched.
 \end{itemize}
 
 \chapter{Background}
-\section{Intrusion detection}
-Intrusion detection is a process of detection undesired traffic on a network or device. An Intrusion Detection System is a combination of a physical device with a software which monitors network traffic in order to detect undesired activity and traffic that violates security policies. Different IDS tools are able also to store event information into log for later review or combine events with other information to make decisions about policies and losses. More functionalities provide IPS that can prevent or stop undesired traffic.
-
-\textbf{Network-based Intrusion Detection (NID)}
-
-A Network Intrusion Detection System (NIDS) is a type of IDS that monitors network traffic and analyzes packets deep on all levels of OSI model. Based on result of analyzis it makes decisions about the traffic type and suspicious activity. However, historically NIDS has been unable to operate in the following environment:
-\begin{itemize}
-\item Switched networks.
-\item Encrypted networks.
-\end{itemize}
-
-\textbf{Host-based Intrusion Detection (HID)}
-
-Host-based intrusion detection systems monitor and detect system and user activities on a given host. More complicated tools also offer policy management, data forensics statistical analysis and some access control. The difference between network-based intrusion detection and host-based intrusion detection is that NID deals with a traffic transmitted from one host to another while HID controls what is happening on the hosts themselfs.
-
-Host-based intrusion detection is better fits to fight with internal threats, because it monitor and control specific user actions and file access. A lot of computer threats comes from the inside of organization, for example disgruntled employees or corporate spies.
-
-\subsection*{Detection types}
-
-\textbf{Signature-Based Detection}
-
-Intrusion Detection may use signature-based detection to analyze traffic. Using such type of detection means that system is relying on known traffic data to analyze running traffic. An attacker can modify a little an attack to make it undetectable for such type of IDS. But regular expression-based rules give more power against such slightly changed attacks in the same time remaining very accurate.
-
-\subsection*{Anomaly-Based Detection}
-An IDS that looks at network traffic and detects data that is incorrect, not valid, or generally abnormal. This method is useful for detecting undesired traffic that is not specifically known. For instance, an anomaly-based IDS will detect that an Internet protocol (IP) packet is malformed. It does not detect that it is malformed in a specific way, but indicates that it is anomalous.
-
-\subsection*{Stateful Protocol Inspection}
-This type of detection is similar to anomaly-based detection, but it additionally inspects traffic on the transport layer and vendor-specific application layer, while anomaly-based detection is not doing it.
-
-\section{Intrusion Detection Systems: A Brief History.}
-The goal of intrusion detection is to monitor network assets to detect anomalous behavior and misuse. This concept has been around for nearly twenty years but only recently has it seen a dramatic rise in popularity and incorporation into the overall information security infrastructure. Beginning in 1980, with James Anderson's paper, Computer Security Threat Monitoring and Surveillance, the notion of intrusion detection was born. Since then, several pivotal events in IDS technology have advanced intrusion detection to its current state.
-
-James Anderson's seminal paper, written for a government organization, introduced the notion that audit trails contained vital information that could be valuable in tracking misuse and understanding user behavior. With the release of this paper, the concept of "detecting" misuse and specific user events emerged. His insight into audit data and its importance led to tremendous improvements in the auditing subsystems of virtually every operating system. Anderson's conjecture also provided the foundation for future intrusion detection system design and development. His work was the start of host-based intrusion detection and IDS in general.
-
-In 1983, SRI International, and specifically Dr. Dorothy Denning, began working on a government project that launched a new effort into intrusion detection development. Their goal was to analyze audit trails from government mainframe computers and create profiles of users based upon their activities. One year later, Dr. Denning helped to develop the first model for intrusion detection, the Intrusion Detection Expert System (IDES), which provided the foundation for the IDS technology development that was soon to follow.
-
-In 1984, SRI also developed a means of tracking and analyzing audit data containing authentication information of users on ARPANET, the original Internet. Soon after, SRI completed a Navy SPAWAR contract with the realization of the first functional intrusion detection system, IDES. Using her research and development work at SRI, Dr. Denning published the decisive work, An Intrusion Detection Model, which revealed the necessary information for commercial intrusion detection system development. Her paper is the basis for most of the work in IDS that followed.
-
-Meanwhile, there were other significant advances occurring at University of California Davis' Lawrence Livermore Laboratories. In 1988, the Haystack project at Lawrence Livermore Labs released another version of intrusion detection for the US Air Force. This project produced an IDS that analyzed audit data by comparing it with defined patterns. In a telephone interview with the author, Crosby Marks, a former Haystack Project team member and Haystack Labs employee said that, "searching through this large amount of data for one specific misuse was equivalent to looking for a needle in a haystack."
-
-The subsequent iteration of this tool was called the Distributed Intrusion Detection System (DIDS). DIDS augmented the existing solution by tracking client machines as well as the servers it originally monitored. Finally in 1989, the developers from the Haystack project formed the commercial company, Haystack Labs, and released the last generation of the technology, Stalker. Crosby Marks says that "Stalker was a host-based, pattern matching system that included robust search capabilities to manually and automatically query the audit data." The Haystack advances, coupled with the work of SRI and Denning, greatly advanced the development of host-based intrusion detection technologies.
-
-To kick off the '90s, UC Davis's Todd Heberlein introduced the idea of network intrusion detection. In 1990, Heberlein was the primary author and developer of Network Security Monitor (NSM), the first network intrusion detection system ( see Heberlein, L. et al. "A Network Security Monitor." Proceedings of the IEEE Computer Society Symposium, Research in Security and Privacy, May 1990, pp. 296-303.) NSM was deployed at major government installations where network traffic analysis provided massive amounts of information. This new awareness generated more interest in the field of intrusion detection and investments in that market increased significantly. Heberlein's contributions also extended to the DIDS project where, along with the Haystack team, he introduced the first idea of hybrid intrusion detection. The work of the Haystack project and the introduction of the Network Security Monitor revolutionized the IDS field and brought it into the commercial world.
-
-Commercial development of intrusion detection technologies began in the early 1990s. Haystack Labs was the first commercial vendor of IDS tools, with its Stalker line of host-based products. SAIC was also developing a form of host-based intrusion detection, called Computer Misuse Detection System (CMDS). Simultaneously, the Air Force's Cryptologic Support Center developed the Automated Security Measurement System (ASIM) to monitor network traffic on the US Air Force's network. ASIM made considerable progress in overcoming scalability and portability issues that previously plagued NID products. Additionally, ASIM was the first solution to incorporate both a hardware and software solution to network intrusion detection. ASIM is still currently in use and managed by the Air Force's Computer Emergency Response Team (AFCERT) at locations all over the world. As often happened, the development group on the ASIM project formed a commercial company in 1994, the Wheel Group. Their product, NetRanger, was the first commercially viable network intrusion detection device. Nonetheless, commercial intrusion detection systems developed slowly during these years and only truly blossomed towards the latter half of the decade.
-The intrusion detection market began to gain in popularity and truly generate revenues around 1997. In that year, the security market leader, ISS, developed a network intrusion detection system called RealSecure. A year later, Cisco recognized the importance of network intrusion detection and purchased the Wheel Group, attaining a security solution they could provide to their customers. Similarly, the first visible host-based intrusion detection company, Centrax Corporation, emerged as a result of a merger of the development staff from Haystack Labs and the departure of the CMDS team from SAIC. From there, the commercial IDS world expanded its market-base and a roller coaster ride of start-up companies, mergers, and acquisitions ensued. (The next section, Players, discusses these developments.)
-
-Currently, market statistics show that IDS is amidst the top selling security vendor technologies and should continue to rise. Furthermore, government initiatives, such as the Federal Intrusion Detection Network, (FIDNet) created under Presidential Decision Directive 63, are also adding impetus to the evolution of IDS. Advancements in IDS will ultimately push security technology into a whole new arena of automated security intelligence.
-
 \section{Traffic analyzing: sniffers.}
 Packet sniffer is a program or library which allows to intercept data packets transmitted over a certain network to which the system is connected throught a network card. Most popular known sniffing software is tcpdump[], Wireshark and OmniPeek. These programs are used for obtaining raw network packets and performing analyzing over obtained packets in order to represent them in a some visual form or dump to a file. There are also pure sniffing libraries, such as Libpcap (for UNIX like OS) and Winpcap (for Windows OS).
 
@@ -262,6 +216,55 @@ Non linear methods are fundamentally based in AI (artificial intelligence) algor
 \textbf{Bayesian and probability approaches.}
 Bayesian and probability approaches assume that parameters that are being studied are random rather than fixed parameters. Before looking at the current data, old information can be used to construct a prior distribution model for these parameters and therefore classify new data based on how likely various values of the unknown parameters are, and then make use of the current data to revise this starting assessment so that parameters can be considered random, not fixed. This attribute allows an intrusion detection systems to make a more precise decision based on the probability approach. Latent class model based analysis like proposed in Wang, Kim, Mbateng and Ho [34] or Bayes role based analysis like proposed by Barbard, Wu and Jajodia [35] are some examples of Bayesian and probability approaches.
 
+\section{Intrusion detection.}
+Intrusion detection is a process of detection undesired traffic on a network or device. An Intrusion Detection System is a combination of a physical device with a software which monitors network traffic in order to detect undesired activity and traffic that violates security policies. Different IDS tools are able also to store event information into log for later review or combine events with other information to make decisions about policies and losses. More functionalities provide IPS that can prevent or stop undesired traffic.
+
+\textbf{Network-based Intrusion Detection (NID)}
+
+A Network Intrusion Detection System (NIDS) is a type of IDS that monitors network traffic and analyzes packets deep on all levels of OSI model. Based on result of analyzis it makes decisions about the traffic type and suspicious activity. However, historically NIDS has been unable to operate in the following environment:
+\begin{itemize}
+\item Switched networks.
+\item Encrypted networks.
+\end{itemize}
+
+\textbf{Host-based Intrusion Detection (HID)}
+
+Host-based intrusion detection systems monitor and detect system and user activities on a given host. More complicated tools also offer policy management, data forensics statistical analysis and some access control. The difference between network-based intrusion detection and host-based intrusion detection is that NID deals with a traffic transmitted from one host to another while HID controls what is happening on the hosts themselfs.
+
+Host-based intrusion detection is better fits to fight with internal threats, because it monitor and control specific user actions and file access. A lot of computer threats comes from the inside of organization, for example disgruntled employees or corporate spies.
+
+\subsection*{Detection types}
+
+\textbf{Signature-Based Detection}
+
+Intrusion Detection may use signature-based detection to analyze traffic. Using such type of detection means that system is relying on known traffic data to analyze running traffic. An attacker can modify a little an attack to make it undetectable for such type of IDS. But regular expression-based rules give more power against such slightly changed attacks in the same time remaining very accurate.
+
+\subsection*{Anomaly-Based Detection}
+An IDS that looks at network traffic and detects data that is incorrect, not valid, or generally abnormal. This method is useful for detecting undesired traffic that is not specifically known. For instance, an anomaly-based IDS will detect that an Internet protocol (IP) packet is malformed. It does not detect that it is malformed in a specific way, but indicates that it is anomalous.
+
+\subsection*{Stateful Protocol Inspection}
+This type of detection is similar to anomaly-based detection, but it additionally inspects traffic on the transport layer and vendor-specific application layer, while anomaly-based detection is not doing it.
+
+\section{Intrusion Detection Systems: A Brief History.}
+The goal of intrusion detection is to monitor network assets to detect anomalous behavior and misuse. This concept has been around for nearly twenty years but only recently has it seen a dramatic rise in popularity and incorporation into the overall information security infrastructure. Beginning in 1980, with James Anderson's paper, Computer Security Threat Monitoring and Surveillance, the notion of intrusion detection was born. Since then, several pivotal events in IDS technology have advanced intrusion detection to its current state.
+
+James Anderson's seminal paper, written for a government organization, introduced the notion that audit trails contained vital information that could be valuable in tracking misuse and understanding user behavior. With the release of this paper, the concept of "detecting" misuse and specific user events emerged. His insight into audit data and its importance led to tremendous improvements in the auditing subsystems of virtually every operating system. Anderson's conjecture also provided the foundation for future intrusion detection system design and development. His work was the start of host-based intrusion detection and IDS in general.
+
+In 1983, SRI International, and specifically Dr. Dorothy Denning, began working on a government project that launched a new effort into intrusion detection development. Their goal was to analyze audit trails from government mainframe computers and create profiles of users based upon their activities. One year later, Dr. Denning helped to develop the first model for intrusion detection, the Intrusion Detection Expert System (IDES), which provided the foundation for the IDS technology development that was soon to follow.
+
+In 1984, SRI also developed a means of tracking and analyzing audit data containing authentication information of users on ARPANET, the original Internet. Soon after, SRI completed a Navy SPAWAR contract with the realization of the first functional intrusion detection system, IDES. Using her research and development work at SRI, Dr. Denning published the decisive work, An Intrusion Detection Model, which revealed the necessary information for commercial intrusion detection system development. Her paper is the basis for most of the work in IDS that followed.
+
+Meanwhile, there were other significant advances occurring at University of California Davis' Lawrence Livermore Laboratories. In 1988, the Haystack project at Lawrence Livermore Labs released another version of intrusion detection for the US Air Force. This project produced an IDS that analyzed audit data by comparing it with defined patterns. In a telephone interview with the author, Crosby Marks, a former Haystack Project team member and Haystack Labs employee said that, "searching through this large amount of data for one specific misuse was equivalent to looking for a needle in a haystack."
+
+The subsequent iteration of this tool was called the Distributed Intrusion Detection System (DIDS). DIDS augmented the existing solution by tracking client machines as well as the servers it originally monitored. Finally in 1989, the developers from the Haystack project formed the commercial company, Haystack Labs, and released the last generation of the technology, Stalker. Crosby Marks says that "Stalker was a host-based, pattern matching system that included robust search capabilities to manually and automatically query the audit data." The Haystack advances, coupled with the work of SRI and Denning, greatly advanced the development of host-based intrusion detection technologies.
+
+To kick off the '90s, UC Davis's Todd Heberlein introduced the idea of network intrusion detection. In 1990, Heberlein was the primary author and developer of Network Security Monitor (NSM), the first network intrusion detection system ( see Heberlein, L. et al. "A Network Security Monitor." Proceedings of the IEEE Computer Society Symposium, Research in Security and Privacy, May 1990, pp. 296-303.) NSM was deployed at major government installations where network traffic analysis provided massive amounts of information. This new awareness generated more interest in the field of intrusion detection and investments in that market increased significantly. Heberlein's contributions also extended to the DIDS project where, along with the Haystack team, he introduced the first idea of hybrid intrusion detection. The work of the Haystack project and the introduction of the Network Security Monitor revolutionized the IDS field and brought it into the commercial world.
+
+Commercial development of intrusion detection technologies began in the early 1990s. Haystack Labs was the first commercial vendor of IDS tools, with its Stalker line of host-based products. SAIC was also developing a form of host-based intrusion detection, called Computer Misuse Detection System (CMDS). Simultaneously, the Air Force's Cryptologic Support Center developed the Automated Security Measurement System (ASIM) to monitor network traffic on the US Air Force's network. ASIM made considerable progress in overcoming scalability and portability issues that previously plagued NID products. Additionally, ASIM was the first solution to incorporate both a hardware and software solution to network intrusion detection. ASIM is still currently in use and managed by the Air Force's Computer Emergency Response Team (AFCERT) at locations all over the world. As often happened, the development group on the ASIM project formed a commercial company in 1994, the Wheel Group. Their product, NetRanger, was the first commercially viable network intrusion detection device. Nonetheless, commercial intrusion detection systems developed slowly during these years and only truly blossomed towards the latter half of the decade.
+The intrusion detection market began to gain in popularity and truly generate revenues around 1997. In that year, the security market leader, ISS, developed a network intrusion detection system called RealSecure. A year later, Cisco recognized the importance of network intrusion detection and purchased the Wheel Group, attaining a security solution they could provide to their customers. Similarly, the first visible host-based intrusion detection company, Centrax Corporation, emerged as a result of a merger of the development staff from Haystack Labs and the departure of the CMDS team from SAIC. From there, the commercial IDS world expanded its market-base and a roller coaster ride of start-up companies, mergers, and acquisitions ensued. (The next section, Players, discusses these developments.)
+
+Currently, market statistics show that IDS is amidst the top selling security vendor technologies and should continue to rise. Furthermore, government initiatives, such as the Federal Intrusion Detection Network, (FIDNet) created under Presidential Decision Directive 63, are also adding impetus to the evolution of IDS. Advancements in IDS will ultimately push security technology into a whole new arena of automated security intelligence.
+
 \section{GPUs}
 Graphical processor units commonly referred to them as GPUs and occasionally called visual processing units or VPUs, are a specialized type of processors that its purpose is to offload 3D graphics rendering from the microprocessor or CPU. The history of GPUs started in 1970s, where ANTIC and CTIA chips provided for hardware control of mixed graphics and text mode on Atari 8-bit computers. The ANTIC chip was a special purpose processor, that mapped text and graphics data to the video output.
 
@@ -306,10 +309,185 @@ The code contained in the figure 2.12 shows a simplified example of a kernel cal
 \chapter{Analysis and design}
 
 \section{Developing tools and methodology.}
+The tools and programming languages selected for implementing application are:
+
+Languages:
+
+\begin{itemize}
+\item \textbf{C++}: due to perfomance requirements and supporting of object oriented features (classes, inheritance), C++ is used for developing the whole program, instead of the CUDA device code part, where C dialect for CUDA is used.
+\item \textbf{CUDA}: CUDA uses C language with additional features to perform general purpose calculations in the GPUs.
+\end{itemize}
+
+Libraries:
+
+\begin{itemize}
+\item \textbf{Libpcap}: is packet-capture library for retrieving packets from the Packet Filter.
+\item \textbf{QT}: is a cross-platform application framework for developing application with a rich graphical interface. It is used for building GUI part of the application.
+\item \textbf{Boost}: is a set of libraries that extend the functionality of the C++ programming language. From boost libraries components for processes synchronization were used (semaphores and mutexes). Also boost.spirit parser is used to parse rules dataset.
+\item \textbf{Sqlite}: is a software library that implements a SQL database engine and is used to store results.
+\end{itemize}
+
+The methodology used has been the spiral model.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.7]{images/spiral-model.png}
+\caption{Spiral methodology used in the developing process of the application.}
+\end{figure}
+
+In this methodology, the process of determining requirements, analyzing possible risks, implementing, testing and planning (results evaluation), are performed during the whole project. The number of rotating through the spiral depend on the found implementation issues, the precision of objective definition in the early stages of the development and the requirements accomplishment of the current implementation.
+
+\section{NIDS rules.}
+NIDS rules dataset has a simple text format. Each line of the text file contain rule in the following format:
 
 
+\begin{figure}[h]
+\centering
+\begin{verbatim}
+action protocol src_ip src_port direction dst_ip dst_port {options}
+\end{verbatim}
+\caption{Rule format.}
+\label{fig:rule_format}
+\end{figure}
 
-\chapter{Realisation}
+\textbf{Action} could be an \textbf{alert} or \textbf{log}, where 'alert' means that if case rule is matched against some packet it should be alerted to user, for example highlighted with a red color in a GUI. If rule starts with a 'log' action it means that packet matched against rule will be logged into a database without any specific actions for gaining user attention.
+
+\textbf{Protocol} is a packet's protocol type. Because of simplifications only 'tcp' is supported by developing application.
+
+\textbf{Src\_ip} is a source IP address of the packet. IP address is written in a standard form '192.168.0.1' where each position could be a range, for example '192.168.0-20.1'. Also instead of any position in the IP address, '*' symbol could be used to accept all values on that position. For example '192.168.*.*'.
+
+\textbf{Src\_port} is a source TCP port. It is a value from 0 to 65535, or range, for example 5-1234, or '*' symbol which means any port.
+
+\textbf{Direction} is a string "\textendash\textgreater". At this moment only this direction string is supported.
+
+\textbf{Dst\_ip} is a destination IP address written in the same format as source IP address.
+
+\textbf{Dst\_port} is a destination TCP port written in the same format as a source TCP port.
+
+\textbf{Options} are parameters that specifies payload analysis. Within options should be a \textbf{content} or \textbf{pcre}. Content specifies a string which is searched within a packet payload. Also content string could contain raw bytes which should be written within '\textbar' symbols. Example of the content option with a string and raw bytes \textbf{content:"searchedstring\textbar00 01 02\textbar"}.\newline Pcre specifies the searched string as a regular expression. Example of pcre option \textbf{pcre:"\textasciicircum(some)*regex"}. The reason of dividing searched string on content and pcre is that all content strings are compiled into one DFA while each pcre is compiled in its own DFA and could consume much more memory. Options may contain parameters \textbf{offset} and \textbf{length} which means position in a payload from which searching should be started and number of bytes from the start position to observe. And finally \textbf{msg} parameter could be withing options. It is a simple string that should be logged or alerted to user when some packet matches against the rule.
+
+\section{Application design overview.}
+The main objective of this thesis is to design and implement simple NIDS application capable to analyze network traffic using GPUs, specifically using CUDA. 
+\subsection*{Pattern matching.}
+Pattern matching is the most heavy operation that affects the NIDS perfomance. Pattern matching algorithms can be classified into single-pattern and multi-pattern algorithms.
+
+Single-pattern algorithms work in a way that each pattern is searched in a given text individually. Therefore for k searched patterns algorithm should be repeated k times. Some of the widely used algorithms are Knuth-Morris-Pratt and Boyer-Moore. Knuth-Morris-Pratt is able to skip characters when a mismatch occurs in the comparison phase using a partial match table for each pattern. Each table is built by preprocessing every pattern separately. Boyer-Moore is the most widely used single-pattern algorithm. Its execution time can be sublinear if the suffix of the string to be searched for appears infrequently in the input stream, due to the skipping heuristics that it uses.
+
+Multi-pattern matching algorithms search a set of patterns in a text simultaneously. It is done by preprocessing all patterns that could be searched into an automation which is used during searching phase. The automation may be represented as a trie, a table or combination of the two. Such algorithms searches each byte from the text only once. Also such algorithms scales much better that single-pattern. Example of multi-pattern algorithms: Aho-Corasick, Wu-Manber and Commentz-Walter.
+
+Previous section introduced NIDS rule which could contain \textbf{content} or \textbf{pcre} patterns that should be searched withing payload. As there could be a lot of rules and a lot of contents it was decided to use Aho-Corasick algorithm to search all content string simultaneously within packet payload. 
+
+The algorithm consists of two parts. In the first part we construct from the set of patterns a finiste state machine; in the second part we apply the packet payload as input to the pattern matching machine. The machine signals whenever it has found a match for a keyword. The pattern matching machine consists of a set of states. Each state is represented by a number. The machine processes the text by successively reading symbols from input string, making state transitions and occasionally emitting output. The behaviour of the pattern matching machine is dictated by three functions: a goto function \emph{g}, a failure function \emph{f} and an output function \emph{output}. Figures \ref{fig:goto_function}, \ref{fig:failure_function} and \ref{fig:output_function} shows the functions used by a pattern matching machine for a set of keywords (he, she, his, hers).
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{images/goto_function.png}
+\caption{Aho-Corasick goto function.}
+\label{fig:goto_function}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\begin{tabular}{l l l l l l l l l l}
+\emph{i}       & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\
+\emph{f(i)}    & 0 & 0 & 0 & 1 & 2 & 0 & 3 & 0 & 3 \\
+\end{tabular}
+\caption{Aho-Corasick failure function.}
+\label{fig:failure_function}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\begin{tabular}{l l}
+\emph{i} & \emph{output(i)} \\
+2 & {he} \\
+5 & {she, he} \\
+7 & {his} \\
+9 & {hers} \\
+\end{tabular}
+\caption{Aho-Corasick output function.}
+\label{fig:output_function}
+\end{figure}
+
+One state (usually 0) is designated as a start state. In figure \ref{fig:goto_function} the states are 0, 1,...,9. The goto function \emph{g} maps a pair consisting of state and an input symbol into a state or the message fail. The directed graph in figure \ref{fig:goto_function} represents the goto function. The absence of an arrow indicates \emph{fail}. Thus, g(1, \emph{s}) = \emph{fail} for all input symbols \emph{s} that are not 'e' or 'i'.
+
+The failure function \emph{f} maps a state into a state. The failure function is consulted whenever the goto function reports \emph{fail}. Certain states are designated as output states which indicate that a set of keywords has been found.
+
+An operating cycle of a pattern matching machine is defined as follows. Let s be the current state of the machine and a the current symbol of the input string x.
+\begin{enumerate}
+\item If \emph{g(s, a) = s'}, the machine makes a goto transition. It enters state s' and the next symbol of x becomes the current input symbol.
+In addition, if  \emph{output(s')  empty}, then the machine emits the set \emph{output(s')} along with the position of the current input symbol. The operating cycle is now complete.
+\item If \emph{g(s, a) = fail}, the machine consults the failure function \emph{f} and is said to make a \emph{failure} transition. If \emph{f(s)=s'} the machine repeats the cycle with s' as the current state and a as the current input symbol.
+\end{enumerate}
+Initially, the current state of the machine is the start and the first symbol of the text string is the current input symbol. 
+
+\begin{figure}
+\textbf{Input.} A text string $x = a_1 a_2 ... a_n$ where each $a_i$ is an input symbol and a pattern matching machine M with goto function \emph{g}, failure function \emph{f}, and output function \emph{output}.\\
+\textbf{Output.} Locations at which keywords occur in x.\\
+\textbf{Method.}
+\begin{algorithmic}
+\STATE $state \leftarrow 0$
+\FOR{$i=1$ to $n$}
+\WHILE{$g(state, a_i) = fail$}
+\STATE $state \leftarrow f(state)$
+\ENDWHILE
+\STATE $state \leftarrow g(state, a_i)$
+\IF{$output(state) \neq empty$}
+\PRINT i
+\PRINT $output(state)$
+\ENDIF
+\ENDFOR
+\end{algorithmic}
+\caption{Aho-Corasick pattern matching machine algorithm.}
+\label{fig:ac_search_pseudocode}
+\end{figure}
+
+\begin{figure}
+\textbf{Input.} Set of keywords K={$y_1$, $y_2$,..., $y_k$} \\
+\textbf{Output.} Goto function \emph{g} and a partially computed output function \emph{output}.\\
+\textbf{Method.}
+\begin{algorithmic}
+\STATE $state \leftarrow 0$
+\FOR{$i=1$ to $n$}
+\WHILE{$g(state, a_i) = fail$}
+\STATE $state \leftarrow f(state)$
+\ENDWHILE
+\STATE $state \leftarrow g(state, a_i)$
+\IF{$output(state) \neq empty$}
+\PRINT i
+\PRINT $output(state)$
+\ENDIF
+\ENDFOR
+\end{algorithmic}
+\caption{Aho-Corasick pattern matching machine algorithm.}
+\label{fig:ac_search_pseudocode}
+\end{figure}
+
+Figure \ref{fig:ac_search_pseudocode} shows Aho-Corasick matching machine algorithm pseudocode. Pseudocodes for construction of \textbf{Goto}, \textbf{Failure}, and \textbf{Output} are shown in figures \ref{fig:ac_goto_pseudocode}, \ref{fig:ac_fail_pseudocode}, \ref{fig:ac_output_pseudocode}.
+
+
+\subsection*{Packet filtering based in route information.}
+
+
+Application design is divided in several components. The diagram contained in figure \ref{fig:app_architecture} show the relationship between components.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{images/app_architecture.png}
+\caption{Relation between application components.}
+\label{fig:app_architecture}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{GUI}. Component which implements user interactions with a program. Application has simple window-based interface which allows to perform all major manipulations with the application like starting capturing traffic, stop capturing, switching analyzing mode, saving traffic into the file, etc.
+\item \textbf{Network packets capturing library}. Application itself doesn't capture packet from the kernel, because it is not a trivial task. Instead, program uses external library for packet capturing.
+\item \textbf{NIDS}. The main component of the system. Uses all others modules to read rules, start capturing and analysing of packets. Stores results of analyzing into a database and updates counters which are used within NIDS to do perfomance calculations.
+\item \textbf{Regular expressions implementation}. This module is used to compile regular expression obtained from rules. Regular expressions are compiled to DFA for loading into CUDA device later.
+\item \textbf{Aho-Corasick implementation}. This module is used to create DFA for all simple content strings that are read from rules. Application uses Aho-Corasick algorithm for fast string searching within network packets.
+\item \textbf{CUDA module}. Code that runs on a GPU and performs analysis of packets against rules.
+\item \textbf{Database module}. Used for logging matched packets into the database.
+\end{itemize}
+
+
 
 \setsecnumdepth{part}
 \chapter{Conclusion}

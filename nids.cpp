@@ -24,15 +24,20 @@ void packet_received(u_char *user,
                      const u_char *bytes)
 {
     BOOST_LOG_TRIVIAL(trace) << "Begin - packet_received";
+    Nids *nids = reinterpret_cast<Nids *>(user);
+
+    ++nids->num_packets;
+    nids->num_bytes += h->caplen;
 
     Packet *packet = Packet::create_packet(bytes);
 
     if (packet) {
-        Nids *nids = reinterpret_cast<Nids *>(user);
+        ++nids->num_tcp_ip_packets;
+        nids->num_tcp_ip_payload_bytes += packet->get_payload_size();
 
         if (nids->gpu_enabled) {
             nids->process_packet_gpu(packet);
-            BOOST_LOG_TRIVIAL(info) << "packet buffer size: " << nids->packet_buffer->size();
+            BOOST_LOG_TRIVIAL(trace) << "packet buffer size: " << nids->packet_buffer->size();
         }
         else {
             packet->save_payload();
@@ -74,7 +79,7 @@ int Nids::read_rules(const char *filename)
     ifstream f;
     f.open(filename);
     if (!f.good()) {
-        BOOST_LOG_TRIVIAL(debug) << "Unable to read file: " << filename;
+        BOOST_LOG_TRIVIAL(error) << "Unable to read file: " << filename;
         BOOST_LOG_TRIVIAL(trace) << "End - Nids::read_rules";
         return -1;
     }
@@ -116,23 +121,43 @@ int Nids::read_rules(const char *filename)
 bool Nids::start_monitor(const char *interface, int threads_num)
 {
     BOOST_LOG_TRIVIAL(trace) << "Begin - Nids::start_monitor";
+
+    num_packets = 0;
+    num_tcp_ip_packets = 0;
+    num_bytes = 0;
+    num_tcp_ip_payload_bytes = 0;
+
     char errbuf[PCAP_ERRBUF_SIZE];
 
     // open pcap session
     handle = pcap_open_live(interface, 2048, 1, 0, errbuf);
     if (handle == NULL) {
-        BOOST_LOG_TRIVIAL(debug) << "pcap_open_live() failed";
+        BOOST_LOG_TRIVIAL(error) << "pcap_open_live() failed";
         BOOST_LOG_TRIVIAL(trace) << "End - Nids::start_monitor";
         return false;
+    } else {
+        BOOST_LOG_TRIVIAL(debug) << "pcap_open_live() success";
     }
 
     gpu_enabled = false;
 
-    boost::thread threads[threads_num > 0 ? threads_num : 1];
-//    for (int i = 0; i < threads; ++i)
-//        cpu_exec_threads[i] = new boost::thread(process_on_cpu_callable(), this);
+    //boost::thread threads[threads_num > 0 ? threads_num : 1];
+    cpu_exec_threads = new boost::thread*[threads_num > 0 ? threads_num : 1];
+    for (int i = 0; i < threads_num; ++i)
+        cpu_exec_threads[i] = new boost::thread(process_on_cpu_callable(), this);
 
     int res = pcap_loop(handle, 0, packet_received, reinterpret_cast<u_char *>(this));
+    BOOST_LOG_TRIVIAL(debug) << "pcap_loop() returned: " << res;
+
+    pcap_close(handle);
+    handle = NULL;
+
+    for (int i = 0; i < threads_num; ++i) {
+        cpu_exec_threads[i]->interrupt();
+        delete cpu_exec_threads[i];
+    }
+
+    delete [] cpu_exec_threads;
 //    while (true) {
 //        Packet *p = Packet::create_fake_packet();
 //        p->save_payload();
@@ -165,12 +190,18 @@ bool Nids::start_monitor_gpu(const char *interface, int device_num, WINDOW_TYPE 
     // open pcap session
     handle = pcap_open_live(interface, 8192, 1, 0, errbuf);
     if (handle == NULL) {
-        BOOST_LOG_TRIVIAL(debug) << "pcap_open_live() failed";
+        BOOST_LOG_TRIVIAL(error) << "pcap_open_live() failed";
         BOOST_LOG_TRIVIAL(trace) << "End - Nids::start_monitor";
         return false;
+    } else {
+        BOOST_LOG_TRIVIAL(debug) << "pcap_open_live() success";
     }
 
     int res = pcap_loop(handle, 0, packet_received, reinterpret_cast<u_char *>(this));
+    BOOST_LOG_TRIVIAL(debug) << "pcap_loop() returned: " << res;
+
+    pcap_close(handle);
+    handle = NULL;
 
 //    while (true) {
 //        Packet *packet = Packet::create_fake_packet();
@@ -197,7 +228,6 @@ bool Nids::list_cuda_devices(vector<cudaDeviceProp> &device_properties)
 bool Nids::stop_monitor()
 {
     pcap_breakloop(handle);
-    handle = NULL;
     state = IDLE;
 }
 
@@ -632,6 +662,44 @@ void process_on_cpu_callable::operator ()(Nids *nids)
                 nids->process_result();
         }
     } catch (boost::thread_interrupted e) {
-        cout << "thread interrupted" << endl;
+        BOOST_LOG_TRIVIAL(info) << "thread interrupted" << endl;
     }
+}
+
+void Nids::set_log_level(LOG_LEVEL level)
+{
+//    logging::init_log_to_file
+//        (
+//            "my_nids.log",
+//            keywords::filter = flt::attr< logging::trivial::severity_level >("Severity") >= logging::trivial::trace,
+//            keywords::auto_flush = true
+//        );
+
+    logging::trivial::severity_level slevel;
+
+    switch (level) {
+    case TRACE:
+        slevel = logging::trivial::trace;
+        break;
+    case INFO:
+        slevel = logging::trivial::info;
+        break;
+    case DEBUG:
+        slevel = logging::trivial::debug;
+        break;
+    case WARNING:
+        slevel = logging::trivial::warning;
+        break;
+    case ERROR:
+        slevel = logging::trivial::error;
+        break;
+    case FATAL:
+        slevel = logging::trivial::fatal;
+        break;
+    }
+
+    logging::core::get()->set_filter
+       (
+           flt::attr< logging::trivial::severity_level >("Severity") >= slevel
+       );
 }

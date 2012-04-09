@@ -2,6 +2,7 @@
 #define GANIDSMAINWINDOW_H
 
 #include <QMainWindow>
+#include <QElapsedTimer>
 #include "nids.h"
 #include "capturethread.h"
 
@@ -28,6 +29,9 @@ private slots:
 
     void on_button_stop_clicked();
 
+protected:
+    void timerEvent(QTimerEvent *event);
+
 private:
     Ui::GanidsMainWindow *ui;
 
@@ -42,12 +46,21 @@ private:
     void start_cpu_capture_thread(const char *interface_name, int threads_num);
     void stop_capture_thread();
 
+    void lock_ui_for_capture();
+    void unlock_ui();
+
     void show_message_cuda_device_not_selected();
     void show_message_interface_not_selected();
 
     CaptureThread *nids_capture_thread;
     Nids nids;
+
     bool gpu_enabled;
+
+    int timer_id;
+    QElapsedTimer el_timer;
+    qint64 capture_start_time;
+    long bytes_received;
 };
 
 #endif // GANIDSMAINWINDOW_H

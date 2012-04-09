@@ -53,7 +53,7 @@ Packet *Packet::create_packet(const u_char *raw_packet)
         const ip *ip_packet = reinterpret_cast<const ip *>(raw_packet + sizeof(*ether));
         if (ip_packet->ip_p == IPPROTO_TCP) {
             const int ip_header_size = IP_HL(ip_packet) * 4;
-            BOOST_LOG_TRIVIAL(info) << "ip header size: " << ip_header_size;
+            BOOST_LOG_TRIVIAL(trace) << "ip header size: " << ip_header_size;
             const tcphdr *tcp_header = reinterpret_cast<const tcphdr *>(raw_packet + sizeof(*ether) + ip_header_size);
             Packet *p = new Packet(ip_packet->ip_src, ip_packet->ip_dst, ntohs(tcp_header->source), ntohs(tcp_header->dest));
             sequence32 &route = p->get_route();
@@ -79,9 +79,9 @@ Packet *Packet::create_packet(const u_char *raw_packet)
             route.push_back(ntohs(tcp_header->dest));
 
             const int tcp_header_size = tcp_header->doff;
-            BOOST_LOG_TRIVIAL(info) << "tcp header size: " << tcp_header_size;
+            BOOST_LOG_TRIVIAL(trace) << "tcp header size: " << tcp_header_size;
             p->payload_size = ntohs(ip_packet->ip_len) - ip_header_size - tcp_header_size;
-            BOOST_LOG_TRIVIAL(info) << "payload size: " << p->payload_size;
+            BOOST_LOG_TRIVIAL(trace) << "payload size: " << p->payload_size;
             p->payload_offset = static_cast<int>(reinterpret_cast<const u_char *>(tcp_header) - raw_packet) + tcp_header_size;
             p->raw_packet = raw_packet;
 

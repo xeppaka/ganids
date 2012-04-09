@@ -1,3 +1,4 @@
+#include <QMessageBox>
 #include "ganidsmainwindow.h"
 #include "ui_ganidsmainwindow.h"
 
@@ -5,12 +6,16 @@ GanidsMainWindow::GanidsMainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::GanidsMainWindow),
     gpu_enabled(false),
-    nids_capture_thread(NULL)
+    nids_capture_thread(NULL),
+    timer_id(0)
 {
     ui->setupUi(this);
 
+    nids.set_log_level(DEBUG);
+
     update_network_interfaces();
     update_cuda_devices();
+    el_timer.start();
 }
 
 GanidsMainWindow::~GanidsMainWindow()
@@ -21,13 +26,24 @@ GanidsMainWindow::~GanidsMainWindow()
         delete nids_capture_thread;
         nids_capture_thread = NULL;
     }
+
+    if (timer_id)
+        killTimer(timer_id);
+
     delete ui;
 }
 
 void GanidsMainWindow::on_button_start_clicked()
 {
+    QString interface = ui->combo_interfaces->currentText();
+    if (interface.length() <= 0) {
+        show_message_interface_not_selected();
+        return;
+    }
+
+    QByteArray ba = interface.toLocal8Bit();
+
     if (gpu_enabled) {
-        QString interface = ui->combo_interfaces->currentText();
         int cudaNum = ui->combo_cuda_devices->currentIndex();
 
         if (cudaNum < 0) {
@@ -35,12 +51,6 @@ void GanidsMainWindow::on_button_start_clicked()
             return;
         }
 
-        if (interface.length() <= 0) {
-            show_message_interface_not_selected();
-            return;
-        }
-
-        QByteArray ba = interface.toLocal8Bit();
         WINDOW_TYPE window_type;
         int flush_buffer_size = 0;
         int flush_time = 0;
@@ -55,7 +65,17 @@ void GanidsMainWindow::on_button_start_clicked()
         }
 
         start_gpu_capture_thread(ba.data(), cudaNum, window_type, flush_buffer_size, flush_time);
+    } else {
+        int num_threads = ui->spin_threads->value();
+
+        start_cpu_capture_thread(ba.data(), num_threads);
     }
+
+    bytes_received = 0;
+
+    lock_ui_for_capture();
+    timer_id = startTimer(1000);
+    capture_start_time = el_timer.elapsed();
 }
 
 void GanidsMainWindow::on_check_gpu_toggled(bool checked)
@@ -127,19 +147,54 @@ void GanidsMainWindow::start_cpu_capture_thread(const char *interface_name,
 void GanidsMainWindow::stop_capture_thread()
 {
     nids_capture_thread->stop();
-    nids_capture_thread->wait(5000);
+    nids_capture_thread->wait(10000);
     if (!nids_capture_thread->isFinished()) {
         nids_capture_thread->terminate();
         nids_capture_thread->wait(5000);
     }
 }
 
+void GanidsMainWindow::lock_ui_for_capture()
+{
+    ui->button_start->setEnabled(false);
+    ui->button_stop->setEnabled(true);
+    ui->group_cpu_settings->setEnabled(false);
+    ui->group_gpu_settings->setEnabled(false);
+    ui->combo_cuda_devices->setEnabled(false);
+    ui->combo_interfaces->setEnabled(false);
+    ui->check_gpu->setEnabled(false);
+    ui->check_load->setEnabled(false);
+    ui->check_save->setEnabled(false);
+}
+
+void GanidsMainWindow::unlock_ui()
+{
+    ui->button_start->setEnabled(true);
+    ui->button_stop->setEnabled(false);
+    if (ui->check_gpu->isChecked()) {
+        ui->group_gpu_settings->setEnabled(true);
+        ui->combo_cuda_devices->setEnabled(true);
+    }
+    else
+        ui->group_cpu_settings->setEnabled(true);
+    ui->combo_interfaces->setEnabled(true);
+    ui->check_gpu->setEnabled(true);
+    ui->check_load->setEnabled(true);
+    ui->check_save->setEnabled(true);
+}
+
 void GanidsMainWindow::show_message_cuda_device_not_selected()
 {
+    QMessageBox mb("Information", "CUDA device is not selected. You should select CUDA device from the list.",
+                   QMessageBox::Information, QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton, this);
+    mb.exec();
 }
 
 void GanidsMainWindow::show_message_interface_not_selected()
 {
+    QMessageBox mb("Information", "Network interface is not selected. You should select network interface from the list.",
+                   QMessageBox::Information, QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton, this);
+    mb.exec();
 }
 
 void GanidsMainWindow::on_check_save_toggled(bool checked)
@@ -171,7 +226,23 @@ void GanidsMainWindow::on_button_stop_clicked()
     if (nids_capture_thread) {
         stop_capture_thread();
 
-        delete nids_capture_thread;
-        nids_capture_thread = NULL;
+//        if (nids_capture_thread->isFinished())
+//            delete nids_capture_thread;
+//        nids_capture_thread = NULL;
     }
+
+    if (timer_id)
+        killTimer(timer_id);
+
+    unlock_ui();
+}
+
+void GanidsMainWindow::timerEvent(QTimerEvent *event)
+{
+    qint64 cur_time = el_timer.elapsed();
+    ui->stat_packets_received->setText(QString("%1").arg(nids.num_packets));
+    ui->stat_tcpip->setText(QString("%1").arg(nids.num_tcp_ip_packets));
+    ui->stat_avg_load->setText(QString("%1").arg(nids.num_bytes / (cur_time - capture_start_time) / 1000.0));
+    ui->stat_cur_load->setText(QString("%1").arg((nids.num_bytes - bytes_received) / 1048576.0));
+    bytes_received = nids.num_bytes;
 }
