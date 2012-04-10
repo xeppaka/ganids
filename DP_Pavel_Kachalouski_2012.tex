@@ -20,10 +20,31 @@
 % \iflanguage{czech}{\renewcommand*{\acronymname}{Seznam pou{\v z}it{\' y}ch zkratek}}{}
 % \makeglossaries
 
-% \usepackage{listings}
-% \usepackage{color}
+\usepackage{listings}
+\usepackage{color}
 
-% \definecolor{textbg}{RGB}{195,195,195}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{lightgray}{rgb}{0.93,0.93,0.93}
+
+\lstset{frame=none,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+	backgroundcolor=\color{lightgray},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=3
+}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % EDIT THIS
@@ -58,6 +79,7 @@ In short it works as follows: you have a computer system. Your computer system i
 \centering
 \includegraphics[scale=0.5]{images/Typical_NIDS.png}
 \caption{Typical NIDS scenario.}
+\label{fig:typical_nids}
 \end{figure}
 Intrusion detection systems fall into two categories:
 \begin{itemize}
@@ -69,12 +91,14 @@ Such types of detection systems are run on the system being monitored and determ
 There are also more recent type of intrusion detection system which reside in the kernel of operation system and monitor on low-level system activity.
 
 Most modern network intrusion detection and prevention systems use a set of rules that are compared to incoming and outcoming packets. Usually, a rule consists of a filter based on packet header information, a data that should be contained in the packet payload and an associated action that is taken in case filter and payload matching conditions are met.
-Matching payload signatures is a resource-intensive process, accounting for about 75\% of the total CPU processing time of modern Network Intrusion Detection systems. The reason why is it so intensive is in the fact that most of the time, every byte of every network packet should be processed as a part of data searching algorithm that searches for matches along a large set of rules that apply for particular packet. As an example, most widely used open-source NIDS Snort has rule set with about 10000 strings. Searching every packet for all of this strings needs a lot of resources. With increasing number of internet-based attacks rules datasets grow every year creating additional load on NIDS systems. In the figure 1.2 is shown a general trend of the number of web-based attacks on web servers taken from Symantec Corporation report[TODO:add number].
+Matching payload signatures is a resource-intensive process, accounting for about 75\% of the total CPU processing time of modern Network Intrusion Detection systems. The reason why is it so intensive is in the fact that most of the time, every byte of every network packet should be processed as a part of data searching algorithm that searches for matches along a large set of rules that apply for particular packet. As an example, most widely used open-source NIDS Snort has rule set with about 10000 strings. Searching every packet for all of this strings needs a lot of resources. 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.3]{images/web-attacks.png}
 \caption{Average Web-based attacks per day, by month, 2009-2010. Source: Symantec Corporation.}
+\label{fig:symantec_report}
 \end{figure}
+With increasing number of internet-based attacks rules datasets grow every year creating additional load on NIDS systems. Figure \ref{fig:symantec_report} shows a general trend of the number of web-based attacks on web servers taken from Symantec Corporation report.
 
 The other source of high load on NIDS is constant grow of networks speeds. In the past 6 years, computer networks were characterized by a steady increase in the transfer rate, complexity and number of networked users. In 2009 the Internet traffic growth all over the world amounted to 40-50 \%, and according to Cisco company forecast [TODO:add number] global IP traffic will increase in the next 5 years, reaching by 2015 about 1 zettabyte of data transferred during one year.
 
@@ -115,13 +139,14 @@ In additional, the software should fulfill the following requirements:
 
 \section{Project overview}
 
+The general application workflow is shown in the figure \ref{fig:app_workflow}.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.4]{images/workflow.png}
 \caption{Application workflow.}
+\label{fig:app_workflow}
 \end{figure}
 
-The general application workflow is shown in the figure [TODO: add number].
 The main stages of the workflow:
 \begin{itemize}
 \item \textbf{Packet capture}. Application captures traffic on one of the network interfaces for later analysis. Raw packet should be obtained from network for full analysis of route information on the next stage.
@@ -139,20 +164,46 @@ The vast majority of network cards, support what is known as promiscuous mode or
 
 If promiscuous mode or monitor mode is enabled, network card passes all packets captured from the network to the operating system, even if they are not addressed to the system. Operating system later manages, using the packet filter engine, how to distribute packets to the applications. In the Unix-like systems, root privileges are required to enable promiscuous and monitor operation mode. Sniffer techniques rely on this functionality to do its job.
 
-It is important to remark that capturing packets from a network is highly dependent of the type of the network used and of the topology and configuration of the network. Clear examples of this fact can be found in LAN (Local Area Network) networks based on the IEEE 802.XX (physical and link layer protocols) protocol macro-family, for instance in the IEEE 802.3 [9] protocol based networks, also known as Ethernet networks, and in the IEEE 802.11[10] based networks, so-called Wifi or Wireless networks. In the following subsections some details over sniffing on both network types are exposed.
+It is important to remark that capturing packets from a network is highly dependent of the type of the network used and of the topology and configuration of the network. Clear examples of this fact can be found in LAN (Local Area Network) networks based on the IEEE 802.XX (physical and link layer protocols) protocol macro-family, for instance in the IEEE 802.3 protocol based networks, also known as Ethernet networks, and in the IEEE 802.11 based networks, so-called Wifi or Wireless networks. In the following subsections some details over sniffing on both network types are exposed.
 
-\subsection{IEEE 802.3 sniffing details.}
-In a typical IEEE 802.3 LAN network, a star topology is used, so all the nodes in the network are connected (through their own cable) to either a hub or a switch. 
+\subsection{Packet capture in IEEE 802.3 networks.}
+In a typical IEEE 802.3 LAN network, a star topology is used, so all the nodes in the network are connected (through their own cable) to either a hub or a switch.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.45]{images/IEEE802_3_LAN.png}
+\caption{IEEE 802.3 networks usually use star topology.}
+\label{fig:ieee802.3star_topology}
+\end{figure}
+
 Hubs are basically repeaters: packets coming from a certain port are retransmitted over the rest of the ports.
 Switches instead, only send packets to the port where the destination host is connected, by previously identifying all the hosts connected to each port. Switched networks have better performance than not switched networks. Switches may perform other actions over traffic, such as filtering based on different protocol fields (link, network, transport and application protocol fields, depending on the switch), but this is beyond the scope of this thesis.
 That means that if a switched network is used, only packets flowing to or from the particular host running the sniffer or broadcast packets will be captured. Several techniques have been used to overcome this problem:
 \begin{itemize}
 \item Using a hub: an obvious but bad solution is to use hubs instead of switches. It is not a valid solution as its performance is very reduced compared to switched networks and their production is practically discontinued.
-\item Placing the sniffer in the gateway links as a bridge/router: this technique is widely used and has the advantage of being able to sniff packets from a lot of sub-networks by only placing one network tap. The disadvantage is that only traffic going through that link is captured, so internal traffic (between nodes in the same subnetwork or between different sub-networks) is not captured, which in some cases, like data centers for instance, is very relevant. In those cases the only solution is to use distributed sniffers, port mirroring or a combination of both of them. Figure 2.3 illustrates this technique with an example.
-\item Switch port mirroring: some switches have what is called port mirroring or monitoring port 2 . If port mirroring is enabled, a copy of all the packets flowing in the switched are transmitted to the mirroring port selected. On networks formed by several switches, obtaining packets in a single host is more complex, and may require to use advanced switch capabilities like Cisco’s RSPAN or combine them with a distributed sniffer.
-\item Distributed sniffer: distributed sniffers use a software based architecture to collect traffic in several network taps (hosts), and combine them to obtain them in a unique host. The main advantages of this type of systems are their scalability and flexibility. The drawbacks of this kind of systems are that distributed network sniffers have less performance than port mirroring due to overhead introduced by software architecture and the increase of network traffic. The figure 2.5 shows graphically the structure of a distributed sniffer platform.
+\item Placing the sniffer in the gateway links as a bridge/router: this technique is widely used and has the advantage of being able to sniff packets from a lot of sub-networks by only placing one network tap. The disadvantage is that only traffic going through that link is captured, so internal traffic (between nodes in the same subnetwork or between different sub-networks) is not captured, which in some cases, like data centers for instance, is very relevant. 
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.6]{images/gateway_sniffering.png}
+\caption{Sniffering traffic in the gateway links.}
+\label{fig:gateway_sniffering}
+\end{figure}
+In those cases the only solution is to use distributed sniffers, port mirroring or a combination of both of them. Figure \ref{fig:gateway_sniffering} illustrates this technique with an example.
+\item Switch port mirroring: some switches have what is called port mirroring or monitoring port 2. If port mirroring is enabled, a copy of all the packets flowing in the switched are transmitted to the mirroring port selected. On networks formed by several switches, obtaining packets in a single host is more complex, and may require to use advanced switch capabilities like Cisco’s RSPAN or combine them with a distributed sniffer.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.6]{images/mirror_sniffering.png}
+\caption{Sniffering traffic using switch port mirroring.}
+\label{fig:mirror_sniffering}
+\end{figure}
+\item Distributed sniffer: distributed sniffers use a software based architecture to collect traffic in several network taps (hosts), and combine them to obtain them in a unique host. The main advantages of this type of systems are their scalability and flexibility. The drawbacks of this kind of systems are that distributed network sniffers have less performance than port mirroring due to overhead introduced by software architecture and the increase of network traffic. The figure \ref{fig:distributed_sniffering} shows graphically the structure of a distributed sniffer platform.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.6]{images/distributed_sniffering.png}
+\caption{Distributed sniffer.}
+\label{fig:distributed_sniffering}
+\end{figure}
 \end{itemize}
-\subsection{IEEE 802.11 sniffing details.}
+\subsection{Packet capture in IEEE 802.11 networks.}
 IEEE 802.11 based networks share access medium, so it may be easier than IEEE 802.3 switched networks to capture packets, as having a network card being able to be set to promiscuous mode (actually monitor mode) is all the hardware required.
 Nevertheless, some considerations have to be kept in mind. When placing a sniffer in a wireless network, some packets or even all the packets sent by a certain host may be lost, due to environment conditions (shadowing) and the physical position of the sniffer host and the other hosts in the network (attenuation due to propagation). IEEE 802.11 networks made up by several access points may increase capturing problems, due to the larger coverage area (and therefore the higher reception antenna gain needed when using a unique sniffer host).
 Some approaches to solve these problems are:
@@ -195,9 +246,9 @@ Statistical information and pattern extraction is a big field in network analysi
 Obtaining interesting statistics over network traffic is widely used primarily in monitoring platforms. Average number of connections to a certain hosts, average inbound and outbound throughputs, transport and application layer protocol distribution, time distribution of connections to servers, time distribution of average network throughput are some examples. These statistics can also be applied for other purposes rather tan monitoring and network management, like security or marketing purposes (specially application level statics).
 
 On the other hand, statistical pattern recognition or statistical pattern extraction is an extensive area related to network traffic analysis. They are applicable to security and
-marketing fields. Due to the extension of this field and complexity, further information is given in the 2.2.2.2 section. Rule based (signature based) analysis and policies are all the analysis that inspect traffic searching packets that match a certain rule or signature. Rules or signatures are defined as values of certain headers fields or a combination of several values of certain headers fields. Rules may also define adequate field value intervals or thresholds. Rule based analysis is also frequently called signature pattern matching. There is quite a confusing usage of the term pattern over the network analysis literature, and particularly in network intrusion detection analysis literature: while some authors use the word pattern to designate statistical patterns (statistical user behaviour patterns, statistical usage patterns in general) like W.S. Chen in [31] or Yung Wang in [32], some others like Richard Bejtlich in several books like [33] use them to refer as rule based analysis. In this thesis be are going to refer to patterns as statistical patterns only. Rule based analysis techniques are used above all for security purposes and specially in signature based intrusion detection systems (NIDS), like Snort. Threshold rules are commonly used in security (for instance to detect DoS attacks and other resource abuse attacks) and also for network management purposes like for example in network link load monitoring.
+marketing fields. Due to the extension of this field and complexity, further information is given in the 2.2.2.2 section. Rule based (signature based) analysis and policies are all the analysis that inspect traffic searching packets that match a certain rule or signature. Rules or signatures are defined as values of certain headers fields or a combination of several values of certain headers fields. Rules may also define adequate field value intervals or thresholds. Rule based analysis is also frequently called signature pattern matching. There is quite a confusing usage of the term pattern over the network analysis literature, and particularly in network intrusion detection analysis literature: while some authors use the word pattern to designate statistical patterns (statistical user behaviour patterns, statistical usage patterns in general) like W.S. Chen in or Yung Wang in, some others like Richard Bejtlich in several books like use them to refer as rule based analysis. In this thesis be are going to refer to patterns as statistical patterns only. Rule based analysis techniques are used above all for security purposes and specially in signature based intrusion detection systems (NIDS), like Snort. Threshold rules are commonly used in security (for instance to detect DoS attacks and other resource abuse attacks) and also for network management purposes like for example in network link load monitoring.
 
-In this sense, rules could be considered as policies, as certainly define the type and amount of traffic permitted and not permitted in the network. Flow based analysis techniques are focused in the treatment of network traffic as flows, as most information exchanged in a computer network is session or connection oriented and not packet oriented, so analysis can take advantage of it. A clear example of a typical network flow is a TCP connection, where data exchanged is ruled by the TCP state machine[26].
+In this sense, rules could be considered as policies, as certainly define the type and amount of traffic permitted and not permitted in the network. Flow based analysis techniques are focused in the treatment of network traffic as flows, as most information exchanged in a computer network is session or connection oriented and not packet oriented, so analysis can take advantage of it. A clear example of a typical network flow is a TCP connection, where data exchanged is ruled by the TCP state machine.
 Their main applications are in the monitoring and security field. Regarding security, most NIDS like Snort, use flow based analysis techniques to detect possible threats, based on anomalies and well known attacks. Monitoring platforms on the other hand, inspect network traffic in search of flows, to generally list them or represent them in a diagram.
 
 \textbf{Advanced statistical and signal processing techniques applied to the network traffic analysis.}
@@ -205,16 +256,16 @@ Since early 1990’s, researchers all over the world have devoted some of their 
 signature based NIDS have the obvious drawback that rulesets have to be frequently updated. Platforms or applications that use statistical techniques for the network intrusion de-
 tection are known as Statistical Network Intrusion Detection Systems or alternately Behaviour based Network Intrusion Detection Systems. This kind of NIDS rely on advanced statistical techniques, heuristic pattern extraction and signal processing to detect anomalies and classify network traffic.
 
-Y. Wang exposes in his book [32] a general and up to date state-of-the-art of most reliable statistical techniques in the field of statistical network intrusion detection. There
+Y. Wang exposes in his book a general and up to date state-of-the-art of most reliable statistical techniques in the field of statistical network intrusion detection. There
 is also an extensive set of publications from researchers over new statistical and signal processing techniques applied to network intrusion detection. Some of the techniques
 are briefly introduced here.
 
 \textbf{Linear and Nonlinear modeling methods.}
-Significance tests, like χ2 (chi-square) test and t-test have been proposed for a simple network intrusion detection, examining frequency difference between two categorical variables and differences between two continuous variables respectively. Linear methods like logistic models, regression models, principal component analysis or clustered based analysis are some of the main methods suitable to use complex statistical modeling techniques to examine user behaviour based on network traffic data. 
+Significance tests, like $\chi^2$ (chi-square) test and t-test have been proposed for a simple network intrusion detection, examining frequency difference between two categorical variables and differences between two continuous variables respectively. Linear methods like logistic models, regression models, principal component analysis or clustered based analysis are some of the main methods suitable to use complex statistical modeling techniques to examine user behaviour based on network traffic data. 
 Non linear methods are fundamentally based in AI (artificial intelligence) algorithms like Artificial neural networks, Fuzzy logic algorithms and K-nearest neighbour algorithms have also been found effective for aiding network intrusion detection decisions.
 
 \textbf{Bayesian and probability approaches.}
-Bayesian and probability approaches assume that parameters that are being studied are random rather than fixed parameters. Before looking at the current data, old information can be used to construct a prior distribution model for these parameters and therefore classify new data based on how likely various values of the unknown parameters are, and then make use of the current data to revise this starting assessment so that parameters can be considered random, not fixed. This attribute allows an intrusion detection systems to make a more precise decision based on the probability approach. Latent class model based analysis like proposed in Wang, Kim, Mbateng and Ho [34] or Bayes role based analysis like proposed by Barbard, Wu and Jajodia [35] are some examples of Bayesian and probability approaches.
+Bayesian and probability approaches assume that parameters that are being studied are random rather than fixed parameters. Before looking at the current data, old information can be used to construct a prior distribution model for these parameters and therefore classify new data based on how likely various values of the unknown parameters are, and then make use of the current data to revise this starting assessment so that parameters can be considered random, not fixed. This attribute allows an intrusion detection systems to make a more precise decision based on the probability approach. Latent class model based analysis like proposed in Wang, Kim, Mbateng and Ho or Bayes role based analysis like proposed by Barbard, Wu and Jajodia are some examples of Bayesian and probability approaches.
 
 \section{Intrusion detection.}
 Intrusion detection is a process of detection undesired traffic on a network or device. An Intrusion Detection System is a combination of a physical device with a software which monitors network traffic in order to detect undesired activity and traffic that violates security policies. Different IDS tools are able also to store event information into log for later review or combine events with other information to make decisions about policies and losses. More functionalities provide IPS that can prevent or stop undesired traffic.
@@ -266,24 +317,31 @@ The intrusion detection market began to gain in popularity and truly generate re
 Currently, market statistics show that IDS is amidst the top selling security vendor technologies and should continue to rise. Furthermore, government initiatives, such as the Federal Intrusion Detection Network, (FIDNet) created under Presidential Decision Directive 63, are also adding impetus to the evolution of IDS. Advancements in IDS will ultimately push security technology into a whole new arena of automated security intelligence.
 
 \section{GPUs}
-Graphical processor units commonly referred to them as GPUs and occasionally called visual processing units or VPUs, are a specialized type of processors that its purpose is to offload 3D graphics rendering from the microprocessor or CPU. The history of GPUs started in 1970s, where ANTIC and CTIA chips provided for hardware control of mixed graphics and text mode on Atari 8-bit computers. The ANTIC chip was a special purpose processor, that mapped text and graphics data to the video output.
+GPU is a graphical processor unit sometimes also called visual processing unit or VPU, is a specialized type of processor that is responsible to render 3D graphics and offload this procedure from the micriprocessor or CPU. GPU history starts in 1970s, when ANTIC and CTIA chips were provided for hardware control of mixed graphics and text mode on Atari 8-bit computers. The ANTIC chip was a special purpose processor, that was responsible for mapping graphics and text data to the video output.
 
-Later, in 1984 the IBM Professional Graphics Controller appeared as one of the first 2D/3D graphics accelerators available for the IBM PC architecture compatible systems. IBM’s chip did not succeed, due to the lack of compatibility with already existing programs and due to its high price. The first mass-market computer to include a dedicated graphics processor was the Commodore Amiga, that was launched in 1985. The dedicated graphics processor from Amiga was the first full graphics accelerator as offloaded practically all video operations from the CPU.
+Later, in 1984 the IBM Professional Graphics Controller appeared as one of the first 2D/3D graphics accelerators available for the IBM PC architecture compatible systems. IBM’s chip did not succeed, due to the lack of compatibility with already existing programs and due to its high price. Commondore Amiga was the first mass-market computer which included a dedicated graphics processor launched in 1985. Amiga's graphic processor was the first full graphics accelerator that offloaded practically all video operations from th CPU.
 
-By the time, IBM’s 8514 graphics system was the first PC video cards to implement 2D primitives in hardware. In 1991, S3 manufacturer introduced the S3 86C911 to the market, which claimed to be the first single-chip graphics card to implement 2D acceleration functions in hardware. The rest of the manufacturers followed the 86C911 model, and by 1995, all major PC graphics processor vendors had added 2D hardware acceleration support to their chips. During the first half of 1990s decade, CPU based real-time 3D graphics were becoming increasingly significant, specially in the CAD (Computer Aided Design) field and specially in computer video games. As video games gained popularity, and the consequent increasing demand of 3D hardware acceleration, graphics manufacturers started the development of 2D and 3D graphics accelerators. This milestone was reached with the launch of Verite V1000 chip in 1996 by Rendition.
+The first graphics system that implemented 2D primirives in hardware was the IBM's 8514 PC video card. In 1991, S3 manufacturer introduced the S3 86C911 to the market, which claimed to be the first single-chip graphics card to implement 2D acceleration functions in hardware. Other manufacturers followed the 86C911 model, and in 1995 all graphics card vendors has added 2D hardware acceleration support to their chips. In the first half of 1990s real-time 3D graphics became very significant, because of developing CAD (Computer Aided Design) systems and especially due to video games. Video games became more and more popular and as a result of growing demand on 3D hardware acceleration graphics processor vendors started to develop 2D and 3D graphics accelerators. Launching in 1996 the Verite V1000 chip by Rendition a new level of 3D acceleration was reached. This chip was the first consumer 3D accelerator cards truly capable of delivering playable performance with significantly improved graphics quality.
 
-During the second half of 1990s decade, and thanks to the increasingly success of 3D graphic programs, fundamentally video games, several manufacturers appeared to compete over the GPU market. By the end of 1990s, manufacturers leaders were 3dfx, ATI and NVIDIA. NVIDIA launched the Geforce 256 in 1999 being the first card on the market with hardware transform and lighting capabilities, adopting new hardware solutions that set the precedence for future designs like pixel shaders and vertex shaders. 
+In the second half of 1990s only several manufacturers appeared to compete over the GPU market and by the end of 1990s, manufacturers leaders were NVIDIA, ATI and 3dfx. In 1999 NVIDIA launched Geforce 256 which was the first card on the market supported hardware transormations and lighting capabilities. 
 
-During the early 2000s, thanks to the OpenGL API, a multiplatform and multilanguage API that was created in 1992 by Silicon Graphics Inc. to help programmers draw 3D images, and new the hardware architectures that allowed each image pixel be processed by a short program that could include additional image textures as inputs and geometric vertex be processed similarly, 3D applications experienced a major graphical capability improvement.The first device that supported vertex shaders programming was the NVIDIA’s Geforce 3. In 2000 3dfx was acquired by NVIDIA. From that point to the present, the market of high performance GPU chips has been dominated by NVIDIA on one hand, with an estimated market-share of 63.46\% in October of 2009 according to [38], and ATI, with and estimated of 28.97\% of market-share according to [38] at the same date. 
+In the early 2000s, the OpenGL API appeared. It is a multiplatform and multilanguage API that was created in 1992 by Silicon Graphics Inc. to help programmers draw 3D images. Due to the new API and new hardware architectures that allowed to process each pixel by a short program which is able to include additional textures as inputs and geometric vertex be processed in a similar way, 3D software got a huge capability improvement. NVIDIA's Geforce 3 was the first device that supported vertex shaders programming. In 2000 NVIDIA bought 3dfx and from that point to present, the market of high perfomance GPU is dominated by NVIDIA on one side, with an estimated market share of 59.4\% in June 2011 according to [TODO: add source], and ATI, with an estimated 40.6\% of market share.
 
-The latest chips of NVIDIA are the G80 and G90 chip family (Geforce 8 and 9 ) generation. Recently NVIDIA has published a new architecture for the CUDA enabled chips with the code name Fermi[39], which will have 512 cores integrated in the chip, as well as bigger L1 and L2 cache memory sizes and memory error correction among others, making it more suitable for general purpose computing. For his part ATI has developed Radeon 5000 family, with the Evergreen graphic chipsets.
+The latest chips of NVIDIA are the GF119 and GF110 chip family (Geforce 500 and 600 series) generation. Recently NVIDIA has published a new architecture for the CUDA enabled chips with the code name Kepler, which has 1536 CUDA cores in the entire GPU. For his part ATI has developed Radeon 7000 family, with the Tahiti graphic chipsets.
 
 \subsection{GPGPU: general-purpose computing on graphics processing units.}
-GPGPU stands for General-Purpose Computing on Graphics Processing Units. Since 2003, several researchers like Harris, Mark J., William V. among others [40], outlined that current architecture of high performance GPUs in terms of FLOPS (FLoating-point Operations Per Second), with programmable fragment and vertex shaders that enabled the programmers to create more realistic and complex graphics, could be used for other purposes rather than graphic calculations.
+GPGPU stands for General-Purpose Computing on Graphics Processing Units. Since 2003, several researchers like Harris, Mark J., William V. among others, outlined that current architecture of high performance GPUs in terms of FLOPS (FLoating-point Operations Per Second), with programmable fragment and vertex shaders that enabled the programmers to create more realistic and complex graphics, could be used for other purposes rather than graphic calculations.
 
 The motivation of GPGPU was performance improving of computing algorithms, and particularly to overcome limitations of traditionally CPU based computing: the instruction-level parallelism wall and the memory wall. On one hand, although GPUs architecture offer a limited set of operations to be performed over data, they have the ability to process many of them in parallel, thanks fundamentally to the programmable shaders that were added to the GPU processor’s pipelines. GPUs are able to compute many vertices or fragments of graphics in the same way in so-called streams. A stream is simply a set of elements that require similar computation, providing data parallelism, and kernels are the functions that are applied to each element in the stream.
 
-In the other hand, the usage of graphical processor units have another important advantage over traditionally computing CPU based model; its memory bandwidth. In the last decade the gap between CPU and memory speed have kept growing, and thus memory latency has become a major bottleneck in CPU computing, specially in applications with an intensive usage of memory. The evolution of theoretical single precision floating point operations (FLOPS) [2] for both Intel based CPU processors and NVIDIA based GPU processors is shown in the figure 2.10. 
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.45]{images/cpuvsgpu.png}
+\caption{GPU vs. CPU processor FLOPS performance gap.}
+\label{fig:cpuvsgpu}
+\end{figure}
+
+In the other hand, the usage of graphical processor units have another important advantage over traditionally computing CPU based model; its memory bandwidth. In the last decade the gap between CPU and memory speed have kept growing, and thus memory latency has become a major bottleneck in CPU computing, specially in applications with an intensive usage of memory. The evolution of theoretical single precision floating point operations (FLOPS) for both Intel based CPU processors and NVIDIA based GPU processors is shown in the figure \ref{fig:cpuvsgpu}. 
 
 First attempts of using GPUs with other purposes rather than graphics, required to transform or convert complex algorithms and data into a graphics, to be able to use the GPU through graphics libraries (like OpenGL) to solve them and later revert the transformation. 
 
@@ -298,15 +356,43 @@ CUDA has become widely used in many areas such as physics simulations, scientifi
 The CUDA SDK allows programmers to code parts or functions of a general purpose program to be executed in the GPU using C language with some extensions. The main three key abstractions that are exposed to the programmer as the C extensions are: a hierarchy of thread groups, shared memories and thread barrier synchronization. CUDA programmers have to partition the algorithms or parts of the code that are going to be boosted using the GPU into coarse sub-problems that can be solved independently in parallel, and then into smaller pieces that can be solved cooperatively in parallel. Functions executed into the GPU are called kernels, the rest of the code, and particularly
 high control intensive parts of the code, are executed on the CPU. 
 
-Kernels are functions designated with global attribute. When they are called, kernels throw a total number of N threads. To achieve a good performance in general, kernels should throw thousands of threads. Figure 2.11 show kernel’s thread organization of model. The N threads thrown by the kernel are organized in 2D array of blocks called grid 3 , each of this blocks containing a 3D array of threads. The number of threads, and their organization cannot be modified during the kernel execution. The programmer may use or not multidimensional block and grid organization according to their needs, simply not using (0 value) the dimensions not needed. 
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.45]{images/cuda_threads.png}
+\caption{CUDA thread hierarchy.}
+\label{fig:cuda_threads}
+\end{figure}
+
+Kernels are functions designated with \_global\_ attribute. When they are called, kernels throw a total number of N threads. To achieve a good performance in general, kernels should throw thousands of threads. 
+
+Figure \ref{fig:cuda_threads} show kernel’s thread organization of model. The N threads thrown by the kernel are organized in 2D array of blocks called grid, each of this blocks containing a 3D array of threads (hardware supports only 2D array at this moment). The number of threads, and their organization cannot be modified during the kernel execution. The programmer may use or not multidimensional block and grid organization according to their needs, simply not using (0 value) the dimensions not needed. 
 
 The programmer can access to the current thread block ID dimensions values with variables blockIdx.x and blockIdx.y respectively. Likewise, the programmer can access to current thread ID dimension with variables threadIdx.x, threadIdx.y and threadIdx.z respectively. The combination of blockIdx and threadIdx complex variables values identify unequivocally each thread, and are used to perform ordered data accesses and execute code conditionally depending on the thread and block IDs. Currently, CUDA based programs have the restriction of a maximum of 65536 (216) threads and the limitation of 512 threads/blocks per dimension due to current GPU architectures (Tesla architecture).
+
+\begin{figure}[h]
+\begin{lstlisting}
+__global__ void vecAdd (float *A , float *B , float *C)
+{
+	int i = threadIdx.x;
+	C[i] = A[i] + B[i];
+}
+
+int main (int argc, char *argv[])
+{
+	vecAdd<<<Nb,Nt>>>(A, B, C);
+	return 0;
+}
+
+\end{lstlisting}
+\caption{Simplified CUDA kernel and associated main() function.}
+\label{fig:cuda_threads}
+\end{figure}
 
 The code contained in the figure 2.12 shows a simplified example of a kernel call, throwing vecAdd kernel with a 1D grid organization and 1D thread block organization, throwing NB blocks, with NT threads per block. Some coding details, like memory data transfers from CPU to host are omitted for simplicity.
 
 
 \setsecnumdepth{all}
-\chapter{Analysis and design}
+\chapter{Design}
 
 \section{Developing tools and methodology.}
 The tools and programming languages selected for implementing application are:
@@ -420,7 +506,7 @@ In addition, if  \emph{output(s')  empty}, then the machine emits the set \emph{
 \end{enumerate}
 Initially, the current state of the machine is the start and the first symbol of the text string is the current input symbol. 
 
-\begin{figure}
+\begin{figure}[h]
 \textbf{Input.} A text string $x = a_1 a_2 ... a_n$ where each $a_i$ is an input symbol and a pattern matching machine M with goto function \emph{g}, failure function \emph{f}, and output function \emph{output}.\\
 \textbf{Output.} Locations at which keywords occur in x.\\
 \textbf{Method.}
@@ -441,36 +527,82 @@ Initially, the current state of the machine is the start and the first symbol of
 \label{fig:ac_search_pseudocode}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
 \textbf{Input.} Set of keywords K={$y_1$, $y_2$,..., $y_k$} \\
 \textbf{Output.} Goto function \emph{g} and a partially computed output function \emph{output}.\\
-\textbf{Method.}
+\textbf{Method.} We assume \emph{output(s)} is empty when state s is first created, and \emph{g{s, a} = fail} if \emph{a} is undefined or if \emph{g(s, a)} has not yet been defined. The procedure \emph{enter(y)} inserts into goto graph a path that spells out \emph{y}.
 \begin{algorithmic}
-\STATE $state \leftarrow 0$
-\FOR{$i=1$ to $n$}
-\WHILE{$g(state, a_i) = fail$}
-\STATE $state \leftarrow f(state)$
-\ENDWHILE
-\STATE $state \leftarrow g(state, a_i)$
-\IF{$output(state) \neq empty$}
-\PRINT i
-\PRINT $output(state)$
-\ENDIF
-\ENDFOR
+\PRINT here will be algorithm
 \end{algorithmic}
-\caption{Aho-Corasick pattern matching machine algorithm.}
-\label{fig:ac_search_pseudocode}
+\caption{Aho-Corasick goto function construction algorithm.}
+\label{fig:ac_goto_pseudocode}
 \end{figure}
 
-Figure \ref{fig:ac_search_pseudocode} shows Aho-Corasick matching machine algorithm pseudocode. Pseudocodes for construction of \textbf{Goto}, \textbf{Failure}, and \textbf{Output} are shown in figures \ref{fig:ac_goto_pseudocode}, \ref{fig:ac_fail_pseudocode}, \ref{fig:ac_output_pseudocode}.
+\begin{figure}[h]
+\textbf{Input.} Set of keywords K={$y_1$, $y_2$,..., $y_k$} \\
+\textbf{Output.} Goto function \emph{g} and a partially computed output function \emph{output}.\\
+\textbf{Method.} We assume \emph{output(s)} is empty when state s is first created, and \emph{g{s, a} = fail} if \emph{a} is undefined or if \emph{g(s, a)} has not yet been defined. The procedure \emph{enter(y)} inserts into goto graph a path that spells out \emph{y}.
+\begin{algorithmic}
+\PRINT here will be algorithm
+\end{algorithmic}
+\caption{Aho-Corasick fail function construction algorithm.}
+\label{fig:ac_fail_pseudocode}
+\end{figure}
 
+Figure \ref{fig:ac_search_pseudocode} shows Aho-Corasick matching machine algorithm pseudocode. Pseudocodes for construction of \textbf{Goto}, \textbf{Failure}, and \textbf{Output} are shown in figures \ref{fig:ac_goto_pseudocode} and \ref{fig:ac_fail_pseudocode}.
 
-\subsection*{Packet filtering based in route information.}
+\begin{figure}[h]
+\textbf{Input.} Set of keywords K={$y_1$, $y_2$,..., $y_k$} \\
+\textbf{Output.} Goto function \emph{g} and a partially computed output function \emph{output}.\\
+\textbf{Method.} We assume \emph{output(s)} is empty when state s is first created, and \emph{g{s, a} = fail} if \emph{a} is undefined or if \emph{g(s, a)} has not yet been defined. The procedure \emph{enter(y)} inserts into goto graph a path that spells out \emph{y}.
+\begin{algorithmic}
+\PRINT here will be algorithm
+\end{algorithmic}
+\caption{Aho-Corasick DFA construction algorithm.}
+\label{fig:ac_dfa_pseudocode}
+\end{figure}
 
+To be able to use Aho-Corasick algorithm with a GPU a DFA should be constructed from the previously constructed \textbf{Goto}, \textbf{Fail} and \textbf{Output} functions. The algorithm for constructing DFA is shown in a figure \ref{fig:ac_dfa_pseudocode}. In practice, algorithm shown in figure \ref{fig:ac_dfa_pseudocode} should be evaluated in conjunction with algorithm \ref{fig:ac_fail_pseudocode}. The resulting DFA is a two dimensional array. The dimensions of the array are equal to the number of states and the size of the alphabet (256 in our case) plus one position to store flag if state is \emph{output}.
 
+The algorithm for searching through DFA is similar to the regular expression's one and described in the next section.
+
+\subsection*{Regular expression pattern matching.}
+Regular expressions are compiled into a DFA by using external library. As a result a two dimensional array is obtained. Array structure is similar to Aho-Corasick DFA. The dimensions of the array are equal to the number of states and the size of the alphabet (256 in our case) plus one position to store index of the rule if current state signs that regular expression is matched. Therefore the final algorithm for searching pattern withing packet payload is shown in figure \ref{fig:dfa_search}.
+
+\begin{figure}[h]
+\textbf{Input.} Set of keywords K={$y_1$, $y_2$,..., $y_k$} \\
+\textbf{Output.} Goto function \emph{g} and a partially computed output function \emph{output}.\\
+\textbf{Method.} We assume \emph{output(s)} is empty when state s is first created, and \emph{g{s, a} = fail} if \emph{a} is undefined or if \emph{g(s, a)} has not yet been defined. The procedure \emph{enter(y)} inserts into goto graph a path that spells out \emph{y}.
+\begin{algorithmic}
+\PRINT here will be algorithm
+\end{algorithmic}
+\caption{Pattern matching DFA search.}
+\label{fig:dfa_search}
+\end{figure}
+
+\subsection*{Packet filtering based on route information.}
+Information obtained from packet header is used to select packet for analysing it payload or drop it without any analysis. During loading rules route information is stored into a trie structure as a sequence of bytes. Later, when packet is obtained from the network its route header is presented as a sequence of bytes and trie search is perfomed. If search in trie found any rule for this packet, this packet is put in a queue for a payload analysis. This approach is similar to Aho-Corasick algorithm with data saved in trie. The only difference is that to save values with range trie node may contain value ranges.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.6]{images/trie.png}
+\caption{Example of trie structure.}
+\label{fig:trie_example}
+\end{figure}
+
+Figure \ref{fig:trie_example} shows example of trie with stored IP addresses: 192.168.0.1, 192.168.1.38, 192.168.5-100.1 and 232.222.1.79. The full route sequence stored in a trie is shown in the figure \ref{fig:route_sequence}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.8]{images/route_sequence.png}
+\caption{Full route sequence extracted from packet header.}
+\label{fig:route_sequence}
+\end{figure}
+
+\subsection*{Application components.}
 Application design is divided in several components. The diagram contained in figure \ref{fig:app_architecture} show the relationship between components.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[scale=0.5]{images/app_architecture.png}
 \caption{Relation between application components.}
@@ -487,6 +619,7 @@ Application design is divided in several components. The diagram contained in fi
 \item \textbf{Database module}. Used for logging matched packets into the database.
 \end{itemize}
 
+\chapter{Implementation.}
 
 
 \setsecnumdepth{part}
