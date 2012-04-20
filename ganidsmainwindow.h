@@ -29,6 +29,10 @@ private slots:
 
     void on_button_stop_clicked();
 
+    void on_capture_finished();
+
+    void on_capture_terminated();
+
 protected:
     void timerEvent(QTimerEvent *event);
 

@@ -19,6 +19,7 @@
 #include "packet.h"
 #include "ac.h"
 #include "regex.h"
+#include "db.h"
 
 using std::string;
 using std::vector;
@@ -63,7 +64,7 @@ public:
     ~Nids();
 
     int read_rules(const char *filename);
-    bool start_monitor(const char *interface, int threads_num);
+    bool start_monitor(const char *interface, int threads_num, const char *db_filename = NULL);
     bool stop_monitor();
     bool list_interfaces(vector<string> &result);
     int packet_buffer_size() const;
@@ -71,8 +72,10 @@ public:
                            int device_num,
                            WINDOW_TYPE window_type = BUF_SIZE,
                            int buf_threshold_size = DEF_PACKET_BUFFER_SIZE,
-                           int buf_flush_time = DEF_TIME_FLUSH_BUFFER);
+                           int buf_flush_time = DEF_TIME_FLUSH_BUFFER,
+                           const char *db_filename = NULL);
     bool list_cuda_devices(vector<cudaDeviceProp> &device_properties);
+    void set_log_level(LOG_LEVEL level);
 
 //private:
 public:
@@ -95,7 +98,9 @@ public:
                                      int *task_buffer,
                                      int *out_buffer,
                                      int tasks);
-    void set_log_level(LOG_LEVEL level);
+
+    // object for database manipulations
+    Db db;
 
     // pcap handle
     pcap_t *handle;
@@ -124,9 +129,12 @@ public:
     // CPU processing
     boost::thread **cpu_exec_threads;
     queue<Packet *> packets_queue;
+    bool cpu_threads_exit;
 
     // packets number semaphore
     boost::interprocess::interprocess_semaphore packets_queue_sem;
+    // cpu threads finished semaphore
+    boost::interprocess::interprocess_semaphore cpu_threads_finished_sem;
     // mutex for accessing packets_queue
     boost::interprocess::interprocess_mutex packets_queue_mutex;
     // mutex for accessing analyzing_result array
@@ -170,8 +178,8 @@ public:
     boost::interprocess::interprocess_semaphore gpu_init_finished;
     boost::interprocess::interprocess_mutex gpu_switch_buffer_mutex;
 
-    // thread which executed tasks on GPU
-    boost::thread gpu_exec_thread;
+//    // thread which executed tasks on GPU
+//    boost::thread gpu_exec_thread;
 
     // counters
     int num_rules;

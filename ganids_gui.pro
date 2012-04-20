@@ -7,10 +7,11 @@
 QT       += core gui
 
 INCLUDEPATH +=  ../boost-1.49.0/include \
-                ../re2
+                ../re2 \
+                ../sqlite-amalgamation-3071100
 
 LIBS += -L../boost-1.49.0/lib -lpcap -lboost_log -lboost_filesystem -lboost_system -lboost_date_time -lboost_thread -lboost_regex \
-        -L../re2/obj -lre2
+        -L../re2/obj -lre2 -L../sqlite-amalgamation-3071100 -lsqlite3
 
 TARGET = ganids_gui
 TEMPLATE = app
@@ -25,7 +26,8 @@ SOURCES += main.cpp\
     nids.cpp \
     common.cpp \
     ac.cpp \
-    capturethread.cpp
+    capturethread.cpp \
+    db.cpp
 
 HEADERS  += ganidsmainwindow.h \
     trie_node.h \
@@ -39,7 +41,8 @@ HEADERS  += ganidsmainwindow.h \
     grammar.h \
     common.h \
     ac.h \
-    capturethread.h
+    capturethread.h \
+    db.h
 
 FORMS    += ganidsmainwindow.ui
 

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ganidsmainwindow.ui'
 **
-** Created: Sun Apr 8 13:12:19 2012
+** Created: Fri Apr 20 16:43:12 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
