@@ -1,7 +1,7 @@
 #include "capturethread.h"
 
 CaptureThread::CaptureThread(Nids *nids,
-                             const char *interface_name,
+                             QString interface_name,
                              int cuda_device_num,
                              WINDOW_TYPE window_type,
                              int flush_buffer_size,
@@ -19,7 +19,7 @@ CaptureThread::CaptureThread(Nids *nids,
 }
 
 CaptureThread::CaptureThread(Nids *nids,
-                             const char *interface_name,
+                             QString interface_name,
                              int threads_num):
     save_to_file(NULL),
     load_from_file(NULL),
@@ -43,14 +43,14 @@ void CaptureThread::run()
     qDebug("starting capture thread");
 
     if (gpu_enabled) {
-        nids->start_monitor_gpu(interface_name,
+        nids->start_monitor_gpu(interface_name.toAscii().data(),
                                 cuda_device_num,
                                 window_type,
                                 flush_buffer_size,
                                 flush_time,
                                 "nids_log.db");
     } else {
-        nids->start_monitor(interface_name,
+        nids->start_monitor(interface_name.toAscii().data(),
                             threads_num,
                             "nids_log.db");
     }

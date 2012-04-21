@@ -7,15 +7,15 @@
 class CaptureThread : public QThread
 {
 public:
-    CaptureThread(Nids *nids, const char *interface_name, int cuda_device_num, WINDOW_TYPE window_type, int flush_buffer_size, int flush_time);
-    CaptureThread(Nids *nids, const char *interface_name, int threads_num);
+    CaptureThread(Nids *nids, QString interface_name, int cuda_device_num, WINDOW_TYPE window_type, int flush_buffer_size, int flush_time);
+    CaptureThread(Nids *nids, QString interface_name, int threads_num);
     void run();
     void stop();
 
 private:
     bool gpu_enabled;
     Nids *nids;
-    const char *interface_name;
+    QString interface_name;
     int cuda_device_num;
     WINDOW_TYPE window_type;
     int flush_buffer_size;

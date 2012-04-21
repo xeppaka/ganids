@@ -41,13 +41,13 @@ private:
 
     void update_network_interfaces();
     void update_cuda_devices();
-    void start_gpu_capture_thread(const char *interface_name,
+    void start_gpu_capture_thread(QString interface_name,
                                   int cuda_device_num,
                                   WINDOW_TYPE window_type,
                                   int flush_buffer_size,
                                   int flush_time);
 
-    void start_cpu_capture_thread(const char *interface_name, int threads_num);
+    void start_cpu_capture_thread(QString interface, int threads_num);
     void stop_capture_thread();
 
     void lock_ui_for_capture();

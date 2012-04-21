@@ -61,7 +61,7 @@ Nids::Nids() :
     gpu_task_finished(1),
     gpu_init_finished(0),
     packets_queue_sem(0),
-    cpu_threads_finished_sem(0)
+    threads_finished_sem(0)
 {
     cur_buffers = 1;
     switch_buffers();
@@ -134,9 +134,9 @@ bool Nids::start_monitor(const char *interface, int threads_num, const char *db_
     char errbuf[PCAP_ERRBUF_SIZE];
 
     // open pcap session
-    handle = pcap_open_live(interface, 2048, 1, 0, errbuf);
+    handle = pcap_open_live(interface, 65535, 1, 0, errbuf);
     if (handle == NULL) {
-        BOOST_LOG_TRIVIAL(error) << "pcap_open_live() failed";
+        BOOST_LOG_TRIVIAL(error) << "pcap_open_live() failed for interface '" << interface << "'";
         BOOST_LOG_TRIVIAL(trace) << "End - Nids::start_monitor";
         return false;
     } else {
@@ -148,7 +148,7 @@ bool Nids::start_monitor(const char *interface, int threads_num, const char *db_
     if (db_filename)
         db.open(db_filename);
 
-    cpu_threads_exit = false;
+    threads_exit = false;
 
     cpu_exec_threads = new boost::thread*[threads_num > 0 ? threads_num : 1];
     for (int i = 0; i < threads_num; ++i)
@@ -157,19 +157,20 @@ bool Nids::start_monitor(const char *interface, int threads_num, const char *db_
     int res = pcap_loop(handle, 0, packet_received, reinterpret_cast<u_char *>(this));
     BOOST_LOG_TRIVIAL(debug) << "pcap_loop() returned: " << res;
 
-    cpu_threads_exit = true;
+    threads_exit = true;
 
     for (int i = 0; i < threads_num * 10; ++i)
         packets_queue_sem.post();
 
     // here we should wait until all capture threads return
     for (int i = 0; i < threads_num; ++i)
-        cpu_threads_finished_sem.timed_wait(boost::get_system_time() + boost::posix_time::milliseconds(500));
+        threads_finished_sem.timed_wait(boost::get_system_time() + boost::posix_time::milliseconds(500));
 
-    BOOST_LOG_TRIVIAL(trace) << "closing pcap handle";
-    pcap_close(handle);
-    handle = NULL;
-    BOOST_LOG_TRIVIAL(trace) << "pcap handle closed";
+    if (handle) {
+        pcap_close(handle);
+        handle = NULL;
+        BOOST_LOG_TRIVIAL(trace) << "pcap handle closed";
+    }
 
     for (int i = 0; i < threads_num; ++i)
         delete cpu_exec_threads[i];
@@ -210,10 +211,12 @@ bool Nids::start_monitor_gpu(const char *interface, int device_num, WINDOW_TYPE 
     if (db_filename)
         db.open(db_filename);
 
+    threads_exit = false;
+
     // open pcap session
-    handle = pcap_open_live(interface, 8192, 1, 0, errbuf);
+    handle = pcap_open_live(interface, 65535, 1, 0, errbuf);
     if (handle == NULL) {
-        BOOST_LOG_TRIVIAL(error) << "pcap_open_live() failed";
+        BOOST_LOG_TRIVIAL(error) << "pcap_open_live() failed for interface '" << interface << "'";
         BOOST_LOG_TRIVIAL(trace) << "End - Nids::start_monitor";
         return false;
     } else {
@@ -223,10 +226,18 @@ bool Nids::start_monitor_gpu(const char *interface, int device_num, WINDOW_TYPE 
     int res = pcap_loop(handle, 0, packet_received, reinterpret_cast<u_char *>(this));
     BOOST_LOG_TRIVIAL(debug) << "pcap_loop() returned: " << res;
 
-    BOOST_LOG_TRIVIAL(trace) << "closing pcap handle";
-    pcap_close(handle);
-    handle = NULL;
-    BOOST_LOG_TRIVIAL(trace) << "pcap handle closed";
+    //
+    threads_exit = true;
+    gpu_task_ready.post();
+
+    // here we should wait until gpu process thread return
+    threads_finished_sem.timed_wait(boost::get_system_time() + boost::posix_time::milliseconds(500));
+
+    if (handle) {
+        pcap_close(handle);
+        handle = NULL;
+        BOOST_LOG_TRIVIAL(trace) << "pcap handle closed";
+    }
 
 //    while (true) {
 //        Packet *packet = Packet::create_fake_packet();
@@ -508,6 +519,9 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
             else
                 nids->gpu_task_ready.timed_wait(boost::get_system_time() + boost::posix_time::milliseconds(nids->buffer_flush_time));
 
+            if (nids->threads_exit)
+                break;
+
             nids->switch_buffers();
 
             //BOOST_LOG_TRIVIAL(trace) << "processing buffer of packets on GPU, length = " << nids->packet_buffer->size();
@@ -625,6 +639,9 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
 
     if (dfa_device)
         cudaFree(dfa_device);
+
+    nids->threads_finished_sem.post();
+    BOOST_LOG_TRIVIAL(trace) << "capture thread finished successfully" << endl;
 }
 
 void process_on_cpu_callable::operator ()(Nids *nids)
@@ -636,7 +653,7 @@ void process_on_cpu_callable::operator ()(Nids *nids)
         while (true) {
             nids->packets_queue_sem.wait();
 
-            if (nids->cpu_threads_exit)
+            if (nids->threads_exit)
                 break;
 
             {
@@ -696,7 +713,7 @@ void process_on_cpu_callable::operator ()(Nids *nids)
         BOOST_LOG_TRIVIAL(info) << "thread interrupted" << endl;
     }
 
-    nids->cpu_threads_finished_sem.post();
+    nids->threads_finished_sem.post();
     BOOST_LOG_TRIVIAL(trace) << "capture thread finished successfully" << endl;
 }
 

@@ -1,4 +1,5 @@
 #include <QMessageBox>
+#include <QComboBox>
 #include "ganidsmainwindow.h"
 #include "ui_ganidsmainwindow.h"
 
@@ -11,7 +12,17 @@ GanidsMainWindow::GanidsMainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    nids.set_log_level(TRACE);
+//    QComboBox *comboWidget = new QComboBox(this);
+//    comboWidget->addItem("TRACE");
+//    comboWidget->addItem("INFO");
+//    comboWidget->addItem("DEBUG");
+//    comboWidget->addItem("WARNING");
+//    comboWidget->addItem("ERROR");
+//    comboWidget->addItem("FATAL");
+//    ui->statusBar->addPermanentWidget(comboWidget);
+
+    nids.set_log_level(INFO);
+    nids.read_rules("rules.txt");
 
     update_network_interfaces();
     update_cuda_devices();
@@ -35,13 +46,11 @@ GanidsMainWindow::~GanidsMainWindow()
 
 void GanidsMainWindow::on_button_start_clicked()
 {
-//    QString interface = ui->combo_interfaces->currentText();
-//    if (interface.length() <= 0) {
-//        show_message_interface_not_selected();
-//        return;
-//    }
-
-//    QByteArray ba = interface.toLocal8Bit();
+    QString interface = "wlan0";//ui->combo_interfaces->currentText();
+    if (interface.length() <= 0) {
+        show_message_interface_not_selected();
+        return;
+    }
 
     if (gpu_enabled) {
         int cudaNum = ui->combo_cuda_devices->currentIndex();
@@ -64,11 +73,11 @@ void GanidsMainWindow::on_button_start_clicked()
             flush_buffer_size = ui->spin_buffer_size->value();
         }
 
-        start_gpu_capture_thread("wlan0"/*ba.data()*/, cudaNum, window_type, flush_buffer_size, flush_time);
+        start_gpu_capture_thread(interface, cudaNum, window_type, flush_buffer_size, flush_time);
     } else {
         int num_threads = ui->spin_threads->value();
 
-        start_cpu_capture_thread("wlan0"/*ba.data()*/, num_threads);
+        start_cpu_capture_thread(interface, num_threads);
     }
 
     bytes_received = 0;
@@ -117,7 +126,7 @@ void GanidsMainWindow::update_cuda_devices()
     }
 }
 
-void GanidsMainWindow::start_gpu_capture_thread(const char *interface_name,
+void GanidsMainWindow::start_gpu_capture_thread(QString interface_name,
                                                 int cuda_device_num,
                                                 WINDOW_TYPE window_type,
                                                 int flush_buffer_size,
@@ -129,15 +138,19 @@ void GanidsMainWindow::start_gpu_capture_thread(const char *interface_name,
                                             window_type,
                                             flush_buffer_size,
                                             flush_time);
+
+    connect(nids_capture_thread, SIGNAL(finished()), this, SLOT(on_capture_finished()));
+    connect(nids_capture_thread, SIGNAL(terminated()), this, SLOT(on_capture_terminated()));
+
     if (nids_capture_thread)
         nids_capture_thread->start();
 }
 
-void GanidsMainWindow::start_cpu_capture_thread(const char *interface_name,
+void GanidsMainWindow::start_cpu_capture_thread(QString interface,
                                                 int threads_num)
 {
     nids_capture_thread = new CaptureThread(&nids,
-                                            interface_name,
+                                            interface,
                                             threads_num);
 
     connect(nids_capture_thread, SIGNAL(finished()), this, SLOT(on_capture_finished()));
@@ -150,11 +163,6 @@ void GanidsMainWindow::start_cpu_capture_thread(const char *interface_name,
 void GanidsMainWindow::stop_capture_thread()
 {
     nids_capture_thread->stop();
-//    nids_capture_thread->wait(10000);
-//    if (!nids_capture_thread->isFinished()) {
-//        nids_capture_thread->terminate();
-//        nids_capture_thread->wait(5000);
-//    }
 }
 
 void GanidsMainWindow::lock_ui_for_capture()

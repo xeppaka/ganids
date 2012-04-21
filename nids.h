@@ -63,6 +63,9 @@ public:
     Nids();
     ~Nids();
 
+    /**
+      * \brief Function used to read rules from *.txt file and save them in Nids class in internal structures
+      */
     int read_rules(const char *filename);
     bool start_monitor(const char *interface, int threads_num, const char *db_filename = NULL);
     bool stop_monitor();
@@ -129,12 +132,12 @@ public:
     // CPU processing
     boost::thread **cpu_exec_threads;
     queue<Packet *> packets_queue;
-    bool cpu_threads_exit;
+    bool threads_exit;
 
     // packets number semaphore
     boost::interprocess::interprocess_semaphore packets_queue_sem;
     // cpu threads finished semaphore
-    boost::interprocess::interprocess_semaphore cpu_threads_finished_sem;
+    boost::interprocess::interprocess_semaphore threads_finished_sem;
     // mutex for accessing packets_queue
     boost::interprocess::interprocess_mutex packets_queue_mutex;
     // mutex for accessing analyzing_result array
