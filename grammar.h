@@ -59,6 +59,7 @@ struct action_ : qi::symbols<char, Action>
     {
         add
                 ("alert", ALERT)
+                ("log", LOG)
                 ;
     }
 } action;
@@ -108,11 +109,14 @@ struct RuleRouteGrammar : qi::grammar<Iterator, RuleSpirit(), space_type>
         option_value_bin = uint_parser<unsigned, 16, 2, 2>();
         option_value_content = *((lit("\\\"")[push_back(_val, '"')] | lit("\\|")[push_back(_val, '|')] | (char_ - (lit('"') | '|'))[push_back(_val, _1)]) | (lit('|') >> *option_value_bin[push_back(_val, _1)] >> '|'));
         option_value_pcre = *(lit("\\\"")[push_back(_val, '"')] | (char_ - lit('"'))[push_back(_val, _1)]);
+        option_value_message = *(lit("\\\"")[push_back(_val, '"')] | (char_ - lit('"'))[push_back(_val, _1)]);
         option_type_content = lit("content")[_val = CONTENT];
         option_type_pcre = lit("pcre")[_val = PCRE];
         option_type_offset = lit("offset")[_val = OFFSET];
-        option_type_length = lit("offset")[_val = LENGTH];
+        option_type_length = lit("length")[_val = LENGTH];
+        option_type_message = lit("msg")[_val = MESSAGE];
         rule_option = (option_type_pcre[at_c<0>(_val) = _1] >> ':' >> '"' >> option_value_pcre[assign(at_c<2>(_val), begin(_1), end(_1))] >> '"') |
+                (option_type_message[at_c<0>(_val) = _1] >> ':' >> '"' >> option_value_message[assign(at_c<2>(_val), begin(_1), end(_1))] >> '"') |
                 (option_type_content[at_c<0>(_val) = _1] >> ':' >> '"' >> option_value_content[assign(at_c<2>(_val), begin(_1), end(_1))] >> '"') |
                 (option_type_offset[at_c<0>(_val) = _1] >> ':' >> '"' >> uint_[at_c<1>(_val) = _1]) |
                 (option_type_length[at_c<0>(_val) = _1] >> ':' >> '"' >> uint_[at_c<1>(_val) = _1]);
@@ -166,12 +170,14 @@ struct RuleRouteGrammar : qi::grammar<Iterator, RuleSpirit(), space_type>
     qi::rule<Iterator, sequence_val8()> option_value_bin;
     qi::rule<Iterator, sequence8(), space_type> option_value_content;
     qi::rule<Iterator, sequence8(), space_type> option_value_pcre;
+    qi::rule<Iterator, sequence8(), space_type> option_value_message;
 
     // option types
     qi::rule<Iterator, RuleOptionType()> option_type_content;
     qi::rule<Iterator, RuleOptionType()> option_type_pcre;
     qi::rule<Iterator, RuleOptionType()> option_type_offset;
     qi::rule<Iterator, RuleOptionType()> option_type_length;
+    qi::rule<Iterator, RuleOptionType()> option_type_message;
 
     // general option
     qi::rule<Iterator, RuleOption(), space_type> rule_option;

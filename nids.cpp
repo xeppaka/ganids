@@ -704,8 +704,6 @@ void process_on_cpu_callable::operator ()(Nids *nids)
                 }
             }
 
-            delete packet;
-
             if (found)
                 nids->process_result();
         }

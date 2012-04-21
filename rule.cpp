@@ -43,6 +43,9 @@ void Rule::init_from_rule_spirit(const RuleSpirit &rule)
             if (pcre.size() <= 0)
                     pcre = (*it).sequence_value;
             break;
+        case MESSAGE:
+            message.assign((*it).sequence_value.begin(), (*it).sequence_value.end());
+            break;
         case OFFSET:
             offset = (*it).value;
             break;

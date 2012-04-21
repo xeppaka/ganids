@@ -7,7 +7,8 @@
 using std::vector;
 
 enum Action {
-    ALERT = 0
+    ALERT = 0,
+    LOG
 };
 
 enum TransportProtocol {
@@ -18,7 +19,8 @@ enum RuleOptionType {
     CONTENT = 0,
     PCRE,
     OFFSET,
-    LENGTH
+    LENGTH,
+    MESSAGE
 };
 
 struct RuleOption {

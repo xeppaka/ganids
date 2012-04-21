@@ -21,12 +21,12 @@ bool Db::open(const char *filename)
         return false;
 
     char *zErrMsg = NULL;
-    rc = sqlite3_exec(db, "create table if not exists nids_log (timestamp TEXT, message TEXT, rule TEXT, payload BLOB)", NULL, 0, &zErrMsg);
+    rc = sqlite3_exec(db, "create table if not exists nids_log (timestamp TEXT, message TEXT, rule TEXT)", NULL, 0, &zErrMsg);
     if (rc) {
         close();
         return false;
     }
-    insert("message1", "rule1", "payload1", 8);
+    insert("message1", "rule1");
     close();
 
     return true;
@@ -40,7 +40,7 @@ void Db::close()
     }
 }
 
-bool Db::insert(const char *message, const char *rule, const char *payload, int payload_size)
+bool Db::insert(const char *message, const char *rule)
 {
     if (!db)
         return false;
@@ -48,7 +48,7 @@ bool Db::insert(const char *message, const char *rule, const char *payload, int 
     sqlite3_stmt *stmt = NULL;
     int rc = 0;
     try {
-        rc = sqlite3_prepare_v2(db, "insert into nids_log values (datetime('now'), ?, ?, ?)", -1, &stmt, NULL);
+        rc = sqlite3_prepare_v2(db, "insert into nids_log values (datetime('now'), ?, ?)", -1, &stmt, NULL);
         if (rc != SQLITE_OK)
             throw 1;
 
@@ -57,10 +57,6 @@ bool Db::insert(const char *message, const char *rule, const char *payload, int 
             throw 1;
 
         rc = sqlite3_bind_text(stmt, 2, rule, -1, SQLITE_STATIC);
-        if (rc != SQLITE_OK)
-            throw 1;
-
-        rc = sqlite3_bind_blob(stmt, 3, payload, payload_size, SQLITE_STATIC);
         if (rc != SQLITE_OK)
             throw 1;
 

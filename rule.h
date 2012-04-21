@@ -31,6 +31,9 @@ private:
     // action that should be taken if rule is matched
     Action action;
 
+    // message that should be inserted into database if this rule matched
+    string message;
+
     // route info includes all information about protocol and IP adresses and ports.
     // it will be inserted in trie and matched against route info of every received packet.
     sequence32 route;
