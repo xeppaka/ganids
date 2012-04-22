@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ganidsmainwindow.ui'
 **
-** Created: Sun Apr 22 15:09:46 2012
+** Created: Sun Apr 22 22:55:17 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -140,7 +140,7 @@ public:
         spin_buffer_size = new QSpinBox(group_gpu_settings);
         spin_buffer_size->setObjectName(QString::fromUtf8("spin_buffer_size"));
         spin_buffer_size->setGeometry(QRect(117, 59, 111, 28));
-        spin_buffer_size->setMinimum(1024);
+        spin_buffer_size->setMinimum(32);
         spin_buffer_size->setMaximum(100000000);
         spin_buffer_size->setSingleStep(1024);
         spin_buffer_size->setValue(65536);

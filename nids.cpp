@@ -569,6 +569,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
 
             //BOOST_LOG_TRIVIAL(trace) << "processing buffer of packets on GPU, length = " << nids->packet_buffer->size();
             cout << "processing buffer of packets on GPU, length = " << nids->gpu_packet_buffer->size() << endl;
+            cout << "tasks count: " << nids->gpu_tasks->size() << endl;
 
             try {
                 if (cuda_packet_buffer_size < nids->gpu_packet_buffer->size()) {
@@ -597,6 +598,8 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
                     throw 1;
 
                 analyze_payload_cuda(dfa_device, pitch, cuda_packet_buffer, cuda_tasks_buffer, cuda_out_buffer, nids->gpu_tasks->size() / 4);
+                if (cudaThreadSynchronize() != cudaSuccess)
+                    throw 1;
 
                 if (out_buffer_size < nids->gpu_tasks->size() / CUDA_TASK_SIZE * sizeof(int)) {
                     out_buffer_size = nids->gpu_tasks->size() / CUDA_TASK_SIZE * sizeof(int);
@@ -606,7 +609,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
                 if (cudaMemcpy(out_buffer, cuda_out_buffer, nids->gpu_tasks->size() / CUDA_TASK_SIZE * sizeof(int), cudaMemcpyDeviceToHost) != cudaSuccess)
                     throw 1;
             } catch (int i) {
-                BOOST_LOG_TRIVIAL(debug) << "error occured during processing packets on GPU";
+                BOOST_LOG_TRIVIAL(error) << "error occured during processing packets on GPU";
                 nids->gpu_packet_buffer->clear();
                 nids->gpu_tasks->clear();
                 nids->gpu_ac_rules->clear();
@@ -715,6 +718,7 @@ void process_on_cpu_callable::operator ()(Nids *nids)
             if (matched_rules.size() > 0) {
                 bool ac_analyze_needed = false;
 
+//                cout << "number of rules matched to packet header: " << matched_rules.size() << endl;
                 ac_rules.clear();
                 for (vector<int>::iterator it = matched_rules.begin(); it != matched_rules.end(); ++it) {
                     Rule *r = nids->rules[*it];

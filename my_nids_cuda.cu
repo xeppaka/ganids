@@ -10,18 +10,19 @@ __global__ void analyze_payload_cuda_(int *dfa,
 {
     int task_num = blockIdx.x * blockDim.x + threadIdx.x;
     int pitch_int = pitch / 4;
+    int task_offset = task_num * 4;
 
     while (task_num < tasks) {
         out_buffer[task_num] = -1;
 
-        unsigned char* payload = packet_buffer + task_buffer[task_num * 4];
-        int payload_length = task_buffer[task_num * 4 + 1];
-        int *dfa_offset = dfa + pitch_int * task_buffer[task_num * 4 + 2];
-        int result_rule = task_buffer[task_num * 4 + 3];
+        unsigned char* payload = packet_buffer + task_buffer[task_offset];
+        int payload_length = task_buffer[task_offset + 1];
+        int *dfa_offset = dfa + pitch_int * task_buffer[task_offset + 2];
+        int result_rule = task_buffer[task_offset + 3];
         int cur_state = 0;
         int cur_idx = 0;
 
-        while (cur_idx < payload_length) {
+        while (true) {
             if (cur_state == -1)
                 break;
 
@@ -41,8 +42,12 @@ __global__ void analyze_payload_cuda_(int *dfa,
 
             cur_state = (dfa_offset + cur_state * pitch_int)[payload[cur_idx]];
             ++cur_idx;
+
+            if (cur_idx < payload_length)
+                break;
         }
 
+        __syncthreads();
         task_num += gridDim.x * blockDim.x;
     }
 }
@@ -54,5 +59,5 @@ void analyze_payload_cuda(int *dfa,
                           int *out_buffer,
                           int tasks)
 {
-    analyze_payload_cuda_<<< 10, 32 >>>(dfa, pitch, packet_buffer, task_buffer, out_buffer, tasks);
+    analyze_payload_cuda_<<< 4, 64 >>>(dfa, pitch, packet_buffer, task_buffer, out_buffer, tasks);
 }
