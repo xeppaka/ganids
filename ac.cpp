@@ -25,8 +25,6 @@ void AC::search(const sequence8 &sequence, vector<int> &result)
         if (!out[s].empty())
             result.insert(result.end(), out[s].begin(), out[s].end());
     }
-
-    BOOST_LOG_TRIVIAL(info) << "found " << out.size() << " mathes";
     BOOST_LOG_TRIVIAL(trace) << "End - AC::search";
 }
 
@@ -40,10 +38,7 @@ void AC::search(const u_char *sequence, int length, vector<int> &result)
         if (!out[s].empty())
             result.insert(result.end(), out[s].begin(), out[s].end());
     }
-
-    BOOST_LOG_TRIVIAL(info) << "found " << out.size() << " mathes";
     BOOST_LOG_TRIVIAL(trace) << "End - AC::search";
-
 }
 
 int AC::next(int state, sequence_val8 value)

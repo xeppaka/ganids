@@ -12,7 +12,8 @@ public:
 
     bool open(const char *filename);
     void close();
-    bool insert(const char *message, const char *rule);
+    bool insert(const char *action, const char *message, const char *rule);
+    bool is_opened();
 
 private:
     sqlite3 *db;

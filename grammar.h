@@ -123,7 +123,7 @@ struct RuleRouteGrammar : qi::grammar<Iterator, RuleSpirit(), space_type>
         tcp_rule_option = rule_option.alias();
         tcp_options = lit('{') >> *tcp_rule_option >> '}';
 
-        tcp_rule = action >> tcp_route_info >> tcp_options;
+        tcp_rule = action >> tcp_route_info >> -tcp_options;
         rule = tcp_rule.alias();
 
 //        ip_part.name("ip_part");

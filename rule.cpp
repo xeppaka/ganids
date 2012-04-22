@@ -24,6 +24,7 @@ bool Rule::parse_rule(const string &line)
         return false;
 
     init_from_rule_spirit(rule_spirit);
+    rule_str = line;
 
     return true;
 }
@@ -67,6 +68,11 @@ Rule *Rule::create_rule(const string &rule)
     return NULL;
 }
 
+Action Rule::get_action()
+{
+    return action;
+}
+
 const sequence32 &Rule::get_route()
 {
     return route;
@@ -80,6 +86,16 @@ const vector<sequence8> &Rule::get_content()
 const sequence8 &Rule::get_pcre() const
 {
     return pcre;
+}
+
+const string &Rule::get_message() const
+{
+    return message;
+}
+
+const string &Rule::get_rule_str() const
+{
+    return rule_str;
 }
 
 ostream &operator<<(ostream &stream, Rule &rule) {

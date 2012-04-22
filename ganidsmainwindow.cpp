@@ -1,7 +1,18 @@
 #include <QMessageBox>
 #include <QComboBox>
+#include <QDateTime>
 #include "ganidsmainwindow.h"
 #include "ui_ganidsmainwindow.h"
+
+void alert_callback(void *user, const char *message, const char *rule) {
+    GanidsMainWindow *main_window = reinterpret_cast<GanidsMainWindow *>(user);
+    main_window->emit_nids_alert(message, rule);
+}
+
+void log_callback(void *user, const char *message, const char *rule) {
+    GanidsMainWindow *main_window = reinterpret_cast<GanidsMainWindow *>(user);
+    main_window->emit_nids_log(message, rule);
+}
 
 GanidsMainWindow::GanidsMainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,21 +22,23 @@ GanidsMainWindow::GanidsMainWindow(QWidget *parent) :
     timer_id(0)
 {
     ui->setupUi(this);
+    ui->table_matched_rules->setColumnCount(3);
+    QStringList header;
+    header << "Time" << "Message" << "Rule";
+    ui->table_matched_rules->setHorizontalHeaderLabels(header);
+    ui->table_matched_rules->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
-//    QComboBox *comboWidget = new QComboBox(this);
-//    comboWidget->addItem("TRACE");
-//    comboWidget->addItem("INFO");
-//    comboWidget->addItem("DEBUG");
-//    comboWidget->addItem("WARNING");
-//    comboWidget->addItem("ERROR");
-//    comboWidget->addItem("FATAL");
-//    ui->statusBar->addPermanentWidget(comboWidget);
+    connect(this, SIGNAL(nids_alert(const char*,const char*)), this, SLOT(on_nids_alert(const char*,const char*)), Qt::QueuedConnection);
+    connect(this, SIGNAL(nids_log(const char*,const char*)), this, SLOT(on_nids_log(const char*,const char*)), Qt::QueuedConnection);
 
     nids.set_log_level(INFO);
     nids.read_rules("rules.txt");
+    nids.add_alert_callback(alert_callback, this);
+    nids.add_log_callback(log_callback, this);
 
     update_network_interfaces();
     update_cuda_devices();
+
     el_timer.start();
 }
 
@@ -64,7 +77,7 @@ void GanidsMainWindow::on_button_start_clicked()
         int flush_buffer_size = 0;
         int flush_time = 0;
 
-        if (ui->radio_timed->isEnabled()) {
+        if (ui->radio_timed->isChecked()) {
             window_type = TIME;
             flush_time = ui->spin_time->value();
         }
@@ -98,6 +111,7 @@ void GanidsMainWindow::on_check_gpu_toggled(bool checked)
             ui->group_cpu_settings->setEnabled(false);
         }
     } else {
+        gpu_enabled = false;
         ui->combo_cuda_devices->setEnabled(false);
         ui->group_gpu_settings->setEnabled(false);
         ui->group_cpu_settings->setEnabled(true);
@@ -208,6 +222,16 @@ void GanidsMainWindow::show_message_interface_not_selected()
     mb.exec();
 }
 
+void GanidsMainWindow::emit_nids_alert(const char *message, const char *rule)
+{
+    emit nids_alert(message, rule);
+}
+
+void GanidsMainWindow::emit_nids_log(const char *message, const char *rule)
+{
+    emit nids_log(message, rule);
+}
+
 void GanidsMainWindow::on_check_save_toggled(bool checked)
 {
     ui->line_save_path->setEnabled(checked);
@@ -258,6 +282,31 @@ void GanidsMainWindow::on_capture_terminated()
     unlock_ui();
 }
 
+void GanidsMainWindow::on_nids_alert(const char *message, const char *rule)
+{
+    QTableWidgetItem *msg_item = new QTableWidgetItem(QString(message));
+    QTableWidgetItem *rule_item = new QTableWidgetItem(QString(rule));
+    QTableWidgetItem *time_item = new QTableWidgetItem(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz"));
+    time_item->setBackgroundColor(Qt::red);
+    int rows = ui->table_matched_rules->rowCount();
+    ui->table_matched_rules->setRowCount(rows + 1);
+    ui->table_matched_rules->setItem(rows, 0, time_item);
+    ui->table_matched_rules->setItem(rows, 1, msg_item);
+    ui->table_matched_rules->setItem(rows, 2, rule_item);
+}
+
+void GanidsMainWindow::on_nids_log(const char *message, const char *rule)
+{
+    QTableWidgetItem *msg_item = new QTableWidgetItem(QString(message));
+    QTableWidgetItem *rule_item = new QTableWidgetItem(QString(rule));
+    QTableWidgetItem *time_item = new QTableWidgetItem(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz"));
+    int rows = ui->table_matched_rules->rowCount();
+    ui->table_matched_rules->setRowCount(rows + 1);
+    ui->table_matched_rules->setItem(rows, 0, time_item);
+    ui->table_matched_rules->setItem(rows, 1, msg_item);
+    ui->table_matched_rules->setItem(rows, 2, rule_item);
+}
+
 void GanidsMainWindow::timerEvent(QTimerEvent *event)
 {
     qint64 cur_time = el_timer.elapsed();
@@ -266,4 +315,10 @@ void GanidsMainWindow::timerEvent(QTimerEvent *event)
     ui->stat_avg_load->setText(QString("%1").arg(nids.num_bytes / (cur_time - capture_start_time) / 1000.0));
     ui->stat_cur_load->setText(QString("%1").arg((nids.num_bytes - bytes_received) / 1048576.0));
     bytes_received = nids.num_bytes;
+}
+
+void GanidsMainWindow::on_button_clear_matched_clicked()
+{
+    ui->table_matched_rules->clearContents();
+    ui->table_matched_rules->setRowCount(0);
 }

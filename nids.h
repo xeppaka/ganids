@@ -28,6 +28,27 @@ using std::queue;
 #define DEF_PACKET_BUFFER_SIZE 65536
 #define DEF_TIME_FLUSH_BUFFER 1000
 
+typedef void (*AlertCallbackFunc) (void *user, const char *message, const char *rule);
+typedef void (*LogCallbackFunc) (void *user, const char *message, const char *rule);
+
+struct AlertCallback {
+    AlertCallback(AlertCallbackFunc callback, void *user):
+        callback(callback),
+        user(user)
+        {}
+    AlertCallbackFunc callback;
+    void *user;
+};
+
+struct LogCallback {
+    LogCallback(LogCallbackFunc callback, void *user):
+        callback(callback),
+        user(user)
+        {}
+    LogCallbackFunc callback;
+    void *user;
+};
+
 enum LOG_LEVEL {
     TRACE,
     DEBUG,
@@ -57,6 +78,10 @@ struct process_on_cpu_callable {
     void operator() (Nids* nids);
 };
 
+struct process_results_callable {
+    void operator() (Nids* nids, const char *db_filename = NULL);
+};
+
 class Nids
 {
 public:
@@ -80,6 +105,9 @@ public:
     bool list_cuda_devices(vector<cudaDeviceProp> &device_properties);
     void set_log_level(LOG_LEVEL level);
 
+    void add_alert_callback(AlertCallbackFunc callback, void *user);
+    void add_log_callback(LogCallbackFunc callback, void *user);
+
 //private:
 public:
     void analyze_header(const Packet *packet, vector<int> &result);
@@ -89,7 +117,7 @@ public:
     void process_packet(Packet *packet);
     void process_packet_gpu(Packet *packet);
 
-    void process_result();
+    void process_result(Db *db);
 
     void free_rules();
     bool cuda_buffer_reallocate(u_char **buffer_pointer, int size);
@@ -102,8 +130,12 @@ public:
                                      int *out_buffer,
                                      int tasks);
 
-    // object for database manipulations
-    Db db;
+    // callbacks for alert and log
+    vector<AlertCallback> alert_callbacks;
+    vector<LogCallback> log_callbacks;
+
+    // database filename
+    string db_filename;
 
     // pcap handle
     pcap_t *handle;
@@ -138,6 +170,8 @@ public:
     boost::interprocess::interprocess_semaphore packets_queue_sem;
     // cpu threads finished semaphore
     boost::interprocess::interprocess_semaphore threads_finished_sem;
+    // process_result semaphore. result vector contains some matched rules
+    boost::interprocess::interprocess_semaphore process_result_sem;
     // mutex for accessing packets_queue
     boost::interprocess::interprocess_mutex packets_queue_mutex;
     // mutex for accessing analyzing_result array
@@ -195,6 +229,8 @@ public:
 
     friend void packet_received(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes);
     friend struct process_on_gpu_callable;
+    friend struct process_on_cpu_callable;
+    friend struct process_results_callable;
 };
 
 #endif // NIDS_H

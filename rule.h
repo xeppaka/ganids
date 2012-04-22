@@ -21,12 +21,17 @@ public:
     const sequence32 &get_route();
     const vector<sequence8> &get_content();
     const sequence8 &get_pcre() const;
+    const string &get_message() const;
+    const string &get_rule_str() const;
 
 private:
     Rule();
     bool parse_rule(const string &line);
     void init_from_rule_spirit(const RuleSpirit &rule);
     void print_sequence_val(sequence_val32 value, ostream &stream);
+
+    // rule as string
+    string rule_str;
 
     // action that should be taken if rule is matched
     Action action;

@@ -33,6 +33,16 @@ private slots:
 
     void on_capture_terminated();
 
+    void on_nids_alert(const char *message, const char *rule);
+
+    void on_nids_log(const char *message, const char *rule);
+
+    void on_button_clear_matched_clicked();
+
+signals:
+    void nids_alert(const char *message, const char *rule);
+    void nids_log(const char *message, const char *rule);
+
 protected:
     void timerEvent(QTimerEvent *event);
 
@@ -56,6 +66,9 @@ private:
     void show_message_cuda_device_not_selected();
     void show_message_interface_not_selected();
 
+    void emit_nids_alert(const char *message, const char *rule);
+    void emit_nids_log(const char *message, const char *rule);
+
     CaptureThread *nids_capture_thread;
     Nids nids;
 
@@ -65,6 +78,8 @@ private:
     QElapsedTimer el_timer;
     qint64 capture_start_time;
     long bytes_received;
+    friend void alert_callback(void *user, const char *message, const char *rule);
+    friend void log_callback(void *user, const char *message, const char *rule);
 };
 
 #endif // GANIDSMAINWINDOW_H

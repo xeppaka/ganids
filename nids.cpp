@@ -61,7 +61,8 @@ Nids::Nids() :
     gpu_task_finished(1),
     gpu_init_finished(0),
     packets_queue_sem(0),
-    threads_finished_sem(0)
+    threads_finished_sem(0),
+    process_result_sem(0)
 {
     cur_buffers = 1;
     switch_buffers();
@@ -128,9 +129,6 @@ bool Nids::start_monitor(const char *interface, int threads_num, const char *db_
     num_bytes = 0;
     num_tcp_ip_payload_bytes = 0;
 
-    if (db_filename)
-        db.open(db_filename);
-
     char errbuf[PCAP_ERRBUF_SIZE];
 
     // open pcap session
@@ -144,11 +142,9 @@ bool Nids::start_monitor(const char *interface, int threads_num, const char *db_
     }
 
     gpu_enabled = false;
-
-    if (db_filename)
-        db.open(db_filename);
-
     threads_exit = false;
+
+    boost::thread th(process_results_callable(), this, db_filename);
 
     cpu_exec_threads = new boost::thread*[threads_num > 0 ? threads_num : 1];
     for (int i = 0; i < threads_num; ++i)
@@ -157,14 +153,20 @@ bool Nids::start_monitor(const char *interface, int threads_num, const char *db_
     int res = pcap_loop(handle, 0, packet_received, reinterpret_cast<u_char *>(this));
     BOOST_LOG_TRIVIAL(debug) << "pcap_loop() returned: " << res;
 
+    // set flag that thread should exit
     threads_exit = true;
 
-    for (int i = 0; i < threads_num * 10; ++i)
+    // finish threads that process captured packets
+    for (int i = 0; i < threads_num; ++i) {
         packets_queue_sem.post();
 
-    // here we should wait until all capture threads return
-    for (int i = 0; i < threads_num; ++i)
+        // here we should wait while thread returns
         threads_finished_sem.timed_wait(boost::get_system_time() + boost::posix_time::milliseconds(500));
+    }
+
+    // finish thread that process results
+    process_result_sem.post();
+    threads_finished_sem.timed_wait(boost::get_system_time() + boost::posix_time::milliseconds(500));
 
     if (handle) {
         pcap_close(handle);
@@ -202,14 +204,12 @@ bool Nids::start_monitor_gpu(const char *interface, int device_num, WINDOW_TYPE 
 
     gpu_enabled = true;
 
+    boost::thread th_pr(process_results_callable(), this, db_filename);
     boost::thread th(process_on_gpu_callable(), this, device_num);
 
     gpu_init_finished.wait();
     if (!cuda_init_ok)
         return false;
-
-    if (db_filename)
-        db.open(db_filename);
 
     threads_exit = false;
 
@@ -226,11 +226,15 @@ bool Nids::start_monitor_gpu(const char *interface, int device_num, WINDOW_TYPE 
     int res = pcap_loop(handle, 0, packet_received, reinterpret_cast<u_char *>(this));
     BOOST_LOG_TRIVIAL(debug) << "pcap_loop() returned: " << res;
 
-    //
+    // set flag that thread should exit
     threads_exit = true;
+    // give some job for thread to continue thread execution
     gpu_task_ready.post();
+    // here we should wait until gpu process thread returns
+    threads_finished_sem.timed_wait(boost::get_system_time() + boost::posix_time::milliseconds(500));
 
-    // here we should wait until gpu process thread return
+    // finish thread that process results
+    process_result_sem.post();
     threads_finished_sem.timed_wait(boost::get_system_time() + boost::posix_time::milliseconds(500));
 
     if (handle) {
@@ -373,11 +377,19 @@ void Nids::process_packet_gpu(Packet *packet)
     if (matched_rules.size() > 0) {
         bool ac_analyze_needed = false;
 
-        // locked in gpu_switch_buffer_mutex
+        // locked on gpu_switch_buffer_mutex
         {
             boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(gpu_switch_buffer_mutex);
             for (vector<int>::iterator it = matched_rules.begin(); it != matched_rules.end(); ++it) {
                 Rule *r = rules[*it];
+
+                // payload analyzing is not needed, rule doesn't contain content or pcre options
+                if (r->get_content().size() <= 0 && regex_dfa_offset[*it] == -1) {
+                    boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(analyzing_result_mutex);
+                    analyzing_result.push_back(*it);
+                    continue;
+                }
+
                 if (regex_dfa_offset[*it] != -1) {
                     tasks->push_back(packet_buffer->size());
                     tasks->push_back(packet->get_payload_size());
@@ -416,12 +428,42 @@ void Nids::process_packet_gpu(Packet *packet)
     BOOST_LOG_TRIVIAL(trace) << "End - Nids::process_packet_gpu";
 }
 
-void Nids::process_result()
+void Nids::process_result(Db *db)
 {
-    boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(analyzing_result_mutex);
-    for (vector<int>::iterator it = analyzing_result.begin();it != analyzing_result.end(); ++it)
-        cout << *it << endl;
-    analyzing_result.clear();
+    BOOST_LOG_TRIVIAL(trace) << "Begin - Nids::process_result";
+
+    vector<int> matched_rules;
+
+    {
+        boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(analyzing_result_mutex);
+        matched_rules = analyzing_result;
+        analyzing_result.clear();
+    }
+
+    for (vector<int>::iterator it = matched_rules.begin();it != matched_rules.end(); ++it) {
+        //BOOST_LOG_TRIVIAL(info) << "rule matched: " << *it;
+        Rule *r = rules[*it];
+        switch (r->get_action()) {
+            case ALERT:
+            {
+                if (db)
+                    db->insert("ALERT", r->get_message().c_str(), r->get_rule_str().c_str());
+                for (vector<AlertCallback>::iterator it = alert_callbacks.begin(); it != alert_callbacks.end(); ++it)
+                    (*it).callback((*it).user, r->get_message().c_str(), r->get_rule_str().c_str());
+            }
+            break;
+            case LOG:
+            {
+                if (db)
+                    db->insert("LOG", r->get_message().c_str(), r->get_rule_str().c_str());
+                for (vector<LogCallback>::iterator it = log_callbacks.begin(); it != log_callbacks.end(); ++it)
+                    (*it).callback((*it).user, r->get_message().c_str(), r->get_rule_str().c_str());
+            }
+            break;
+        }
+    }
+
+    BOOST_LOG_TRIVIAL(trace) << "End - Nids::process_result";
 }
 
 void Nids::switch_buffers()
@@ -497,6 +539,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
         if (dfa_device)
             cudaFree(dfa_device);
         nids->cuda_init_ok = false;
+        nids->gpu_init_finished.post();
         return;
     }
 
@@ -616,7 +659,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
             nids->gpu_ac_rules->clear();
 
             if (found)
-                nids->process_result();
+                nids->process_result_sem.post();
 
             nids->gpu_task_finished.post();
         }
@@ -641,7 +684,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
         cudaFree(dfa_device);
 
     nids->threads_finished_sem.post();
-    BOOST_LOG_TRIVIAL(trace) << "capture thread finished successfully" << endl;
+    BOOST_LOG_TRIVIAL(trace) << "gpu process thread finished successfully" << endl;
 }
 
 void process_on_cpu_callable::operator ()(Nids *nids)
@@ -675,6 +718,15 @@ void process_on_cpu_callable::operator ()(Nids *nids)
                 ac_rules.clear();
                 for (vector<int>::iterator it = matched_rules.begin(); it != matched_rules.end(); ++it) {
                     Rule *r = nids->rules[*it];
+
+                    // payload analyzing is not needed, rule doesn't contain content or pcre options
+                    if (r->get_content().size() <= 0 && nids->regex_dfa_offset[*it] == -1) {
+                        boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(nids->analyzing_result_mutex);
+                        nids->analyzing_result.push_back(*it);
+                        found = true;
+                        continue;
+                    }
+
                     if (r->get_content().size() > 0) {
                         ac_analyze_needed = true;
                         ac_rules.push_back(*it);
@@ -705,7 +757,8 @@ void process_on_cpu_callable::operator ()(Nids *nids)
             }
 
             if (found)
-                nids->process_result();
+                nids->process_result_sem.post();
+
         }
     } catch (boost::thread_interrupted e) {
         BOOST_LOG_TRIVIAL(info) << "thread interrupted" << endl;
@@ -713,6 +766,32 @@ void process_on_cpu_callable::operator ()(Nids *nids)
 
     nids->threads_finished_sem.post();
     BOOST_LOG_TRIVIAL(trace) << "capture thread finished successfully" << endl;
+}
+
+void process_results_callable::operator ()(Nids *nids, const char *db_filename)
+{
+    Db db;
+    if (db_filename && db_filename[0])
+        db.open(db_filename);
+
+    while(true) {
+        nids->process_result_sem.wait();
+
+        if (nids->threads_exit)
+            break;
+
+        if (db.is_opened())
+            nids->process_result(&db);
+        else
+            nids->process_result(NULL);
+    }
+
+    if (db_filename && db_filename[0])
+        db.close();
+
+    nids->threads_finished_sem.post();
+    BOOST_LOG_TRIVIAL(trace) << "process_result thread finished successfully" << endl;
+    cout << "process result thread finished" << endl;
 }
 
 void Nids::set_log_level(LOG_LEVEL level)
@@ -751,4 +830,14 @@ void Nids::set_log_level(LOG_LEVEL level)
        (
            flt::attr< logging::trivial::severity_level >("Severity") >= slevel
        );
+}
+
+void Nids::add_alert_callback(AlertCallbackFunc callback, void *user)
+{
+    alert_callbacks.push_back(AlertCallback(callback, user));
+}
+
+void Nids::add_log_callback(LogCallbackFunc callback, void *user)
+{
+    log_callbacks.push_back(LogCallback(callback, user));
 }

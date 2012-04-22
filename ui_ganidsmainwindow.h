@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ganidsmainwindow.ui'
 **
-** Created: Fri Apr 20 16:43:12 2012
+** Created: Sun Apr 22 15:09:46 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -79,6 +79,7 @@ public:
     QLabel *stat_packets_received;
     QLabel *stat_tcpip;
     QLabel *stat_cur_load;
+    QPushButton *button_clear_matched;
     QGroupBox *groupBox_4;
     QHBoxLayout *horizontalLayout_3;
     QTableWidget *table_matched_rules;
@@ -269,6 +270,11 @@ public:
 
         formLayout->setWidget(0, QFormLayout::FieldRole, stat_cur_load);
 
+        button_clear_matched = new QPushButton(groupBox);
+        button_clear_matched->setObjectName(QString::fromUtf8("button_clear_matched"));
+
+        formLayout->setWidget(4, QFormLayout::LabelRole, button_clear_matched);
+
 
         horizontalLayout_2->addWidget(groupBox);
 
@@ -334,6 +340,7 @@ public:
         stat_packets_received->setText(QString());
         stat_tcpip->setText(QString());
         stat_cur_load->setText(QString());
+        button_clear_matched->setText(QApplication::translate("GanidsMainWindow", "Clear table", 0, QApplication::UnicodeUTF8));
         groupBox_4->setTitle(QApplication::translate("GanidsMainWindow", "Matched rules", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
