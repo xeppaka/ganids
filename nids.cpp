@@ -3,7 +3,9 @@
 #include <string>
 #include <net/ethernet.h>
 #include <netinet/ip.h>
-#include <cuda_runtime_api.h>
+#include <cuda.h>
+//#include <cuda_runtime.h>
+//#include <cuda_runtime_api.h>
 
 #include "common.h"
 #include "nids.h"
@@ -250,6 +252,14 @@ bool Nids::start_monitor_gpu(const char *interface, int device_num, WINDOW_TYPE 
     BOOST_LOG_TRIVIAL(trace) << "End - Nids::start_monitor_gpu";
 }
 
+bool Nids::start_monitor_offline(const char *interface, int threads_num, const char *cap_filename, const char *db_filename)
+{
+}
+
+bool Nids::start_monitor_dump(const char *interface, const char *cap_filename)
+{
+}
+
 bool Nids::list_cuda_devices(vector<cudaDeviceProp> &device_properties)
 {
     int count;
@@ -377,6 +387,10 @@ void Nids::process_packet_gpu(Packet *packet)
     if (matched_rules.size() > 0) {
         bool ac_analyze_needed = false;
 
+        //cout << "Number of matched rule for received packet: " << matched_rules.size() << endl;
+
+        bool ttt = false;
+
         // locked on gpu_switch_buffer_mutex
         {
             boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(gpu_switch_buffer_mutex);
@@ -390,11 +404,12 @@ void Nids::process_packet_gpu(Packet *packet)
                     continue;
                 }
 
-                if (regex_dfa_offset[*it] != -1) {
+                if (regex_dfa_offset[*it] != -1 && packet->get_payload_size() >= 1000) {
                     tasks->push_back(packet_buffer->size());
-                    tasks->push_back(packet->get_payload_size());
+                    tasks->push_back(1000/*packet->get_payload_size()*/);
                     tasks->push_back(regex_dfa_offset[*it] + ac.count_states());
                     tasks->push_back(*it);
+                    ttt = true;
                 }
 
                 if (r->get_content().size() > 0) {
@@ -403,13 +418,14 @@ void Nids::process_packet_gpu(Packet *packet)
                 }
             }
 
-            if (ac_analyze_needed) {
-                tasks->push_back(packet_buffer->size());
-                tasks->push_back(packet->get_payload_size());
-                tasks->push_back(0);
-                tasks->push_back(0);
-            }
+//            if (ac_analyze_needed) {
+//                tasks->push_back(packet_buffer->size());
+//                tasks->push_back(packet->get_payload_size());
+//                tasks->push_back(0);
+//                tasks->push_back(0);
+//            }
 
+            if (ttt)
             packet_buffer->insert(packet_buffer->end(),
                                  packet->get_raw_packet() + packet->get_payload_offset(),
                                  packet->get_raw_packet() + packet->get_payload_offset() + packet->get_payload_size());
@@ -440,28 +456,28 @@ void Nids::process_result(Db *db)
         analyzing_result.clear();
     }
 
-    for (vector<int>::iterator it = matched_rules.begin();it != matched_rules.end(); ++it) {
-        //BOOST_LOG_TRIVIAL(info) << "rule matched: " << *it;
-        Rule *r = rules[*it];
-        switch (r->get_action()) {
-            case ALERT:
-            {
-                if (db)
-                    db->insert("ALERT", r->get_message().c_str(), r->get_rule_str().c_str());
-                for (vector<AlertCallback>::iterator it = alert_callbacks.begin(); it != alert_callbacks.end(); ++it)
-                    (*it).callback((*it).user, r->get_message().c_str(), r->get_rule_str().c_str());
-            }
-            break;
-            case LOG:
-            {
-                if (db)
-                    db->insert("LOG", r->get_message().c_str(), r->get_rule_str().c_str());
-                for (vector<LogCallback>::iterator it = log_callbacks.begin(); it != log_callbacks.end(); ++it)
-                    (*it).callback((*it).user, r->get_message().c_str(), r->get_rule_str().c_str());
-            }
-            break;
-        }
-    }
+//    for (vector<int>::iterator it = matched_rules.begin();it != matched_rules.end(); ++it) {
+//        //BOOST_LOG_TRIVIAL(info) << "rule matched: " << *it;
+//        Rule *r = rules[*it];
+//        switch (r->get_action()) {
+//            case ALERT:
+//            {
+//                if (db)
+//                    db->insert("ALERT", r->get_message().c_str(), r->get_rule_str().c_str());
+//                for (vector<AlertCallback>::iterator it = alert_callbacks.begin(); it != alert_callbacks.end(); ++it)
+//                    (*it).callback((*it).user, r->get_message().c_str(), r->get_rule_str().c_str());
+//            }
+//            break;
+//            case LOG:
+//            {
+//                if (db)
+//                    db->insert("LOG", r->get_message().c_str(), r->get_rule_str().c_str());
+//                for (vector<LogCallback>::iterator it = log_callbacks.begin(); it != log_callbacks.end(); ++it)
+//                    (*it).callback((*it).user, r->get_message().c_str(), r->get_rule_str().c_str());
+//            }
+//            break;
+//        }
+//    }
 
     BOOST_LOG_TRIVIAL(trace) << "End - Nids::process_result";
 }
@@ -510,7 +526,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
         // all states include regex states + ac states
         int states_all = nids->ac.count_states() + nids->regex.count_states();
 
-        // alloc buffer for DFA
+        // alloc memory for DFA
         if (cudaMallocPitch(reinterpret_cast<void**>(&dfa_device), &pitch, (STATE_SIZE + 1) * sizeof(dfa_device[0]), states_all) != cudaSuccess)
             throw 1;
 
@@ -535,6 +551,10 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
                    (STATE_SIZE + 1) * sizeof(dfa_device[0]), cudaMemcpyHostToDevice) != cudaSuccess)
                 throw 1;
         }
+
+        // bind texture to created memory
+        //bind_texture(dfa_device, pitch * states_all);
+
     } catch (int i) {
         if (dfa_device)
             cudaFree(dfa_device);
@@ -569,7 +589,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
 
             //BOOST_LOG_TRIVIAL(trace) << "processing buffer of packets on GPU, length = " << nids->packet_buffer->size();
             cout << "processing buffer of packets on GPU, length = " << nids->gpu_packet_buffer->size() << endl;
-            cout << "tasks count: " << nids->gpu_tasks->size() << endl;
+            cout << "tasks count: " << nids->gpu_tasks->size() / 4 << endl;
 
             try {
                 if (cuda_packet_buffer_size < nids->gpu_packet_buffer->size()) {
@@ -597,7 +617,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
                 if (cudaMemcpy(cuda_tasks_buffer, nids->gpu_tasks->data(), nids->gpu_tasks->size() * sizeof(int), cudaMemcpyHostToDevice) != cudaSuccess)
                     throw 1;
 
-                analyze_payload_cuda(dfa_device, pitch, cuda_packet_buffer, cuda_tasks_buffer, cuda_out_buffer, nids->gpu_tasks->size() / 4);
+                analyze_payload_cuda(dfa_device, pitch, cuda_packet_buffer, cuda_tasks_buffer, cuda_out_buffer, nids->gpu_tasks->size() / CUDA_TASK_SIZE);
                 if (cudaThreadSynchronize() != cudaSuccess)
                     throw 1;
 
@@ -608,11 +628,19 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
 
                 if (cudaMemcpy(out_buffer, cuda_out_buffer, nids->gpu_tasks->size() / CUDA_TASK_SIZE * sizeof(int), cudaMemcpyDeviceToHost) != cudaSuccess)
                     throw 1;
+
+//                cout << "part of out buffer:" << endl;
+//                for (int i = 0; i < 20; ++i) {
+//                    cout << out_buffer[i] << endl;
+//                }
+
             } catch (int i) {
                 BOOST_LOG_TRIVIAL(error) << "error occured during processing packets on GPU";
                 nids->gpu_packet_buffer->clear();
                 nids->gpu_tasks->clear();
                 nids->gpu_ac_rules->clear();
+
+                //unbind_texture();
 
                 if (cuda_packet_buffer)
                     cudaFree(cuda_packet_buffer);
@@ -635,7 +663,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
 
             // process output
             bool found = false;
-            for (int i = 0; i < nids->gpu_tasks->size() / 4; ++i) {
+            for (int i = 0; i < nids->gpu_tasks->size() / CUDA_TASK_SIZE; ++i) {
                 bool ac_search = nids->gpu_tasks->at(i * 4 + 2) == 0;
                 if (out_buffer[i] == -1)
                     continue;
@@ -670,6 +698,8 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
     {
         cout << "thread interrupted" << endl;
     }
+
+    //unbind_texture();
 
     if (cuda_packet_buffer)
         cudaFree(cuda_packet_buffer);
@@ -718,8 +748,9 @@ void process_on_cpu_callable::operator ()(Nids *nids)
             if (matched_rules.size() > 0) {
                 bool ac_analyze_needed = false;
 
-//                cout << "number of rules matched to packet header: " << matched_rules.size() << endl;
+                //cout << "number of rules matched to packet header: " << matched_rules.size() << endl;
                 ac_rules.clear();
+                int k = 0;
                 for (vector<int>::iterator it = matched_rules.begin(); it != matched_rules.end(); ++it) {
                     Rule *r = nids->rules[*it];
 
@@ -742,8 +773,11 @@ void process_on_cpu_callable::operator ()(Nids *nids)
                             nids->analyzing_result.push_back(*it);
                             found = true;
                         }
+                        ++k;
                     }
                 }
+
+                cout << "regex: " << k << endl;
 
                 if (ac_analyze_needed) {
                     vector<int> result;
@@ -844,4 +878,20 @@ void Nids::add_alert_callback(AlertCallbackFunc callback, void *user)
 void Nids::add_log_callback(LogCallbackFunc callback, void *user)
 {
     log_callbacks.push_back(LogCallback(callback, user));
+}
+
+void Nids::update_pcap_stats()
+{
+    if (handle)
+        pcap_stats(handle, &stat);
+    else {
+        stat.ps_drop = 0;
+        stat.ps_ifdrop = 0;
+        stat.ps_recv = 0;
+    }
+}
+
+pcap_stat *Nids::get_pcap_stats()
+{
+    return &stat;
 }

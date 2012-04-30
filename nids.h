@@ -92,21 +92,27 @@ public:
       * \brief Function used to read rules from *.txt file and save them in Nids class in internal structures
       */
     int read_rules(const char *filename);
+
     bool start_monitor(const char *interface, int threads_num, const char *db_filename = NULL);
-    bool stop_monitor();
-    bool list_interfaces(vector<string> &result);
-    int packet_buffer_size() const;
     bool start_monitor_gpu(const char *interface,
                            int device_num,
                            WINDOW_TYPE window_type = BUF_SIZE,
                            int buf_threshold_size = DEF_PACKET_BUFFER_SIZE,
                            int buf_flush_time = DEF_TIME_FLUSH_BUFFER,
                            const char *db_filename = NULL);
+    bool start_monitor_offline(const char *interface, int threads_num, const char *cap_filename, const char *db_filename = NULL);
+    bool start_monitor_dump(const char *interface, const char *cap_filename);
+
+    bool stop_monitor();
+    bool list_interfaces(vector<string> &result);
+    int packet_buffer_size() const;
     bool list_cuda_devices(vector<cudaDeviceProp> &device_properties);
     void set_log_level(LOG_LEVEL level);
 
     void add_alert_callback(AlertCallbackFunc callback, void *user);
     void add_log_callback(LogCallbackFunc callback, void *user);
+    void update_pcap_stats();
+    pcap_stat *get_pcap_stats();
 
 //private:
 public:
@@ -139,6 +145,9 @@ public:
 
     // pcap handle
     pcap_t *handle;
+
+    // struct for collecting pcap stats
+    pcap_stat stat;
 
     // loaded rules
     vector<Rule *> rules;

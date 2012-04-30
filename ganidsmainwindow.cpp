@@ -314,6 +314,8 @@ void GanidsMainWindow::timerEvent(QTimerEvent *event)
     ui->stat_tcpip->setText(QString("%1").arg(nids.num_tcp_ip_packets));
     ui->stat_avg_load->setText(QString("%1").arg(nids.num_bytes / (cur_time - capture_start_time) / 1000.0));
     ui->stat_cur_load->setText(QString("%1").arg((nids.num_bytes - bytes_received) / 1048576.0));
+    nids.update_pcap_stats();
+    ui->stat_dropped->setText(QString("%1").arg(nids.get_pcap_stats()->ps_drop));
     bytes_received = nids.num_bytes;
 }
 

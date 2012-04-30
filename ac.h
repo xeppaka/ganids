@@ -30,6 +30,7 @@ public:
     const vector<int> &get_out(int state);
 
 private:
+//public:
     void enter(const sequence8 &sequence, int value);
     void compute_fail_transitions();
 

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ganidsmainwindow.ui'
 **
-** Created: Sun Apr 22 22:55:17 2012
+** Created: Sat Apr 28 18:05:22 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -80,6 +80,8 @@ public:
     QLabel *stat_tcpip;
     QLabel *stat_cur_load;
     QPushButton *button_clear_matched;
+    QLabel *label_11;
+    QLabel *stat_dropped;
     QGroupBox *groupBox_4;
     QHBoxLayout *horizontalLayout_3;
     QTableWidget *table_matched_rules;
@@ -130,10 +132,11 @@ public:
         radio_timed = new QRadioButton(group_gpu_settings);
         radio_timed->setObjectName(QString::fromUtf8("radio_timed"));
         radio_timed->setGeometry(QRect(27, 35, 71, 23));
-        radio_timed->setChecked(true);
+        radio_timed->setChecked(false);
         radio_buffer = new QRadioButton(group_gpu_settings);
         radio_buffer->setObjectName(QString::fromUtf8("radio_buffer"));
         radio_buffer->setGeometry(QRect(27, 66, 71, 23));
+        radio_buffer->setChecked(true);
         label_9 = new QLabel(group_gpu_settings);
         label_9->setObjectName(QString::fromUtf8("label_9"));
         label_9->setGeometry(QRect(237, 66, 41, 18));
@@ -143,7 +146,7 @@ public:
         spin_buffer_size->setMinimum(32);
         spin_buffer_size->setMaximum(100000000);
         spin_buffer_size->setSingleStep(1024);
-        spin_buffer_size->setValue(65536);
+        spin_buffer_size->setValue(10000);
         label = new QLabel(frame);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(10, 13, 171, 18));
@@ -233,7 +236,7 @@ public:
         label_7 = new QLabel(groupBox);
         label_7->setObjectName(QString::fromUtf8("label_7"));
 
-        formLayout->setWidget(6, QFormLayout::FieldRole, label_7);
+        formLayout->setWidget(7, QFormLayout::FieldRole, label_7);
 
         label_4 = new QLabel(groupBox);
         label_4->setObjectName(QString::fromUtf8("label_4"));
@@ -273,7 +276,17 @@ public:
         button_clear_matched = new QPushButton(groupBox);
         button_clear_matched->setObjectName(QString::fromUtf8("button_clear_matched"));
 
-        formLayout->setWidget(4, QFormLayout::LabelRole, button_clear_matched);
+        formLayout->setWidget(5, QFormLayout::LabelRole, button_clear_matched);
+
+        label_11 = new QLabel(groupBox);
+        label_11->setObjectName(QString::fromUtf8("label_11"));
+
+        formLayout->setWidget(4, QFormLayout::LabelRole, label_11);
+
+        stat_dropped = new QLabel(groupBox);
+        stat_dropped->setObjectName(QString::fromUtf8("stat_dropped"));
+
+        formLayout->setWidget(4, QFormLayout::FieldRole, stat_dropped);
 
 
         horizontalLayout_2->addWidget(groupBox);
@@ -341,6 +354,8 @@ public:
         stat_tcpip->setText(QString());
         stat_cur_load->setText(QString());
         button_clear_matched->setText(QApplication::translate("GanidsMainWindow", "Clear table", 0, QApplication::UnicodeUTF8));
+        label_11->setText(QApplication::translate("GanidsMainWindow", "Dropped packets:", 0, QApplication::UnicodeUTF8));
+        stat_dropped->setText(QString());
         groupBox_4->setTitle(QApplication::translate("GanidsMainWindow", "Matched rules", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

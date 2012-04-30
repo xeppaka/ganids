@@ -393,6 +393,7 @@ The code contained in the figure 2.12 shows a simplified example of a kernel cal
 
 \setsecnumdepth{all}
 \chapter{Design}
+\label{chap:design}
 
 \section{Developing tools and methodology.}
 The tools and programming languages selected for implementing application are:
@@ -462,7 +463,7 @@ Multi-pattern matching algorithms search a set of patterns in a text simultaneou
 
 Previous section introduced NIDS rule which could contain \textbf{content} or \textbf{pcre} patterns that should be searched withing payload. As there could be a lot of rules and a lot of contents it was decided to use Aho-Corasick algorithm to search all content string simultaneously within packet payload. 
 
-The algorithm consists of two parts. In the first part we construct from the set of patterns a finiste state machine; in the second part we apply the packet payload as input to the pattern matching machine. The machine signals whenever it has found a match for a keyword. The pattern matching machine consists of a set of states. Each state is represented by a number. The machine processes the text by successively reading symbols from input string, making state transitions and occasionally emitting output. The behaviour of the pattern matching machine is dictated by three functions: a goto function \emph{g}, a failure function \emph{f} and an output function \emph{output}. Figures \ref{fig:goto_function}, \ref{fig:failure_function} and \ref{fig:output_function} shows the functions used by a pattern matching machine for a set of keywords (he, she, his, hers).
+The Aho-Corasick algorithm consists of two parts. In the first part we construct from the set of patterns a finiste state machine; in the second part we apply the packet payload as input to the pattern matching machine. The machine signals whenever it has found a match for a keyword. The pattern matching machine consists of a set of states. Each state is represented by a number. The machine processes the text by successively reading symbols from input string, making state transitions and occasionally emitting output. The behaviour of the pattern matching machine is dictated by three functions: a goto function \emph{g}, a failure function \emph{f} and an output function \emph{output}. Figures \ref{fig:goto_function}, \ref{fig:failure_function} and \ref{fig:output_function} shows the functions used by a pattern matching machine for a set of keywords (he, she, his, hers).
 
 \begin{figure}[h]
 \centering
@@ -581,7 +582,7 @@ Regular expressions are compiled into a DFA by using external library. As a resu
 \end{figure}
 
 \subsection*{Packet filtering based on route information.}
-Information obtained from packet header is used to select packet for analysing it payload or drop it without any analysis. During loading rules route information is stored into a trie structure as a sequence of bytes. Later, when packet is obtained from the network its route header is presented as a sequence of bytes and trie search is perfomed. If search in trie found any rule for this packet, this packet is put in a queue for a payload analysis. This approach is similar to Aho-Corasick algorithm with data saved in trie. The only difference is that to save values with range trie node may contain value ranges.
+Information obtained from packet header is used to select packet for analysing its payload or drop it without any analysis. Information from loaded rules should match the packet's header information to continue processing of received packet. It was decided to store route information from the loaded rule as a sequence of bytes in a trie structure. Figure \ref{fig:trie_example} shows example of a trie structure with next IP addresses stored: 192.168.0.1, 192.168.1.38, 192.168.5-100.1 and 232.222.1.79. The full sequence stored in trie is shown in a figure \ref{fig:route_sequence}. Theresore to compare any received packet to some rule, route information from packet's header should be represented as a sequence of bytes shown in a figure \ref{fig:route_sequence}, and search procedure on a trie for the sequence of bytes is perfomed. This approach is similar to Aho-Corasick algorithm of searching with data saved in trie. The only difference is that trie may contain IP range (therefore trie node may be not just a simple node with value, but contain range of values). If search in trie found any rule for this packet, this packet is put in a queue for a payload analysis. 
 
 \begin{figure}[h]
 \centering
@@ -590,8 +591,6 @@ Information obtained from packet header is used to select packet for analysing i
 \label{fig:trie_example}
 \end{figure}
 
-Figure \ref{fig:trie_example} shows example of trie with stored IP addresses: 192.168.0.1, 192.168.1.38, 192.168.5-100.1 and 232.222.1.79. The full route sequence stored in a trie is shown in the figure \ref{fig:route_sequence}.
-
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.8]{images/route_sequence.png}
@@ -599,8 +598,35 @@ Figure \ref{fig:trie_example} shows example of trie with stored IP addresses: 19
 \label{fig:route_sequence}
 \end{figure}
 
+\subsection*{Transfering packets to the GPU.}
+The simplest approach is to transfer each packet to the GPU separately. However, there is an overhead associated with a data transfer operation to the GPU and many small transfers to the GPU result into a perfomance decreasing. Therefore the following approach is designed to achieve better perfomance for packets transfering. Packets obtained by CPU are collected in a buffer for some time. When CPU decides that it's time to process packets it transfers a batch of packets to the GPU for processing. 
+
+CPU program decision on transferring packets to the GPU could be based on two policies:
+\begin{itemize}
+\item Decision based on the time. Buffer with packets is transfered to the GPU on timer event.
+\item Decision based on buffer size. Buffer with packets is transfered to the GPU when size of the buffer exceeds some size.
+\end{itemize}
+
+\subsection*{Database structure.}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.55]{images/database.png}
+\caption{Database structure.}
+\label{fig:database_structure}
+\end{figure}
+
+Database with results is very simple and contain only one table which have all information about matched packet inside. Figure \ref{fig:database_structure} shows table fields that are filled for a matched packets.
+\begin{itemize}
+\item \textbf{Time} field contains timestamp when NIDS detected suspicious packet.
+\item \textbf{Action} field contains action from the matched rule.
+\item \textbf{Message} field contains message from the matched rule.
+\item \textbf{Rule} field contains the matched rule itself.
+\end{itemize}
+In the current application version it was decided not to save payload from the matched packet because of perfomance reasons.
+
 \subsection*{Application components.}
-Application design is divided in several components. The diagram contained in figure \ref{fig:app_architecture} show the relationship between components.
+Application design is divided into a several components. The diagram contained in a figure \ref{fig:app_architecture} shows the relationship between components.
 
 \begin{figure}[h]
 \centering
@@ -620,7 +646,490 @@ Application design is divided in several components. The diagram contained in fi
 \end{itemize}
 
 \chapter{Implementation.}
+\section{General considerations.}
+Application implementation has been developed using the following version of the programming tools and libraries:
+\begin{itemize}
+\item GCC 4.7.0.
+\item CUDA [TODO:add version]
+\item LibPcap [TODO:add version]
+\item QT [TODO:add version]
+\end{itemize}
 
+\lstset{language=Python, caption={Part of QT project file with extra compiler configuration.}, label=lst:extra_compiler_config, captionpos=b}
+\begin{lstlisting}
+# CUDA settings (for Arch Linux)
+CUDA_SOURCES += my_nids_cuda.cu
+# Path to cuda toolkit install
+CUDA_DIR = /opt/cuda-toolkit
+# GPU architecture
+CUDA_ARCH = sm_11
+# nvcc flags (ptxas option verbose is always useful)
+NVCCFLAGS = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v
+# include path
+INCLUDEPATH += $$CUDA_DIR/include
+# lib dir
+QMAKE_LIBDIR += $$CUDA_DIR/lib64
+# libs
+LIBS += -lcudart
+# join the includes in a line
+CUDA_INC = $$join(INCLUDEPATH,' -I', '-I', ' ')
+
+# Prepare the extra compiler configuration (taken from the nvidia forum)
+cuda.input = CUDA_SOURCES
+cuda.output = ${OBJECTS_DIR}${QMAKE_FILE_BASE}.o
+cuda.commands = $$CUDA_DIR/bin/nvcc -m64 -g -G -arch=$$CUDA_ARCH -c $$NVCCFLAGS $$CUDA_INC $$LIBS ${QMAKE_FILE_NAME} -o ${QMAKE_FILE_OUT}
+
+cuda.dependcy_type = TYPE_C
+cuda.depend_command = $$CUDA_DIR/bin/nvcc -g -G -M $$CUDA_INC $$NVCCFLAGS ${QMAKE_FILE_NAME}
+# Tell Qt that we want add more stuff to the Makefile
+QMAKE_EXTRA_COMPILERS += cuda
+\end{lstlisting}
+
+The NIDS application has been developed based on the design presented in the chapter \ref{chap:design}. The application uses workflow presented in \ref{}. Project sources are organized into QT project file and to compile project first qmake utility from QT is used to generate Makefile. Makefile is required by \textbf{make } utility to compile and link sources into final executable. The whole project structure is placed in one folder, but logically source codes are divided into "Headers", "Sources", "Forms" and "Other files" if IDE such as QT creator is used to manage a project. All source codes are compiled with \textbf{gcc} compiler except CUDA code. Files with CUDA source codes have \textbf{*.cu} extension and are compiled with \textbf{nvcc} compiler. To add possibility to compile \textbf{*.cu} files to QT project an extra compiler configuration is created in QT project file (shown in listing \ref{lst:extra_compiler_config}).
+
+\section{Application threading model.}
+The NDIS application has been developed using Boost.Thread library for Nids itself and QThread for GUI part. Boost.Thread is used in the main Nids class for processing packets on CPU or GPU. The QThread is used for executing Main window message processing and running Nids packet capture task. The reason why two different threads classes were used is that developing of the core Nids application was started using only Boost library and QT part is added a little bit later.
+
+When NIDS application process in CPU mode N threads are created for packet processing and 1 thread is created for packets collecting. Packet capture thread writes packet payload into a buffer and puts pointer to the buffer into a queue. Other threads are sleep until some packet arrive in the queue. In the moment when packet arrived in the queue one of the thread awakes and pulls packet from the queue for processing. After finishing working on packet it goes to sleep state again until new packet arrive into the queue.
+
+For NIDS working in CPU+GPU mode packets processing is slightly different. There is only 1 thread which puts tasks (packet payload, payload length and number of DFA to search) into the queue and 1 thread which process packets when size of the packets in the queue exceeds threshold or time for processing elapsed. A double-buffered mechanism of processing packets were implemented to speed up the process of collecting packets: before processing packets on GPU buffers are switched and CPU is able to collect arriving packets into the second buffer.
+
+To keep multithreaded code integrity, synchronization mechanisms from Boost library were used: Boost.Semaphore for synchronizing access to queues and Boost.Mutex for synchronizing access to other objects.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.3]{images/cpu_threads.png}
+\caption{Threading model for CPU processing.}
+\label{fig:cpu_threads}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.3]{images/gpu_threads.png}
+\caption{Threading model for CPU+GPU processing.}
+\label{fig:gpu_threads}
+\end{figure}
+
+Figures \ref{fig:cpu_threads} and \ref{fig:gpu_threads} shows the threading model for CPU and CPU+GPU modes graphically.
+
+\section{Main application classes.}
+In this section the main application classes are described, their functionality and purpose.
+
+\subsection{Packet class.}
+Packet class is used to store all information about network packet needed to analyze packet header and payload. It is used by Nids class to search within trie structure and analyze payload for regex or ac patterns. Listing \ref{lst:packet_class} shows part of the implementation of the class header.
+
+\lstset{language=C++, caption={Extract of Packet.h}, label=lst:packet_class, captionpos=b}
+\begin{lstlisting}
+class Packet
+{
+public:
+    Packet(in_addr ip_from, in_addr ip_to, int port_from, int port_to);
+
+    // create packet from raw data
+    static Packet* create_packet(const u_char *raw_packet);
+
+    // for test purposes
+    static Packet* create_fake_packet();
+
+    // getters and setters for packet components
+    in_addr get_ip_from() const;
+    // ...
+
+    sequence32 &get_route();
+    const sequence32 &get_route() const;
+    int get_payload_offset() const;
+    int get_payload_size() const;
+    const u_char *get_raw_packet() const;
+
+    // payload from raw_packet is saved into internal vector
+    // it means that packet will be analyzed by CPU
+    vector<u_char> &save_payload();
+    const vector<u_char> &get_payload() const;
+
+private:
+    //...
+    int payload_size;
+    int payload_offset;
+
+    // info about route for analyzing in the trie
+    sequence32 route;
+    const u_char *raw_packet;
+    vector<u_char> payload;
+};
+\end{lstlisting}
+
+When new packet is arrived a create\_packet static method is used to analyze packet. This method is a packet analyzer and it's used for every received packet to create Packet class with properly filled fields. Method create\_packet analyzes raw packet data and makes protocol identification. In case it is TCP/IP packet it creates Packet object, otherwise it returns null object which means that it's not needed to analyze received packet.
+
+Right after returning from create\_packet method raw\_packet field contains the pointer to the raw packet payload. Method create\_packet doesn't copy payload data into any other place because of efficienty. This moment is described later in Nids class description.
+
+Field route is used to save packet route information in the format described in figure \ref{fig:route_sequence}. The route information is stored in sequence32 type array which is defined as a std::vector class that contain 32 bit values. There is also sequence8 type in the application which is std::vector itself containing 8 bit values.
+
+\subsection{AC class.}
+AC class is the implementation of the Aho-Corasick algorithm. The main methods are insert and search. Method insert inserts some string into the internal trie and search tries to find given string within saved strings. When all strings are inserted finish method should be called to process all strings into a DFA which later can be extracted for loading to GPU. 
+
+\lstset{language=C++, caption={Extract of AC.h}, label=lst:ac_class, captionpos=b}
+\begin{lstlisting}
+#define FAIL -1
+#define STATE_SIZE UCHAR_MAX + 1
+
+class AC
+{
+public:
+    AC();
+
+    void insert(const sequence8 &sequence, int value);
+    void search(const sequence8 &sequence, vector<int> &result);
+    void search(const u_char *sequence, int length, vector<int> &result);
+    int next(int state, sequence_val8 value);
+
+    void finish();
+    int count_states();
+    int get_transition_value(int state, int c);
+    const vector<int> &get_transition_row(int state);
+    const vector<int> &get_out(int state);
+
+private:
+    void enter(const sequence8 &sequence, int value);
+    void compute_fail_transitions();
+
+    vector< vector<int> > transition_table;
+    vector< vector<int> > out;
+};
+\end{lstlisting}
+
+Internally DFA is stored in a transition\_table field with unbounded maximum number of states and number of transitions for the state equals to UCHAR\_MAX + 1 (256). Field out is an out function as described in Aho-Corasick algorithm description. For every state it contains all matched strings.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{images/ac_grid.png}
+\caption{Aho-Corasick DFA traversing.}
+\label{fig:ac_grid}
+\end{figure}
+
+The search algorithm is simple traversing internal DFA for every next input symbol is shown on figure \ref{fig:ac_grid}.
+
+\subsection{Regex class.}
+Regex class implements compilation of regex patterns into DFA and searching in the input strings for previously compiled patterns. The main methods are compile and search. 
+
+\lstset{language=C++, label=lst:regex_class, captionpos=b, caption={Extract of Regex.h}}
+\begin{lstlisting}
+#define STATE_SIZE (UCHAR_MAX + 1)
+#define STATE_DEAD -1
+#define STATE_WHOLE_STR -2
+
+class Regex
+{
+public:
+    Regex();
+
+    int compile(const sequence8 &regex);
+    int count_states();
+    int get_transition_value(int dfa_offset, int state, int c);
+    const vector<int> get_transition_state(int dfa_offset, int state);
+    const vector<int> get_transition_state(int row);
+    bool is_match(int dfa_offset, int state);
+    bool is_match(int row);
+    const vector<int> get_dfa_offsets() const;
+    bool search(const sequence8 &data, int dfa_offset);
+    bool search(const u_char *data, int length, int dfa_offset);
+
+private:
+    vector< vector<int> > transition_table;
+    vector<int> dfa_offsets;
+    int states_total;
+    int states_cur_dfa;
+    map<void *, int> states_map;
+    const re2::uint8 *bytemap;
+
+    int analyze_state(void *state);
+};
+\end{lstlisting}
+
+Method compile uses RE2 regular expression library to compile input pattern into DFA. Default memory budget for compiling one DFA is 8388608 bytes. If compiling pattern exceed memory budget such regex is declined and won't be searched during packet analyzing.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{images/regex_grid.png}
+\caption{Regex DFA internal representation.}
+\label{fig:regex_grid}
+\end{figure}
+
+The internal representation of DFA is similar to AC's one. The only difference is that AC has one DFA and all input string falls into it, while for every regular expression separate DFA is created. Thus, Regex class stores all DFAs into one vector and to be able to find specific DFA start offsets are stored into other vector. Other difference is that regex DFA contains states defined as STATE\_DEAD and STATE\_WHOLE\_STR. This states finish the whole searching procedure: value STATE\_DEAD means that for any input character the next state is the current one, value STATE\_WHOLE\_STR means that no matter what next input symbols could be, current searching procedure in any case cannot succeed (e.g. searched pattern should match from the start of the string, if start is not matched, not matter what are the other symbols, searching could not succeed).
+Regex DFAs representation stored in Regex class is shown in figure \ref{fig:regex_grid}.
+
+\subsection{Trie class.}
+Trie class is used to store the sequence of symbols and quick search over the input string. Internal structure of the trie was described in \ref{TODO:add ref}. Trie class itself contain only three methods: insert, search and clear. The name of the methods are pretty clear and speaks for themselfs.
+
+\lstset{language=C++, label=lst:trie_node_class, captionpos=b, caption={Extract of Trie_node.h}}
+\begin{lstlisting}
+typedef vector<trie_range> trie_range_t;
+typedef vector<Trie_node *> trie_range_value_t;
+typedef map<sequence_val32, Trie_node *> trie_transition_t;
+
+class Trie_node
+{
+public:
+    Trie_node();
+    vector<int>& get_values();
+    void set_values(vector<int> &values);
+    void append_values(vector<int> &values);
+    void append_value(int value);
+    Trie_node *next(sequence_val32 val);
+    void set_next(sequence_val32 val, Trie_node *next);
+    void set_next_any(Trie_node *next);
+    Trie_node *get_next_any();
+
+    trie_transition_t &get_transitions();
+    trie_range_t &get_ranges();
+    trie_range_value_t &get_range_values();
+
+private:
+    trie_transition_t next_;
+    trie_range_t range_next_;
+    trie_range_value_t range_next_value_;
+    Trie_node *any_next_;
+    vector<int> values;
+};
+\end{lstlisting}
+
+More complex is the Trie\_node class which stores information for one trie node (listing \ref{lst:trie_node_class}). The type trie\_transition\_t maps symbol value to the next trie node. Thus the search algorithm is similar to the searching over DFA, but trie node additionally contains range\_next\_ field which is used to store range for IP or port values. If, for example, 192.0-4.*.* is used, than range\_next\_ will contain 0-4 part of the IP address in current trie node. Also any\_next\_ is the pointer to the next trie node, so for * symbol used in IP address any\_next\_ field is filled with pointer to the next trie node. Therefore searching over such kind of the trie is getting next trie node from the next\_ field for each input symbol from the input string. Additionally check if range or any symbol exist in the current node.
+
+\subsection{Rule class.}
+For each rule in the rules.txt file one object of Rule class type is created. Rule class stores a text representation of the rule and also all parameters of the rule which are parsed by using Boost.Spirit parser.
+
+\lstset{language=C++, label=lst:rule_class, captionpos=b, caption={Extract of Rule.h}}
+\begin{lstlisting}
+class Rule
+{
+public:
+    static Rule *create_rule(const string &rule);
+
+    Action get_action();
+    const sequence32 &get_route();
+    // ...
+
+private:
+    Rule();
+    // ...
+
+    // rule as string
+    string rule_str;
+    // action that should be taken if rule is matched
+    Action action;
+    // message that should be inserted into database if this rule matched
+    string message;
+    // route info includes all information about protocol and IP adresses and ports.
+    // it will be inserted in trie and matched against route info of every received packet.
+    sequence32 route;
+    vector<sequence8> content;
+    sequence8 pcre;
+    int offset;
+    int length;
+};
+
+\end{lstlisting}
+
+The Rule object is created using static create\_rule method. This method simply parses passed string value and returns pointer to newly created Rule object with filled parameters. Parsing is done by using Boost.Spirit library which allows to write grammar for parsing directly in the C++ code. For parsing rules a RuleRouteGrammar was created and used in a Boost's phrase\_parse function. In case of malformed rule create\_rule function returns NULL. Listing \ref{lst:ip_grammar} contains an example of a simple grammar for parsing IP address. This grammar returns std::vector object with four ip parts represented as unsigned integers.
+
+\lstset{language=C++, label=lst:ip_grammar, captionpos=b, caption={Boost.Spirit grammar for parsing IP address.}}
+\begin{lstlisting}
+template<typename Iterator>
+struct IPGrammar : qi::grammar<Iterator, std::vector<unsigned>(), space_type>
+{
+    IPGrammar() : IPGrammar::base_type(ip_address)
+    {
+        ip_address = uint_parser<unsigned, 10, 1, 3>() >> '.' >> 
+                     uint_parser<unsigned, 10, 1, 3>() >> '.' >> 
+                     uint_parser<unsigned, 10, 1, 3>() >> '.' >> 
+                     uint_parser<unsigned, 10, 1, 3>();
+    }
+
+    qi::rule<Iterator, std::vector<unsigned>()> ip_address;
+}
+\end{lstlisting}
+
+Grammar could be easily extended to include new parameters by adding qi::rule as a field and include new rules definitions into IPGrammar. Boost.Spirit allows to parse strings directly into C++ structures, so it is possible to create structures layout for parsing very complex expressions.
+
+\subsection{Nids class.}
+
+Nids class is the main class in the application. It manages all activities in the application, starts and stops network monitoring, all previously described classes are used by Nids class as helpers. 
+
+\lstset{language=C++, label=lst:nids_class, captionpos=b, caption={Extract of Nids.h}}
+\begin{lstlisting}
+class Nids
+{
+public:
+    Nids();
+    ~Nids();
+
+    int read_rules(const char *filename);
+    bool start_monitor(const char *interface, int threads_num, const char *db_filename = NULL);
+    bool start_monitor_gpu(const char *interface,
+                           int device_num,
+                           WINDOW_TYPE window_type = BUF_SIZE,
+                           int buf_threshold_size = DEF_PACKET_BUFFER_SIZE,
+                           int buf_flush_time = DEF_TIME_FLUSH_BUFFER,
+                           const char *db_filename = NULL);
+    bool start_monitor_offline(const char *interface, 
+                           const char *cap_filename, 
+                           int threads_num, 
+                           const char *db_filename = NULL);
+    bool start_monitor_offline_gpu(const char *interface, 
+                           const char *cap_filename, 
+                           int device_num,
+                           WINDOW_TYPE window_type = BUF_SIZE,
+                           int buf_threshold_size = DEF_PACKET_BUFFER_SIZE,
+                           int buf_flush_time = DEF_TIME_FLUSH_BUFFER,
+                           const char *db_filename = NULL);
+    bool start_monitor_dump(const char *interface, const char *cap_filename);
+    // ...
+    void add_alert_callback(AlertCallbackFunc callback, void *user);
+    void add_log_callback(LogCallbackFunc callback, void *user);
+
+private:
+    // ...
+
+    // loaded rules
+    vector<Rule *> rules;
+
+    // route info saved in trie
+    Trie rules_trie;
+
+    // ...
+
+    // CPU processing
+    // ...
+    boost::interprocess::interprocess_semaphore packets_queue_sem;
+    boost::interprocess::interprocess_semaphore threads_finished_sem;
+    boost::interprocess::interprocess_semaphore process_result_sem;
+    boost::interprocess::interprocess_mutex packets_queue_mutex;
+    boost::interprocess::interprocess_mutex analyzing_result_mutex;
+
+    // GPU processing
+    // ...
+    // pointers to current buffer that should be processed on gpu
+    vector<int> *gpu_ac_rules;
+    vector<u_char> *gpu_packet_buffer;
+    vector<int> *gpu_tasks;
+
+    // double buffered packets, tasks and ac_rules
+    vector<int> ac_rules1;
+    vector<int> ac_rules2;
+    vector<u_char> packet_buffer1;
+    vector<u_char> packet_buffer2;
+    vector<int> tasks1;
+    vector<int> tasks2;
+
+    vector<int> analyze_rules;
+    vector<int> matched_rules;
+
+    // CUDA synchronization semaphores
+    boost::interprocess::interprocess_semaphore gpu_task_ready;
+    boost::interprocess::interprocess_semaphore gpu_task_finished;
+    boost::interprocess::interprocess_semaphore gpu_init_finished;
+    boost::interprocess::interprocess_mutex gpu_switch_buffer_mutex;
+
+		void switch_buffers();
+    // ...
+    friend void packet_received(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes);
+    friend struct process_on_gpu_callable;
+    friend struct process_on_cpu_callable;
+    friend struct process_results_callable;
+};\end{lstlisting}
+
+When application is started it should read Nids rules first. For this process read\_rules method is used: it creates array of rules in a \textbf{rules} variable and uses these rules for packet analysis.
+
+Different start\_* methods are used to start monitoring network in different modes:
+\begin{itemize}
+\item \textbf{start\_monitor} is used to start network monitoring in a CPU mode. Number of threads used to process packets is passed as threads\_num parameter.
+\item \textbf{start\_monitor\_gpu} is used to start network monitoring in a CPU+GPU mode. Pararmeter window\_type specifies what kind of flush mechanism is used for transferring packets to GPU: BUF\_SIZE or TIME. Parameter device\_num specifies which GPU device is used for packets analyzing.
+\item \textbf{start\_monitor\_offline} is used to process packets from saved *.cap file in CPU mode. It operates in the same manner as start\_monitor, the only difference that new parameter cap\_filename is used as a name of the file with packets.
+\item \textbf{start\_monitor\_offline\_gpu} is used to process packets from saved *.cap file in CPU+GPU mode. It operates in the same manner as start\_monitor\_gou, the only difference that new parameter cap\_filename is used as a name of the file with packets.
+\item \textbf{start\_monitor\_dump} is used to start monitoring network and save packets into the *.cap log file. Later this file is used by previously defined methods for analyzing.
+\end{itemize}
+
+Just after starting monitoring network Nids class creates threads for processing packets on CPU or GPU. For this purpose three process\_* structures were created:
+\begin{itemize}
+\item \textbf{process\_on\_gpu\_callable} is a structure with overrided operator (). This way Boost.Thread executes code in operator() in a separate thread. The process\_on\_gpu\_callable thread performs tasks execution on GPU. Because CUDA device should be initialized in the thread where it will be used, process\_on\_gpu\_callable also initializes CUDA device. For synchronization purposes during initialization and processing on GPU Boost.Semaphore and Boost.Mutex is used. For example, after Nids started process\_on\_gpu\_callable thread, it waits on gpu\_init\_finished semaphore until thread finishes initializing CUDA device.
+\item \textbf{process\_on\_cpu\_callable} has similar structure with overrided operator (). Parameter threads\_num defines how many process\_on\_cpu\_callable threads will be created. Every process\_on\_cpu\_callable thread waits on packets\_queue\_sem until new packet appears in the queue. For every packet exactly one thread will seize the packets\_queue\_sem and get packet from the queue.
+\item \textbf{process\_results\_callable} is a thread which process results of the analysis. The thread main task is to insert matched rules into a database. There are also mechanism of the callbacks in Nids class. Callbacks functions can be added to Nids using add\_alert\_callback or add\_log\_callback methods and for every matched rule process\_results\_callable thread will call it.
+\end{itemize}
+
+The \textbf{packet\_received} function is a callback for a pcap library. Pcap call this function every time the new packet arrived into the system. The main responsibility of this function in CPU mode is to check whether new packet is TCP/IP (using Packet::create\_packet() method), create the Packet class object and put it into the queue. For CPU+GPU mode processing of the received packet is slightly different. The Packet class object is created as it is done in CPU mode, but just after creation all parsed parameters are saved into internal vectors (including payload) and Packet object is deleted. This way Nids class gathers all payloads into the one linear buffer and if the buffer size exceeds limit it increases gpu\_task\_ready semaphore to awake process\_on\_gpu\_callable thread to process packets on the GPU. Also CPU+GPU mode manages \textbf{tasks} array. This array is directly copied to the CUDA device and contains tasks that CUDA threads will process. The structure of task is described later in the CUDA code description.
+
+The Nids class has two vectors for CUDA tasks and packet buffer. This way double-buffered mechanism is implemented for packet capturing and CUDA processing. When process\_on\_gpu\_callable thread copies data to the GPU and executes kernel on \textbf{tasks1} vector of tasks, packet\_received adds newly received packets to the \textbf{tasks2} vector of tasks.
+
+Nids class logs a lot of information during its work. To reduce logged information set\_log\_level method is used. It defines six different log levels, but the major ones are: TRACE, DEBUG and INFO.
+
+\subsubsection*{Future work.}
+The future work for the Nids class is to implement packet categorization based on the payload size and process different categories of packets separately. There could be several categories of packets: small, medium, large, etc. This way CUDA resources could be used more effectively.
+
+\subsection{CUDA code.}
+The code on the CUDA device is quite simple. It receives array of tasks, pointer to packets buffer and pointer to DFAs buffer. Every CUDA thread gets task from the tasks buffer which contain information about data for processing. The packet processing is just traversing over DFA table for every input byte from the packet payload. If new state is the final one and has \textbf{found} flag  set, CUDA thread sets \textbf{found} flag for the current task. The task structure is described in the figure \ref{fig:cuda_task}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{images/cuda_task.png}
+\caption{Cuda task.}
+\label{fig:cuda_task}
+\end{figure}
+
+When CUDA kernel is starte, every CUDA thread calculates task using formula: \textbf{task\_num = blockIdx.x * blockDim.x + threadIdx.x}. This way every thread process takes task in sequential order. CUDA has limits on the number of threads per block (maximum 512 threads), but the number of tasks could be greather than the maximum number of threads, therefore CUDA code reuses threads to process all tasks. If we are using 4 block with 256 threads in each block, than maximum number of threads is 1024. This way only 1024 threads are logically executed in the same moment and should be reused for tasks that are not processed yet. The mechanism of thread resuing is described in the figure \ref{fig:cuda_thread_reuse}.
+
+\lstset{language=C++, label=lst:nids_class, captionpos=b, caption={Extract of my\_nids\_cuda.cu}}
+\begin{lstlisting}
+    while (task_num < tasks) {
+        // ...
+        while (cur_idx < payload_length) {
+            if (cache_index >= 64) {
+                for (int i = 0; i < 16 && (cur_idx + i*4 < payload_length); ++i) {
+                    payload_cache[i] = ((unsigned int*)(payload + cur_idx))[i];
+                }
+                cache_index = 0;
+            }
+            __syncthreads();
+
+            if (cur_state == -1)
+                break;
+
+            if (cur_state == -2) {
+                out_buffer[task_num] = result_rule;
+                break;
+            }
+
+            if (dfa_state[256] > 0) {
+                if (dfa_offset == dfa)
+                    out_buffer[task_num] = cur_state;
+                else
+                    out_buffer[task_num] = result_rule;
+
+                break;
+            }
+
+            cur_state = dfa_state[((unsigned char *)payload_cache)[cache_index]];
+            ++cur_idx;
+            ++cache_index;
+        }
+
+        // next task for the thread
+        task_num += gridDim.x * blockDim.x;
+    }
+\end{lstlisting}
+
+To speed up the process of analyzing packet on the GPU shared memory is used. Shared GPU memory has less access time than the global memory where all packets are situated. Each thread uses shared memory to copy small part of the payload for analyzing. When thread finishes analyzing part of the payload, it copies next part and so on until whole payload is analyzed. Application uses 64 bytes of a shared memory for each thread, because application mainly tested on Geforce 9600M GT which has 16Kb of shared memory per block.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{images/cuda_thread_reuse.png}
+\caption{Cuda threads reuse.}
+\label{fig:cuda_thread_reuse}
+\end{figure}
+
+\subsubsection*{Future work.}
+The future work for the CUDA code is to use texture memory to save DFA and\\or packets payload. Texture memory has the same access time as a global memory: 400-600 cycles. The only difference the Nids application is that texture memory is cached and in case of the cache hit access time is about 1 cycle. On the other side access pattern for the packet analyzing has random structure, therefore using structures may not give desired results.
+
+\chapter{Evaluation}
+In the experiments 
 
 \setsecnumdepth{part}
 \chapter{Conclusion}

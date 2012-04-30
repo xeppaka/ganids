@@ -16,9 +16,13 @@ class Packet
 public:
     Packet(in_addr ip_from, in_addr ip_to, int port_from, int port_to);
 
+    // create packet from raw data
     static Packet* create_packet(const u_char *raw_packet);
+
+    // for test purposes
     static Packet* create_fake_packet();
 
+    // getters and setters for packet components
     in_addr get_ip_from() const;
     in_addr get_ip_to() const;
     int get_port_from() const;
@@ -32,6 +36,9 @@ public:
     int get_payload_offset() const;
     int get_payload_size() const;
     const u_char *get_raw_packet() const;
+
+    // payload from raw_packet is saved into internal vector
+    // it means that packet will be analyzed by CPU
     vector<u_char> &save_payload();
     const vector<u_char> &get_payload() const;
 
@@ -44,7 +51,7 @@ private:
     int payload_size;
     int payload_offset;
 
-    // info about route to analyze in trie
+    // info about route for analyzing in the trie
     sequence32 route;
     const u_char *raw_packet;
     vector<u_char> payload;
