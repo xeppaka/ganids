@@ -51,16 +51,16 @@
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
 \department{Department of \ldots (SPECIFY)}
-\title{Thesis title (SPECIFY)}
+\title{Network intrusion detection system\\ accelerated with GPU.}
 \author{Pavel Kachalouski} %author's name without academic degrees
-\authorWithDegrees{Pavel Kachalouski \& degrees} %author's name with academic degrees
-\supervisor{Your Supervisor's Name (SPECIFY)}
-\acknowledgements{THANKS}
-\abstractEN{Summarize the contents and contribution of your work in a few sentences in English language.}
-\abstractCS{V n{\v e}kolika v{\v e}t{\' a}ch shr{\v n}te obsah a p{\v r}{\' i}nos t{\' e}to pr{\' a}ce v {\v c}esk{\' e}m jazyce.}
+\authorWithDegrees{Bc. Pavel Kachalouski} %author's name with academic degrees
+\supervisor{Šimeček Ivan Ing., Ph.D.}
+\acknowledgements{}
+\abstractEN{The goal of this thesis is to develop and test application for network intrusion detection accelerated with GPU. Deep packet inspection is a heavy process and consumes a lot of CPU calculation resources, thereby the main application objective is to offload the heaviest operations during analysing network traffic to the GPU. The project is based on Nvidia CUDA architecture and uses standard features provided by CUDA devices with 1.1 version of compute capabilities.}
+\abstractCS{Cílem této práce je vývoj a testování aplikaci pro detekci průniků sítě zrychlené pomoci GPU. Hloubkové prověřování paketů je těžký proces který konzumuje velké množství výpočetních prostředků procesoru, tím hlavním cílem aplikace je zbavit nejtěžší operace v analýze síťového provozu na GPU. Projekt je založen na architektuře NVIDIA CUDA a používá standardní funkce poskytované CUDA zařízení s verzí 1.1 výpočetních schopností.}
 \placeForDeclarationOfAuthenticity{Prague}
-\keywordsCS{Replace with comma-separated list of keywords in Czech.}
-\keywordsEN{Replace with comma-separated list of keywords in English.}
+\keywordsCS{Síťová analýza, Detekce průniku, GPU, CUDA, Paralelní výpočty.}
+\keywordsEN{Network analysis, Intrusion detection, GPU, CUDA, Parallel computing.}
 
 \parskip 2mm
 \setcounter{tocdepth}{5}
@@ -157,7 +157,7 @@ The main stages of the workflow:
 
 \chapter{Background}
 \section{Traffic analyzing: sniffers.}
-Packet sniffer is a program or library which allows to intercept data packets transmitted over a certain network to which the system is connected throught a network card. Most popular known sniffing software is tcpdump, Wireshark and OmniPeek. These programs are used for obtaining raw network packets and performing analyzing over obtained packets in order to represent them in a some visual form or dump to a file. There are also pure sniffing libraries, such as Libpcap (for UNIX like OS) and Winpcap (for Windows OS).
+Packet sniffer is a program or library which allows to intercept data packets transmitted over a certain network to which the system is connected throught a network card. Most popular known sniffing software is tcpdump and Wireshark. These programs are used for obtaining raw network packets and performing analyzing over obtained packets in order to represent them in a some visual form or dump to a file. There are also pure sniffing libraries, such as Libpcap (for UNIX like OS) and Winpcap (for Windows OS).
 
 \subsection{How they work.}
 Most of the network cards, support what is known as promiscuous mode or monitor mode. Normal operation of the network card is to receive packet from the network and compare the destination layer 2 (link layer) address (also known as MAC address) to the one used by the network card. If packet destination address and network card address match or packet destination address is a broadcast address, packet is transferred to the operating system. Not matched packets are dropped.
@@ -210,7 +210,7 @@ In case sniffer in a gateway link doesn't satisfy requirements port mirroring or
 \end{figure}
 \end{itemize}
 \subsection{Packet capture in IEEE 802.11 networks.}
-The main advantage of the packet sniffering in the IEEE 802.11 network compared to the IEEE 802.3 is that 802.11 networks all share the same carrier for transferring packets. So the all hardware required to capture packets is a network card in promiscuous mode. However, some considerations have to be kept in mind. IEEE 802.11 network could be made up by a number of access points which could be a problem for capturing packets. The coverage area becomes bigger and therefore higher reception antenna is needed if one sniffer point is used. Also some environment conditions and sniffer physical positionmay have big influence on the quality of sniffering. Because of shadowing packet sent by a some host could be lost at all.
+The main advantage of the packet sniffering in the IEEE 802.11 network compared to the IEEE 802.3 is that 802.11 networks all share the same carrier for transferring packets. So the only hardware required to capture packets is a network card in promiscuous mode. However, some considerations have to be kept in mind. IEEE 802.11 network could be made up by a number of access points which could be a problem for capturing packets. The coverage area becomes bigger therefore higher reception antenna is needed if one sniffer point is used. Also some environment conditions and sniffer physical position could have big influence on the quality of sniffering. Because of shadowing packet sent by a some host could be lost at all.
 
 Some approaches to solve these problems are:
 \begin{itemize}
@@ -223,7 +223,7 @@ Some approaches to solve these problems are:
 Libpcap is a sniffer library for packet capturing in a Unix-like systems. For a Windows systems a port of Libpcap named Winpcap exist. The library provides an API for using kernel resources for packet capturing in kernel architectures that are based on Berkeley Packet Filter. Libpcap was originally developed by the tcpdump developers in the Network Research Group at Lawrence Berkeley Laboratory. The following features are supported by Libpcap: packet capture, saving captured packets to a file, reading files containing saved packets. A capture file saved in the format that Libpcap can be read by applications such as tcpdump, Wireshark, CA NetMaster.
 
 \subsection{Network traffic analysis techniques.}
-This section gives a brief information about network traffic monitoring and analysis process. In the network analysis process a network data is intercepted and examined in order to retrieve information from patterns in communication. Packets collected from the network are called a dataset and contain the raw network data including header information and high level user information. By analysing datasets a useful pieces of information are retrieved and perfomed some manipudations over it.
+This section gives a brief information about network traffic monitoring and analysis process. In the network analysis process a network data is intercepted and examined in order to retrieve information from patterns in communication. Packets collected from the network are called a dataset and contain the raw network data including header information and high level user information. By analysing datasets a useful pieces of information are retrieved and perfomed some manipulations over it.
 
 Collected datasets are often divided into a smaller parts, data subsets, to analyse later separately. It is done because of perfomance reasons: algorithms used for analysis such a data could have non-linear compute time and processing a large amount of data by such algorithms may increase time exponentially. Such technique of dividing large dataset into smaller parts called windowing. Depending on the requrements two types of windowing are used:
 
@@ -276,14 +276,16 @@ Host-based intrusion detection is better fits to fight with internal threats, be
 
 \subsection*{Detection types}
 
-\textbf{Signature-Based Detection}
+\subsection*{Signature-Based Detection}
 
 Intrusion Detection may use signature-based detection to analyze traffic. Using such type of detection means that system is relying on known traffic data to analyze running traffic. An attacker can modify a little an attack to make it undetectable for such type of IDS. But regular expression-based rules give more power against such slightly changed attacks in the same time remaining very accurate.
 
 \subsection*{Anomaly-Based Detection}
-An IDS that looks at network traffic and detects data that is incorrect, not valid, or generally abnormal. This method is useful for detecting undesired traffic that is not specifically known. For instance, an anomaly-based IDS will detect that an Internet protocol (IP) packet is malformed. It does not detect that it is malformed in a specific way, but indicates that it is anomalous.
+
+This type of IDS looks at network traffic and detects data that is incorrect, not valid, or generally abnormal. This method is useful for detecting undesired traffic that is not specifically known. For instance, an anomaly-based IDS will detect that an Internet protocol (IP) packet is malformed. It does not detect that it is malformed in a specific way, but indicates that it is anomalous.
 
 \subsection*{Stateful Protocol Inspection}
+
 This type of detection is similar to anomaly-based detection, but it additionally inspects traffic on the transport layer and vendor-specific application layer, while anomaly-based detection is not doing it.
 
 \section{Intrusion Detection Systems: A Brief History.}
@@ -307,9 +309,9 @@ The intrusion detection market began to gain in popularity and truly generate re
 Currently, market statistics show that IDS is amidst the top selling security vendor technologies and should continue to rise. Furthermore, government initiatives, such as the Federal Intrusion Detection Network, (FIDNet) created under Presidential Decision Directive 63, are also adding impetus to the evolution of IDS. Advancements in IDS will ultimately push security technology into a whole new arena of automated security intelligence.
 
 \section{GPUs}
-GPU is a graphical processor unit sometimes also called visual processing unit or VPU, is a specialized type of processor that is responsible to render 3D graphics and offload this procedure from the micriprocessor or CPU. GPU history starts in 1970s, when ANTIC and CTIA chips were provided for hardware control of mixed graphics and text mode on Atari 8-bit computers. The ANTIC chip was a special purpose processor, that was responsible for mapping graphics and text data to the video output.
+GPU is a graphical processor unit sometimes also called visual processing unit or VPU, is a specialized type of processor that is responsible to render 3D graphics and offload this procedure from the micriprocessor or CPU. GPU history starts in 70s, when CTIA and ANTIC chips were developed. These chips allowed mixed graphics and text mode on Atari computers be hardware controlled. The ANTIC chip was a special purpose processor, that was responsible for mapping graphics and text data to the video output.
 
-Later, in 1984 the IBM Professional Graphics Controller appeared as one of the first 2D/3D graphics accelerators available for the IBM PC architecture compatible systems. IBM’s chip did not succeed, due to the lack of compatibility with already existing programs and due to its high price. Commondore Amiga was the first mass-market computer which included a dedicated graphics processor launched in 1985. Amiga's graphic processor was the first full graphics accelerator that offloaded practically all video operations from th CPU.
+In the 1984 appeared one of the first accelerators for the 2D and 3D graphics for the IBM PC architecture compatible systems: IBM's Professional Graphics Controller. Chip didn't succeed because of high cost and poor compatibility with already existing software. Commondore Amiga was the first mass-market computer which included a dedicated graphics processor launched in 1985. Amiga's graphic processor was the first full graphics accelerator that offloaded practically all video operations from the CPU.
 
 The first graphics system that implemented 2D primirives in hardware was the IBM's 8514 PC video card. In 1991, S3 manufacturer introduced the S3 86C911 to the market, which claimed to be the first single-chip graphics card to implement 2D acceleration functions in hardware. Other manufacturers followed the 86C911 model, and in 1995 all graphics card vendors has added 2D hardware acceleration support to their chips. In the first half of 1990s real-time 3D graphics became very significant, because of developing CAD (Computer Aided Design) systems and especially due to video games. Video games became more and more popular and as a result of growing demand on 3D hardware acceleration graphics processor vendors started to develop 2D and 3D graphics accelerators. Launching in 1996 the Verite V1000 chip by Rendition a new level of 3D acceleration was reached. This chip was the first consumer 3D accelerator cards truly capable of delivering playable performance with significantly improved graphics quality.
 
@@ -322,7 +324,7 @@ The latest chips of NVIDIA are the GF119 and GF110 chip family (Geforce 500 and 
 \subsection{GPGPU: general-purpose computing on graphics processing units.}
 GPGPU stands for General-Purpose Computing on Graphics Processing Units. Since 2003, several researchers like Harris, Mark J., William V. among others, outlined that current architecture of high performance GPUs in terms of FLOPS (FLoating-point Operations Per Second), with programmable fragment and vertex shaders that enabled the programmers to create more realistic and complex graphics, could be used for other purposes rather than graphic calculations.
 
-The motivation of GPGPU was performance improving of computing algorithms, and particularly to overcome limitations of traditionally CPU based computing: the instruction-level parallelism wall and the memory wall. On one hand, although GPUs architecture offer a limited set of operations to be performed over data, they have the ability to process many of them in parallel, thanks fundamentally to the programmable shaders that were added to the GPU processor’s pipelines. GPUs are able to compute many vertices or fragments of graphics in the same way in so-called streams. A stream is simply a set of elements that require similar computation, providing data parallelism, and kernels are the functions that are applied to each element in the stream.
+The major motivation for the progress of GPGPU was improving perfomance of the algorithms which easily scales for a parallel computations and overcome limitations of traditionally CPU based computing: the instruction-level parallelism wall and the memory wall. On the one side GPUs have a small number of instructions to be performed on the data, however they are able to execute many of this instructions simultaneously over the large amount of data. This became available because of the programmable shaders that were added to the GPU processor's pipelines. GPUs can compute a lot of vertices or fragments of graphics in the same way. Such a computation called stream. The streams is an array of elements required the same calculation performed on it, and kernels are the functions applied to all elements in the stream.
 
 \begin{figure}[h]
 \centering
@@ -331,7 +333,7 @@ The motivation of GPGPU was performance improving of computing algorithms, and p
 \label{fig:cpuvsgpu}
 \end{figure}
 
-In the other hand, the usage of graphical processor units have another important advantage over traditionally computing CPU based model; its memory bandwidth. In the last decade the gap between CPU and memory speed have kept growing, and thus memory latency has become a major bottleneck in CPU computing, specially in applications with an intensive usage of memory. The evolution of theoretical single precision floating point operations (FLOPS) for both Intel based CPU processors and NVIDIA based GPU processors is shown in the figure \ref{fig:cpuvsgpu}. 
+Also, the usage of graphical processor units have another important advantage over traditionally computing CPU based model: the memory bandwidth. In the last decade the gap between CPU and memory speed have kept growing, and thus memory latency has become a major bottleneck in CPU computing, specially in applications with an intensive usage of memory. The evolution of theoretical single precision floating point operations (FLOPS) for both Intel based CPU processors and NVIDIA based GPU processors is shown in the figure \ref{fig:cpuvsgpu}. 
 
 First attempts of using GPUs with other purposes rather than graphics, required to transform or convert complex algorithms and data into a graphics, to be able to use the GPU through graphics libraries (like OpenGL) to solve them and later revert the transformation. 
 
@@ -343,8 +345,7 @@ CUDA has become widely used in many areas such as physics simulations, scientifi
 
 \subsection{CUDA architecture and programming model for GPGPU.}
 
-The CUDA SDK allows programmers to code parts or functions of a general purpose program to be executed in the GPU using C language with some extensions. The main three key abstractions that are exposed to the programmer as the C extensions are: a hierarchy of thread groups, shared memories and thread barrier synchronization. CUDA programmers have to partition the algorithms or parts of the code that are going to be boosted using the GPU into coarse sub-problems that can be solved independently in parallel, and then into smaller pieces that can be solved cooperatively in parallel. Functions executed into the GPU are called kernels, the rest of the code, and particularly
-high control intensive parts of the code, are executed on the CPU. 
+CUDA is the parallel computing architecture developed by NVIDIA which allows developers to use 'C for CUDA' language to code parts or functions of a general purpose program. The main three key abstractions that are available to the programmer as the C extensions are: a hierarchy of thread groups, shared memories and thread barrier synchronization. CUDA programmers divide the complex task that is going to be accelerated using GPU into a smaller several tasks that can be solved independently in parallel. Functions executed by GPUs are called kernels. The rest of the code remains the same and is executed on the CPU.
 
 \begin{figure}[h]
 \centering
@@ -353,11 +354,11 @@ high control intensive parts of the code, are executed on the CPU.
 \label{fig:cuda_threads}
 \end{figure}
 
-Kernels are functions with \_global\_ attribute. When they are called, kernels throw a total number of N threads. To achieve a good performance in general, kernels should throw thousands of threads. 
+Kernels are functions with \_global\_ attribute. When they are called, kernels throw a total number of N threads. To achieve a good performance in general, thousand of kernels should be executed simultaneously.
 
-Figure \ref{fig:cuda_threads} show kernel’s thread organization of model. The N threads thrown by the kernel are organized in 2D array of blocks called grid, each of this blocks containing a 3D array of threads (hardware supports only 2D array at this moment). The number of threads, and their organization cannot be modified during the kernel execution. The programmer may use or not multidimensional block and grid organization according to their needs, simply not using (0 value) the dimensions not needed. 
+Figure \ref{fig:cuda_threads} shows kernel’s thread organization of model. All CUDA threads are organized into a 2D array of blocks called grid. Each of this block contain a logical 3D array of threads. However at this moment hardware support only 2D array. The dimensions of grid and blocks should be choosed before running a kernel, because they cannot be cnahged during execution of the CUDA code. If the programmer doesn't want to use multidimensional array of threads or blocks one dimension could be defined as 0. This way threads will be organized in a simple array of 1 dimension.
 
-The programmer can access to the current thread block ID dimensions values with variables blockIdx.x and blockIdx.y respectively. Likewise, the programmer can access to current thread ID dimension with variables threadIdx.x, threadIdx.y and threadIdx.z respectively. The combination of blockIdx and threadIdx complex variables values identify unequivocally each thread, and are used to perform ordered data accesses and execute code conditionally depending on the thread and block IDs. Currently, CUDA based programs have the restriction of a maximum of 65536 (216) threads and the limitation of 512 threads/blocks per dimension due to current GPU architectures (Tesla architecture).
+During kernel execution code could read current thread ID and current block ID. It is done by using built-in variables blockIdx.x, blockIdx.y for blocks and threadIdx.x, threadIdx.y and threadIdx.z for threads. Dimensions of the grid and block can also be retrieved using built-in variables like blockDim and gridDim. The combination of the blockIdx and threadIdx identify each thread, are used to perform coalesced memory access and execute code for a different input data based in the thread and block IDs. The current restriction for the maximum threads is 65536 with limit over the one dimension of 512 threads/blocks.
 
 \begin{figure}[h]
 \begin{lstlisting}
@@ -369,7 +370,7 @@ __global__ void vecAdd (float *A , float *B , float *C)
 
 int main (int argc, char *argv[])
 {
-	vecAdd<<<Nb,Nt>>>(A, B, C);
+	vecAdd<<<NUM_BLOCKS, NUM_THREADS>>>(A, B, C);
 	return 0;
 }
 
@@ -378,7 +379,7 @@ int main (int argc, char *argv[])
 \label{fig:cuda_kernel}
 \end{figure}
 
-The code contained in the figure \ref{fig:cuda_kernel} shows a simplified example of a kernel call, throwing vecAdd kernel with a 1D grid organization and 1D thread block organization, throwing NB blocks, with NT threads per block. Some coding details, like memory data transfers from CPU to host are omitted for simplicity.
+The code contained in the figure \ref{fig:cuda_kernel} shows a simplified example of a kernel call, executing vecAdd kernel with a 1D grid organization and 1D thread block organization, throwing NUM\_BLOCKS blocks, with NUM\_THREADS threads per block.
 
 \setsecnumdepth{all}
 \chapter{Design}
@@ -721,14 +722,14 @@ For NIDS working in CPU+GPU mode packets processing is slightly different. There
 
 To keep multithreaded code integrity, synchronization mechanisms from Boost library were used: Boost.Semaphore to notify threads that new packet arrived to the queue and Boost.Mutex for synchronizing access to queue and other shared objects.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[scale=0.3]{images/cpu_threads.png}
 \caption{Threading model for CPU processing.}
 \label{fig:cpu_threads}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[scale=0.3]{images/gpu_threads.png}
 \caption{Threading model for CPU+GPU processing.}
