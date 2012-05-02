@@ -6,7 +6,7 @@
 
 \documentclass[thesis=M,english]{FITthesis}[2011/07/15]
 
-% \usepackage[utf8]{inputenc} % LaTeX source encoded as UTF-8
+\usepackage[utf8]{inputenc} % LaTeX source encoded as UTF-8
 % \usepackage[latin2]{inputenc} % LaTeX source encoded as ISO-8859-2
 % \usepackage[cp1250]{inputenc} % LaTeX source encoded as Windows-1250
 
@@ -58,19 +58,19 @@
 \acknowledgements{THANKS}
 \abstractEN{Summarize the contents and contribution of your work in a few sentences in English language.}
 \abstractCS{V n{\v e}kolika v{\v e}t{\' a}ch shr{\v n}te obsah a p{\v r}{\' i}nos t{\' e}to pr{\' a}ce v {\v c}esk{\' e}m jazyce.}
-\placeForDeclarationOfAuthenticity{Olomouc}
+\placeForDeclarationOfAuthenticity{Prague}
 \keywordsCS{Replace with comma-separated list of keywords in Czech.}
 \keywordsEN{Replace with comma-separated list of keywords in English.}
 
 \parskip 2mm
-
+\setcounter{tocdepth}{5}
 \begin{document}
 
 % \newacronym{CVUT}{{\v C}VUT}{{\v C}esk{\' e} vysok{\' e} u{\v c}en{\' i} technick{\' e} v Praze}
 % \newacronym{FIT}{FIT}{Fakulta informa{\v c}n{\' i}ch technologi{\' i}}
 
-% \setsecnumdepth{part}
 \chapter{Introduction}
+\label{chap:introduction}
 \section{Motivation}
 First major malicious internet-based attack was introduced in 1988 when one of the first Internet worms was released. Referred to as "The Morris Worm", it was written by Robert Tappan Morris and caused major interruptions across large parts of the Internet. Since 1988 Internet has greatly evolved and as a result increased number of internet-based attacks and network security became a really important issue. As an attempt to overcome this problem Intrusion Detection systems were developed. Such systems allow to monitor and possibly prevent attempts to intrude into or compromise the network resources.
 
@@ -104,7 +104,7 @@ The other source of high load on NIDS is constant grow of networks speeds. In th
 
 Problem with high load on NIDS can be solved by using specialized network processing devices such as FPGA, ASIC, Network Processing Unit (NPU), or the TCP Offoading Engine (TOE). Nonetheless, the solutions may not be cost effective and easy to manage because they require special hardware and configurations.
 
-\subsection*{Problem definition}
+\section{Problem definition}
 A quick packet processing in a NIDS over huge amount of data obtained from the network \textbf{is a must}. Perfomance of network data processing algorithms should be fast and should not interfere with the overall network perfomance (or interfere as little as possible).
 The current factors related to the networks and traffic analysis systems listed below:
 \begin{enumerate}
@@ -254,26 +254,8 @@ Network monitoring, network management and security, all are interested in a dat
 
 A major position in the network analysis has pattern retrival task and calculation of the statistical parameters. Different time distributions, statistical moments of the first and second order, mean values and probability distributions could be calculated over the gathered network data. Also statistics can be used for other kind of the purpose, like marketing. Gathering information about average number of connections, average inbound and outboud speeds, time distributions of connections to servers could give a good picture for some product on the market.
 
-Rule based or signature based analysis is a type of traffic inspection where every packet is matched agains a certain rule or signature. Rules or signatures define specific fields in the packet header or combine several field values in a certain packet. Values may also be defined as an intervals or thresholds. Threshold rules are used all over security, for example, to identify DoS or bandwith abuse attacks. The synonym for the rule based analysis is a signature pattern matching and both two terms are used in a literature about network analysis. But the signature pattern matching is also used for the statistical part of the packets inspection. In this thesis rule based analysis is used to name the packet analysis for matching against rules as it is done in network intrusion detection systems and described later. 
-
-In this sense, rules could be considered as policies, as certainly define the type and amount of traffic permitted and not permitted in the network. Flow based analysis techniques are focused in the treatment of network traffic as flows, as most information exchanged in a computer network is session or connection oriented and not packet oriented, so analysis can take advantage of it. A clear example of a typical network flow is a TCP connection, where data exchanged is ruled by the TCP state machine.
-Their main applications are in the monitoring and security field. Regarding security, most NIDS like Snort, use flow based analysis techniques to detect possible threats, based on anomalies and well known attacks. Monitoring platforms on the other hand, inspect network traffic in search of flows, to generally list them or represent them in a diagram.
-
-\textbf{Advanced statistical and signal processing techniques applied to the network traffic analysis.}
-Since early 1990’s, researchers all over the world have devoted some of their efforts in the research of advanced statistical analysis techniques and also applying signal processing techniques to the network traffic analysis. The efforts have been centered in the network intrusion detection and prevention field, due to the fact that signature based NIDS (and NIPS) have important limitations detecting new security threats, as new rules for detection appear as new attacks and security threats are discovered. In addition,
-signature based NIDS have the obvious drawback that rulesets have to be frequently updated. Platforms or applications that use statistical techniques for the network intrusion de-
-tection are known as Statistical Network Intrusion Detection Systems or alternately Behaviour based Network Intrusion Detection Systems. This kind of NIDS rely on advanced statistical techniques, heuristic pattern extraction and signal processing to detect anomalies and classify network traffic.
-
-Y. Wang exposes in his book a general and up to date state-of-the-art of most reliable statistical techniques in the field of statistical network intrusion detection. There
-is also an extensive set of publications from researchers over new statistical and signal processing techniques applied to network intrusion detection. Some of the techniques
-are briefly introduced here.
-
-\textbf{Linear and Nonlinear modeling methods.}
-Significance tests, like $\chi^2$ (chi-square) test and t-test have been proposed for a simple network intrusion detection, examining frequency difference between two categorical variables and differences between two continuous variables respectively. Linear methods like logistic models, regression models, principal component analysis or clustered based analysis are some of the main methods suitable to use complex statistical modeling techniques to examine user behaviour based on network traffic data. 
-Non linear methods are fundamentally based in AI (artificial intelligence) algorithms like Artificial neural networks, Fuzzy logic algorithms and K-nearest neighbour algorithms have also been found effective for aiding network intrusion detection decisions.
-
-\textbf{Bayesian and probability approaches.}
-Bayesian and probability approaches assume that parameters that are being studied are random rather than fixed parameters. Before looking at the current data, old information can be used to construct a prior distribution model for these parameters and therefore classify new data based on how likely various values of the unknown parameters are, and then make use of the current data to revise this starting assessment so that parameters can be considered random, not fixed. This attribute allows an intrusion detection systems to make a more precise decision based on the probability approach. Latent class model based analysis like proposed in Wang, Kim, Mbateng and Ho or Bayes role based analysis like proposed by Barbard, Wu and Jajodia are some examples of Bayesian and probability approaches.
+Rule based or signature based analysis is a type of traffic inspection where every packet is matched agains a certain rule or signature. Rules or signatures define specific fields in the packet header or combine several field values in a certain packet. Values may also be defined as an intervals or thresholds. Threshold rules are used all over security, for example, to identify DoS or bandwith abuse attacks. In this case rules may be treated as policies, which allow or disallow certain amount of traffic in the network.
+The synonym for the rule based analysis is a signature pattern matching and both two terms are used in a literature about network analysis. But the signature pattern matching is also used for the statistical part of the packets inspection. In this thesis rule based analysis is used to name the packet analysis for matching against rules as it is done in network intrusion detection systems and described later. 
 
 \section{Intrusion detection.}
 Intrusion detection is a process of detection undesired traffic on a network or device. An Intrusion Detection System is a combination of a physical device with a software which monitors network traffic in order to detect undesired activity and traffic that violates security policies. Different IDS tools are able also to store event information into log for later review or combine events with other information to make decisions about policies and losses. More functionalities provide IPS that can prevent or stop undesired traffic.
@@ -366,12 +348,12 @@ high control intensive parts of the code, are executed on the CPU.
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.45]{images/cuda_threads.png}
+\includegraphics[scale=0.4]{images/cuda_threads.png}
 \caption{CUDA thread hierarchy.}
 \label{fig:cuda_threads}
 \end{figure}
 
-Kernels are functions designated with \_global\_ attribute. When they are called, kernels throw a total number of N threads. To achieve a good performance in general, kernels should throw thousands of threads. 
+Kernels are functions with \_global\_ attribute. When they are called, kernels throw a total number of N threads. To achieve a good performance in general, kernels should throw thousands of threads. 
 
 Figure \ref{fig:cuda_threads} show kernel’s thread organization of model. The N threads thrown by the kernel are organized in 2D array of blocks called grid, each of this blocks containing a 3D array of threads (hardware supports only 2D array at this moment). The number of threads, and their organization cannot be modified during the kernel execution. The programmer may use or not multidimensional block and grid organization according to their needs, simply not using (0 value) the dimensions not needed. 
 
@@ -393,11 +375,10 @@ int main (int argc, char *argv[])
 
 \end{lstlisting}
 \caption{Simplified CUDA kernel and associated main() function.}
-\label{fig:cuda_threads}
+\label{fig:cuda_kernel}
 \end{figure}
 
-The code contained in the figure 2.12 shows a simplified example of a kernel call, throwing vecAdd kernel with a 1D grid organization and 1D thread block organization, throwing NB blocks, with NT threads per block. Some coding details, like memory data transfers from CPU to host are omitted for simplicity.
-
+The code contained in the figure \ref{fig:cuda_kernel} shows a simplified example of a kernel call, throwing vecAdd kernel with a 1D grid organization and 1D thread block organization, throwing NB blocks, with NT threads per block. Some coding details, like memory data transfers from CPU to host are omitted for simplicity.
 
 \setsecnumdepth{all}
 \chapter{Design}
@@ -409,7 +390,7 @@ The tools and programming languages selected for implementing application are:
 Languages:
 
 \begin{itemize}
-\item \textbf{C++}: due to perfomance requirements and supporting of object oriented features (classes, inheritance), C++ is used for developing the whole program, instead of the CUDA device code part, where C dialect for CUDA is used.
+\item \textbf{C++}: due to perfomance requirements and supporting of object oriented features (classes, inheritance), C++ is used for developing the whole application, except of the CUDA device code part, where C dialect for CUDA is used.
 \item \textbf{CUDA}: CUDA uses C language with additional features to perform general purpose calculations in the GPUs.
 \end{itemize}
 
@@ -418,7 +399,7 @@ Libraries:
 \begin{itemize}
 \item \textbf{Libpcap}: is packet-capture library for retrieving packets from the Packet Filter.
 \item \textbf{QT}: is a cross-platform application framework for developing application with a rich graphical interface. It is used for building GUI part of the application.
-\item \textbf{Boost}: is a set of libraries that extend the functionality of the C++ programming language. From boost libraries components for processes synchronization were used (semaphores and mutexes). Also boost.spirit parser is used to parse rules dataset.
+\item \textbf{Boost}: is a set of libraries that extend the functionality of the C++ programming language. Classes for processes synchronization are used (semaphores and mutexes) and also a Boost.Spirit parser to parse rules dataset.
 \item \textbf{Sqlite}: is a software library that implements a SQL database engine and is used to store results.
 \end{itemize}
 
@@ -444,11 +425,11 @@ action protocol src_ip src_port direction dst_ip dst_port {options}
 \label{fig:rule_format}
 \end{figure}
 
-\textbf{Action} could be an \textbf{alert} or \textbf{log}, where 'alert' means that if case rule is matched against some packet it should be alerted to user, for example highlighted with a red color in a GUI. If rule starts with a 'log' action it means that packet matched against rule will be logged into a database without any specific actions for gaining user attention.
+\textbf{Action} could be an \textbf{alert} or \textbf{log}, where 'alert' means that if case rule is matched against some packet it should be alerted to user, for example highlighted with a red color in a GUI or appeared as a MessageBox dialog. If rule starts with a 'log' action it means that packet matched against rule will be logged into a database without any specific actions for gaining user attention.
 
-\textbf{Protocol} is a packet's protocol type. Because of simplifications only 'tcp' is supported by developing application.
+\textbf{Protocol} is a packet's protocol type. Because of simplifications only 'tcp' is supported by developing application. Also 'tcp' will take into consideration only IP packets from the network layer of the OSI model.
 
-\textbf{Src\_ip} is a source IP address of the packet. IP address is written in a standard form '192.168.0.1' where each position could be a range, for example '192.168.0-20.1'. Also instead of any position in the IP address, '*' symbol could be used to accept all values on that position. For example '192.168.*.*'.
+\textbf{Src\_ip} is a source IP address of the packet. IP address is written in a standard form '192.168.0.1' where each position could be a range, for example '192.168.0-20.1'. Also instead of any position in the IP address '*' symbol can be used to accept all values on that position. For example '192.168.*.*'.
 
 \textbf{Src\_port} is a source TCP port. It is a value from 0 to 65535, or range, for example 5-1234, or '*' symbol which means any port.
 
@@ -458,10 +439,10 @@ action protocol src_ip src_port direction dst_ip dst_port {options}
 
 \textbf{Dst\_port} is a destination TCP port written in the same format as a source TCP port.
 
-\textbf{Options} are parameters that specifies payload analysis. Within options should be a \textbf{content} or \textbf{pcre}. Content specifies a string which is searched within a packet payload. Also content string could contain raw bytes which should be written within '\textbar' symbols. Example of the content option with a string and raw bytes \textbf{content:"searchedstring\textbar00 01 02\textbar"}.\newline Pcre specifies the searched string as a regular expression. Example of pcre option \textbf{pcre:"\textasciicircum(some)*regex"}. The reason of dividing searched string on content and pcre is that all content strings are compiled into one DFA while each pcre is compiled in its own DFA and could consume much more memory. Options may contain parameters \textbf{offset} and \textbf{length} which means position in a payload from which searching should be started and number of bytes from the start position to observe. And finally \textbf{msg} parameter could be withing options. It is a simple string that should be logged or alerted to user when some packet matches against the rule.
+\textbf{Options} are parameters that specifies payload analysis. Within options should be a \textbf{content} or \textbf{pcre} parameters. Content specifies a string which is searched within a packet payload. Also content string could contain raw bytes which should be written within '\textbar' symbols. Example of the content option with a string and raw bytes: \textbf{content:"stringtosearch\textbar00 01 02\textbar"}.\newline Pcre parameter allows to specify the searched string as a regular expression. Example of pcre option: \textbf{pcre:"\textasciicircum(some)*regex"}. The reason of dividing searched string on content and pcre is that all content strings are compiled into one DFA while each pcre is compiled in its own DFA and could consume much more memory. Therefore, if it's possible, it is preffered to use more content parameters against pcre parameters, because content parameters are using fast searched Aho-Corasick algorithm to search all contents simultaneously, while every pcre expression is searched individually for each packet. Options may contain parameters \textbf{offset} and \textbf{length} which means position in a payload from which searching should be started and number of bytes from the start position to observe. And finally \textbf{msg} parameter can appear withing options. It is a simple string that should be logged or alerted to user when some packet matches against the rule.
 
 \section{Application design overview.}
-The main objective of this thesis is to design and implement simple NIDS application capable to analyze network traffic using GPUs, specifically using CUDA. 
+The main objective of this thesis is to design and implement simple NIDS application capable to analyze network traffic using GPUs using CUDA. 
 \subsection*{Pattern matching.}
 Pattern matching is the most heavy operation that affects the NIDS perfomance. Pattern matching algorithms can be classified into single-pattern and multi-pattern algorithms.
 
@@ -469,7 +450,7 @@ Single-pattern algorithms work in a way that each pattern is searched in a given
 
 Multi-pattern matching algorithms search a set of patterns in a text simultaneously. It is done by preprocessing all patterns that could be searched into an automation which is used during searching phase. The automation may be represented as a trie, a table or combination of the two. Such algorithms searches each byte from the text only once. Also such algorithms scales much better that single-pattern. Example of multi-pattern algorithms: Aho-Corasick, Wu-Manber and Commentz-Walter.
 
-Previous section introduced NIDS rule which could contain \textbf{content} or \textbf{pcre} patterns that should be searched withing payload. As there could be a lot of rules and a lot of contents it was decided to use Aho-Corasick algorithm to search all content string simultaneously within packet payload. 
+Previous section introduced NIDS rule which could contain \textbf{content} or \textbf{pcre} patterns that should be searched withing payload. For each regular expression a single DFA will be built and packet payload will be matched against certain DFA. To search content strings it was decided to use Aho-Corasick algorithm, this way all content string are searched simultaneously within the packet payload.
 
 The Aho-Corasick algorithm consists of two parts. In the first part we construct from the set of patterns a finiste state machine; in the second part we apply the packet payload as input to the pattern matching machine. The machine signals whenever it has found a match for a keyword. The pattern matching machine consists of a set of states. Each state is represented by a number. The machine processes the text by successively reading symbols from input string, making state transitions and occasionally emitting output. The behaviour of the pattern matching machine is dictated by three functions: a goto function \emph{g}, a failure function \emph{f} and an output function \emph{output}. Figures \ref{fig:goto_function}, \ref{fig:failure_function} and \ref{fig:output_function} shows the functions used by a pattern matching machine for a set of keywords (he, she, his, hers).
 
@@ -507,27 +488,18 @@ One state (usually 0) is designated as a start state. In figure \ref{fig:goto_fu
 
 The failure function \emph{f} maps a state into a state. The failure function is consulted whenever the goto function reports \emph{fail}. Certain states are designated as output states which indicate that a set of keywords has been found.
 
-An operating cycle of a pattern matching machine is defined as follows. Let s be the current state of the machine and a the current symbol of the input string x.
-\begin{enumerate}
-\item If \emph{g(s, a) = s'}, the machine makes a goto transition. It enters state s' and the next symbol of x becomes the current input symbol.
-In addition, if  \emph{output(s')  empty}, then the machine emits the set \emph{output(s')} along with the position of the current input symbol. The operating cycle is now complete.
-\item If \emph{g(s, a) = fail}, the machine consults the failure function \emph{f} and is said to make a \emph{failure} transition. If \emph{f(s)=s'} the machine repeats the cycle with s' as the current state and a as the current input symbol.
-\end{enumerate}
-Initially, the current state of the machine is the start and the first symbol of the text string is the current input symbol. 
-
 \begin{figure}[h]
 \textbf{Input.} A text string $x = a_1 a_2 ... a_n$ where each $a_i$ is an input symbol and a pattern matching machine M with goto function \emph{g}, failure function \emph{f}, and output function \emph{output}.\\
 \textbf{Output.} Locations at which keywords occur in x.\\
 \textbf{Method.}
 \begin{algorithmic}
-\STATE $state \leftarrow 0$
 \FOR{$i=1$ to $n$}
 \WHILE{$g(state, a_i) = fail$}
 \STATE $state \leftarrow f(state)$
 \ENDWHILE
 \STATE $state \leftarrow g(state, a_i)$
 \IF{$output(state) \neq empty$}
-\PRINT i
+\PRINT $i$
 \PRINT $output(state)$
 \ENDIF
 \ENDFOR
@@ -539,39 +511,70 @@ Initially, the current state of the machine is the start and the first symbol of
 \begin{figure}[h]
 \textbf{Input.} Set of keywords K={$y_1$, $y_2$,..., $y_k$} \\
 \textbf{Output.} Goto function \emph{g} and a partially computed output function \emph{output}.\\
-\textbf{Method.} We assume \emph{output(s)} is empty when state s is first created, and \emph{g{s, a} = fail} if \emph{a} is undefined or if \emph{g(s, a)} has not yet been defined. The procedure \emph{enter(y)} inserts into goto graph a path that spells out \emph{y}.
+\textbf{Method.} It is assumed that \emph{output(s)} is when empty state s is first created, and \emph{g{s, a} = fail} if \emph{a} is undefined or if \emph{g(s, a)} has not yet been defined. The procedure \emph{enter(y)} inserts into goto graph a path that spells out \emph{y}.
 \begin{algorithmic}
-\PRINT here will be algorithm
+\STATE $newstate \leftarrow$0
+\FOR{$i=1$ to $k$}
+\STATE $state \leftarrow$0
+\STATE $j \leftarrow$1
+\WHILE{$g(state, a_j) \neq fail$}
+\STATE $state \leftarrow g(state, a_j)$
+\STATE $j \leftarrow j+1$
+\ENDWHILE
+\FOR{$p \leftarrow j$ to $m$}
+\STATE $newstate \leftarrow newstate+1$
+\STATE $g(state, a_p) \leftarrow newstate$
+\STATE $state \leftarrow newstate$
+\ENDFOR
+\STATE $output(state) \leftarrow {a_1a_2 ... a_m}$
+\ENDFOR
+\FORALL{$a$ such that $g(0, a)=fail$}
+\STATE $g(0, a) \leftarrow$0
+\ENDFOR
 \end{algorithmic}
 \caption{Aho-Corasick goto function construction algorithm.}
 \label{fig:ac_goto_pseudocode}
 \end{figure}
 
 \begin{figure}[h]
-\textbf{Input.} Set of keywords K={$y_1$, $y_2$,..., $y_k$} \\
-\textbf{Output.} Goto function \emph{g} and a partially computed output function \emph{output}.\\
-\textbf{Method.} We assume \emph{output(s)} is empty when state s is first created, and \emph{g{s, a} = fail} if \emph{a} is undefined or if \emph{g(s, a)} has not yet been defined. The procedure \emph{enter(y)} inserts into goto graph a path that spells out \emph{y}.
+\textbf{Input.} Goto function \emph{g} and failure function \emph{f}. \\
+\textbf{Output.} Next move function \emph{d}.\\
 \begin{algorithmic}
-\PRINT here will be algorithm
-\end{algorithmic}
-\caption{Aho-Corasick fail function construction algorithm.}
-\label{fig:ac_fail_pseudocode}
-\end{figure}
-
-Figure \ref{fig:ac_search_pseudocode} shows Aho-Corasick matching machine algorithm pseudocode. Pseudocodes for construction of \textbf{Goto}, \textbf{Failure}, and \textbf{Output} are shown in figures \ref{fig:ac_goto_pseudocode} and \ref{fig:ac_fail_pseudocode}.
-
-\begin{figure}[h]
-\textbf{Input.} Set of keywords K={$y_1$, $y_2$,..., $y_k$} \\
-\textbf{Output.} Goto function \emph{g} and a partially computed output function \emph{output}.\\
-\textbf{Method.} We assume \emph{output(s)} is empty when state s is first created, and \emph{g{s, a} = fail} if \emph{a} is undefined or if \emph{g(s, a)} has not yet been defined. The procedure \emph{enter(y)} inserts into goto graph a path that spells out \emph{y}.
-\begin{algorithmic}
-\PRINT here will be algorithm
+\STATE $queue \leftarrow empty$
+\FOR{each symbol $a$}
+\STATE $d(0, a) \leftarrow g(0, a)$
+\IF{$g(0, a) \neq 0$}
+\STATE $queue \leftarrow queue \cup g(0, a)$
+\ENDIF
+\ENDFOR
+\WHILE{$queue \neq empty$}
+\STATE let $r$ be the next state in $queue$
+\STATE $queue \leftarrow queue - {r}$
+\FOR{each symbol $a$}
+\IF{$g(r, a) = s \neq fail$}
+\STATE $queue \leftarrow queue \cup {s}$
+\STATE $d{r, a} \leftarrow s$
+\ELSE
+\STATE $d(r, a) \leftarrow d(f(r), a)$
+\ENDIF
+\ENDFOR
+\ENDWHILE
 \end{algorithmic}
 \caption{Aho-Corasick DFA construction algorithm.}
 \label{fig:ac_dfa_pseudocode}
 \end{figure}
 
-To be able to use Aho-Corasick algorithm with a GPU a DFA should be constructed from the previously constructed \textbf{Goto}, \textbf{Fail} and \textbf{Output} functions. The algorithm for constructing DFA is shown in a figure \ref{fig:ac_dfa_pseudocode}. In practice, algorithm shown in figure \ref{fig:ac_dfa_pseudocode} should be evaluated in conjunction with algorithm \ref{fig:ac_fail_pseudocode}. The resulting DFA is a two dimensional array. The dimensions of the array are equal to the number of states and the size of the alphabet (256 in our case) plus one position to store flag if state is \emph{output}.
+An operating cycle of a pattern matching machine is defined as follows. Let s be the current state of the machine and a the current symbol of the input string x.
+\begin{enumerate}
+\item If \emph{g(s, a) = s'}, the machine makes a goto transition. It enters state s' and the next symbol of x becomes the current input symbol.
+In addition, if  \emph{output(s')  empty}, then the machine emits the set \emph{output(s')} along with the position of the current input symbol. The operating cycle is now complete.
+\item If \emph{g(s, a) = fail}, the machine consults the failure function \emph{f} and is said to make a \emph{failure} transition. If \emph{f(s)=s'} the machine repeats the cycle with s' as the current state and a as the current input symbol.
+\end{enumerate}
+Initially, the current state of the machine is the start and the first symbol of the text string is the current input symbol. 
+
+Figure \ref{fig:ac_search_pseudocode} shows Aho-Corasick matching machine algorithm pseudocode. Pseudocode for \textbf{Goto} function construction is shown in the figure \ref{fig:ac_goto_pseudocode}.
+
+To be able to use Aho-Corasick algorithm with a GPU a DFA should be constructed from the previously constructed \textbf{Goto}, \textbf{Fail} and \textbf{Output} functions. The algorithm for constructing DFA is shown in a figure \ref{fig:ac_dfa_pseudocode}. In practice, algorithm shown in figure \ref{fig:ac_dfa_pseudocode} should be evaluated in conjunction with algorithm for constructing failure function. The resulting DFA is a two dimensional array. The dimensions of the array are equal to the number of states and the size of the alphabet (256 in our case) plus one position to store flag if state is \emph{output}.
 
 The algorithm for searching through DFA is similar to the regular expression's one and described in the next section.
 
@@ -579,30 +582,40 @@ The algorithm for searching through DFA is similar to the regular expression's o
 Regular expressions are compiled into a DFA by using external library. As a result a two dimensional array is obtained. Array structure is similar to Aho-Corasick DFA. The dimensions of the array are equal to the number of states and the size of the alphabet (256 in our case) plus one position to store index of the rule if current state signs that regular expression is matched. Therefore the final algorithm for searching pattern withing packet payload is shown in figure \ref{fig:dfa_search}.
 
 \begin{figure}[h]
-\textbf{Input.} Set of keywords K={$y_1$, $y_2$,..., $y_k$} \\
-\textbf{Output.} Goto function \emph{g} and a partially computed output function \emph{output}.\\
-\textbf{Method.} We assume \emph{output(s)} is empty when state s is first created, and \emph{g{s, a} = fail} if \emph{a} is undefined or if \emph{g(s, a)} has not yet been defined. The procedure \emph{enter(y)} inserts into goto graph a path that spells out \emph{y}.
+\textbf{Input.} A text string $x = a_1 a_2 ... a_n$ where each $a_i$ is an input symbol and a next move function \emph{d} \\
+\textbf{Output.} Locations at which keywords occur in x.\\
 \begin{algorithmic}
-\PRINT here will be algorithm
+\STATE $curstate \leftarrow$0
+\FOR{$i=1$ to $n$}
+\STATE $state \leftarrow d(state, a_i)$
+\IF{$d(state, 256) \neq $0}
+\PRINT $i$
+\PRINT $output(i)$
+\ENDIF
+\ENDFOR
 \end{algorithmic}
 \caption{Pattern matching DFA search.}
 \label{fig:dfa_search}
 \end{figure}
 
+DFA search algorithm just traverse over DFA starting from zero state and for every input symbol it calculates the new state. Current state corresponds to the row in the DFA two-dimensional array. And current input symbol corresponds to the offset in the current row. This way new state is read from the DFA. For every state it is also checked if it has output values. Output value means that match to some string occured.
+
 \subsection*{Packet filtering based on route information.}
-Information obtained from packet header is used to select packet for analysing its payload or drop it without any analysis. Information from loaded rules should match the packet's header information to continue processing of received packet. It was decided to store route information from the loaded rule as a sequence of bytes in a trie structure. Figure \ref{fig:trie_example} shows example of a trie structure with next IP addresses stored: 192.168.0.1, 192.168.1.38, 192.168.5-100.1 and 232.222.1.79. The full sequence stored in trie is shown in a figure \ref{fig:route_sequence}. Theresore to compare any received packet to some rule, route information from packet's header should be represented as a sequence of bytes shown in a figure \ref{fig:route_sequence}, and search procedure on a trie for the sequence of bytes is perfomed. This approach is similar to Aho-Corasick algorithm of searching with data saved in trie. The only difference is that trie may contain IP range (therefore trie node may be not just a simple node with value, but contain range of values). If search in trie found any rule for this packet, this packet is put in a queue for a payload analysis. 
+Information obtained from packet header is used to select packet for analysing its payload or drop it without any analysis. Information from loaded rules should match the packet's header information to continue processing of received packet. It was decided to store route information from the loaded rule as a sequence of bytes in a trie structure. Figure \ref{fig:trie_example} shows example of a trie structure with next IP addresses stored: 192.168.0.1, 192.168.1.38, 192.168.5-100.1 and 232.222.1.79. 
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.6]{images/trie.png}
+\includegraphics[scale=0.5]{images/trie.png}
 \caption{Example of trie structure.}
 \label{fig:trie_example}
 \end{figure}
 
+The full sequence stored in trie is shown in a figure \ref{fig:route_sequence}. Therefore to compare any received packet to some rule, route information from packet's header should be represented as a sequence of bytes shown in a figure \ref{fig:route_sequence}, and search procedure on a trie for the sequence of bytes is perfomed. This approach is similar to Aho-Corasick algorithm of searching with data saved in trie. The only difference is that trie may contain IP range (trie node may be not just a simple node with value, but contain range of values). If searching in trie found any rule for this packet, this packet is put in a queue for a payload analysis. 
+
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.8]{images/route_sequence.png}
-\caption{Full route sequence extracted from packet header.}
+\includegraphics[scale=0.6]{images/route_sequence.png}
+\caption{Full route sequence extracted from the packet header.}
 \label{fig:route_sequence}
 \end{figure}
 
@@ -634,33 +647,37 @@ Database with results is very simple and contain only one table which have all i
 In the current application version it was decided not to save payload from the matched packet because of perfomance reasons.
 
 \subsection*{Application components.}
-Application design is divided into a several components. The diagram contained in a figure \ref{fig:app_architecture} shows the relationship between components.
+Application design is divided into a several components. The diagram contained in a figure \ref{fig:app_architecture} shows the main application components which should be implemented and used.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.5]{images/app_architecture.png}
-\caption{Relation between application components.}
+\caption{The main application components.}
 \label{fig:app_architecture}
 \end{figure}
 
 \begin{itemize}
-\item \textbf{GUI}. Component which implements user interactions with a program. Application has simple window-based interface which allows to perform all major manipulations with the application like starting capturing traffic, stop capturing, switching analyzing mode, saving traffic into the file, etc.
-\item \textbf{Network packets capturing library}. Application itself doesn't capture packet from the kernel, because it is not a trivial task. Instead, program uses external library for packet capturing.
-\item \textbf{NIDS}. The main component of the system. Uses all others modules to read rules, start capturing and analysing of packets. Stores results of analyzing into a database and updates counters which are used within NIDS to do perfomance calculations.
-\item \textbf{Regular expressions implementation}. This module is used to compile regular expression obtained from rules. Regular expressions are compiled to DFA for loading into CUDA device later.
+\item \textbf{Rules dataset parser}. This component is used to parse input file with Nids rules written in a text format. It is better for parser to be easy extendable for easy adding new options to the rule.
+\item \textbf{Database}. This component allows in an easy way adding results of analysing packets into a database.
+\item \textbf{GUI}. This component implements user interactions with a program. Application has simple window-based interface which allows to perform all major manipulations with the application like starting capturing traffic, stop capturing, switching analyzing mode, saving traffic into the file, etc.
+\item \textbf{Regular expressions implementation}. This module is used to compile regular expression obtained from rules. Regular expressions are compiled to DFA for loading into the CUDA device later.
 \item \textbf{Aho-Corasick implementation}. This module is used to create DFA for all simple content strings that are read from rules. Application uses Aho-Corasick algorithm for fast string searching within network packets.
+\item \textbf{Network packets capture}. Application itself doesn't capture packet from the kernel, because it is not a trivial task. Instead, program uses external library for packet capturing.
 \item \textbf{CUDA module}. Code that runs on a GPU and performs analysis of packets against rules.
-\item \textbf{Database module}. Used for logging matched packets into the database.
+\item \textbf{NIDS}. The main component of the system. Uses all others modules to read rules, start capturing and analysing of packets. Stores results of analyzing into a database and updates counters which are used within NIDS to do perfomance calculations.
 \end{itemize}
 
-\chapter{Implementation.}
+\chapter{Implementation and evaluation.}
 \section{General considerations.}
 Application implementation has been developed using the following version of the programming tools and libraries:
 \begin{itemize}
 \item GCC 4.7.0.
-\item CUDA [TODO:add version]
-\item LibPcap [TODO:add version]
-\item QT [TODO:add version]
+\item Cuda compilation tools, version 4.2
+\item Libpcap 1.2.1
+\item Boost 1.49.0
+\item QT 4.8.0
+\item SQLite 3.7.11
+\item RE2 (without version, source codes snapshot revision '2d252384c5e8' was used)
 \end{itemize}
 
 \lstset{language=Python, caption={Part of QT project file with extra compiler configuration.}, label=lst:extra_compiler_config, captionpos=b}
@@ -693,16 +710,16 @@ cuda.depend_command = $$CUDA_DIR/bin/nvcc -g -G -M $$CUDA_INC $$NVCCFLAGS ${QMAK
 QMAKE_EXTRA_COMPILERS += cuda
 \end{lstlisting}
 
-The NIDS application has been developed based on the design presented in the chapter \ref{chap:design}. The application uses workflow presented in \ref{}. Project sources are organized into QT project file and to compile project first qmake utility from QT is used to generate Makefile. Makefile is required by \textbf{make } utility to compile and link sources into final executable. The whole project structure is placed in one folder, but logically source codes are divided into "Headers", "Sources", "Forms" and "Other files" if IDE such as QT creator is used to manage a project. All source codes are compiled with \textbf{gcc} compiler except CUDA code. Files with CUDA source codes have \textbf{*.cu} extension and are compiled with \textbf{nvcc} compiler. To add possibility to compile \textbf{*.cu} files to QT project an extra compiler configuration is created in QT project file (shown in listing \ref{lst:extra_compiler_config}).
+The NIDS application has been developed based on the design presented in the chapter \ref{chap:design}. The application uses workflow presented in \ref{chap:introduction}. Project sources are organized into QT project file. To compile project first \textbf{qmake} utility from QT is used to generate Makefile. Makefile is required by \textbf{make} utility to compile and link sources into final executable. The whole project structure is placed in one folder, but logically source codes are divided into "Headers", "Sources", "Forms" and "Other files" if IDE such as QT creator is used to manage the project. All source codes are compiled with \textbf{gcc} compiler except CUDA code. Files with CUDA source codes have \textbf{*.cu} extension and are compiled with \textbf{nvcc} compiler. To add possibility to compile \textbf{*.cu} files to QT project an extra compiler configuration is created in QT project file (shown in listing \ref{lst:extra_compiler_config}).
 
 \section{Application threading model.}
-The NDIS application has been developed using Boost.Thread library for Nids itself and QThread for GUI part. Boost.Thread is used in the main Nids class for processing packets on CPU or GPU. The QThread is used for executing Main window message processing and running Nids packet capture task. The reason why two different threads classes were used is that developing of the core Nids application was started using only Boost library and QT part is added a little bit later.
+The NDIS application has been developed using Boost.Thread library for Nids itself and QThread for GUI part. Boost.Thread is used in the main Nids class for processing packets on CPU or GPU. The QThread is used for executing Main window message processing and running Nids packet capture task from GUI event callback. The reason why two different threads classes were used is that developing of the core Nids application was started using only Boost library and QT part is added a little bit later.
 
-When NIDS application process in CPU mode N threads are created for packet processing and 1 thread is created for packets collecting. Packet capture thread writes packet payload into a buffer and puts pointer to the buffer into a queue. Other threads are sleep until some packet arrive in the queue. In the moment when packet arrived in the queue one of the thread awakes and pulls packet from the queue for processing. After finishing working on packet it goes to sleep state again until new packet arrive into the queue.
+When NIDS application process in CPU mode N threads are created for packet processing and 1 thread is created for processing analysis results. Packet capture thread writes packet payload into a buffer and puts pointer to the buffer into a queue. Other threads are sleep until some packet arrive into the queue. In the moment when packet arrived into the queue only one of the threads awakes and pulls packet from the queue for processing. After finishing working on packet it goes to sleep state again until new packet arrive into the queue.
 
-For NIDS working in CPU+GPU mode packets processing is slightly different. There is only 1 thread which puts tasks (packet payload, payload length and number of DFA to search) into the queue and 1 thread which process packets when size of the packets in the queue exceeds threshold or time for processing elapsed. A double-buffered mechanism of processing packets were implemented to speed up the process of collecting packets: before processing packets on GPU buffers are switched and CPU is able to collect arriving packets into the second buffer.
+For NIDS working in CPU+GPU mode packets processing is slightly different. There is only 1 thread which puts \textbf{tasks} (packet payload, payload length and number of DFA to search) into the queue and 1 thread which process packets when size of the packets in the queue exceeds some limit or time for processing elapsed. A double-buffered mechanism of processing packets were implemented to speed up the process of collecting packets: before processing packets on the GPU, buffers are switched and CPU is able to collect arriving packets into the second buffer.
 
-To keep multithreaded code integrity, synchronization mechanisms from Boost library were used: Boost.Semaphore for synchronizing access to queues and Boost.Mutex for synchronizing access to other objects.
+To keep multithreaded code integrity, synchronization mechanisms from Boost library were used: Boost.Semaphore to notify threads that new packet arrived to the queue and Boost.Mutex for synchronizing access to queue and other shared objects.
 
 \begin{figure}
 \centering
@@ -766,14 +783,14 @@ private:
 };
 \end{lstlisting}
 
-When new packet is arrived a create\_packet static method is used to analyze packet. This method is a packet analyzer and it's used for every received packet to create Packet class with properly filled fields. Method create\_packet analyzes raw packet data and makes protocol identification. In case it is TCP/IP packet it creates Packet object, otherwise it returns null object which means that it's not needed to analyze received packet.
+When new packet is arrived a create\_packet static method is used to analyze packet. This method is a packet analyzer and it used for every received packet to create Packet class with properly filled fields. Method create\_packet analyzes raw packet data and makes protocol identification. If received packet is TCP/IP packet it return newly created Packet object, otherwise it returns null object which means that it's not need to analyze received packet.
 
 Right after returning from create\_packet method raw\_packet field contains the pointer to the raw packet payload. Method create\_packet doesn't copy payload data into any other place because of efficienty. This moment is described later in Nids class description.
 
 Field route is used to save packet route information in the format described in figure \ref{fig:route_sequence}. The route information is stored in sequence32 type array which is defined as a std::vector class that contain 32 bit values. There is also sequence8 type in the application which is std::vector itself containing 8 bit values.
 
 \subsection{AC class.}
-AC class is the implementation of the Aho-Corasick algorithm. The main methods are insert and search. Method insert inserts some string into the internal trie and search tries to find given string within saved strings. When all strings are inserted finish method should be called to process all strings into a DFA which later can be extracted for loading to GPU. 
+AC class is the implementation of the Aho-Corasick algorithm. The main methods are \textbf{insert} and \textbf{search}. Method \textbf{insert} inserts some string into the internal trie while \textbf{search} tries to find given string within saved strings. When all strings are inserted \textbf{finish} method should be called to translate all strings into a DFA which later can be extracted for loading to the GPU. 
 
 \lstset{language=C++, caption={Extract of AC.h}, label=lst:ac_class, captionpos=b}
 \begin{lstlisting}
@@ -805,7 +822,7 @@ private:
 };
 \end{lstlisting}
 
-Internally DFA is stored in a transition\_table field with unbounded maximum number of states and number of transitions for the state equals to UCHAR\_MAX + 1 (256). Field out is an out function as described in Aho-Corasick algorithm description. For every state it contains all matched strings.
+Internally DFA is stored in a \textbf{transition\_table} field with unbounded maximum number of states and number of transitions for the state equals to UCHAR\_MAX + 1 (256). Field \textbf{out} is an out function as described in Aho-Corasick algorithm description. For every state it contains all matched strings.
 
 \begin{figure}[h]
 \centering
@@ -817,7 +834,7 @@ Internally DFA is stored in a transition\_table field with unbounded maximum num
 The search algorithm is simple traversing internal DFA for every next input symbol is shown on figure \ref{fig:ac_grid}.
 
 \subsection{Regex class.}
-Regex class implements compilation of regex patterns into DFA and searching in the input strings for previously compiled patterns. The main methods are compile and search. 
+Regex class implements compilation of regex patterns into DFA and searching in the input strings for previously compiled patterns. The main methods are \textbf{compile} and \textbf{search}.
 
 \lstset{language=C++, label=lst:regex_class, captionpos=b, caption={Extract of Regex.h}}
 \begin{lstlisting}
@@ -853,7 +870,7 @@ private:
 };
 \end{lstlisting}
 
-Method compile uses RE2 regular expression library to compile input pattern into DFA. Default memory budget for compiling one DFA is 8388608 bytes. If compiling pattern exceed memory budget such regex is declined and won't be searched during packet analyzing.
+Method \textbf{compile} uses RE2 regular expression library to compile input pattern into DFA. Default memory budget for compiling one DFA is 8388608 bytes. If compiling pattern exceed memory budget such regex is declined and won't be searched during packet analyzing.
 
 \begin{figure}[h]
 \centering
@@ -862,11 +879,11 @@ Method compile uses RE2 regular expression library to compile input pattern into
 \label{fig:regex_grid}
 \end{figure}
 
-The internal representation of DFA is similar to AC's one. The only difference is that AC has one DFA and all input string falls into it, while for every regular expression separate DFA is created. Thus, Regex class stores all DFAs into one vector and to be able to find specific DFA start offsets are stored into other vector. Other difference is that regex DFA contains states defined as STATE\_DEAD and STATE\_WHOLE\_STR. This states finish the whole searching procedure: value STATE\_DEAD means that for any input character the next state is the current one, value STATE\_WHOLE\_STR means that no matter what next input symbols could be, current searching procedure in any case cannot succeed (e.g. searched pattern should match from the start of the string, if start is not matched, not matter what are the other symbols, searching could not succeed).
+The internal representation of DFA is similar to AC's one. The only difference is that AC has one DFA and all input string falls into it, while for every regular expression separate DFA is created. Thus, Regex class stores all DFAs into one vector and to be able to find specific DFA start offsets are stored into other vector. Other difference is that regex DFA contains states defined as \textbf{STATE\_DEAD} and \textbf{STATE\_WHOLE\_STR}. This states finish the whole searching procedure: value \textbf{STATE\_DEAD} means that for any input character the next state is always the current one, value \textbf{STATE\_WHOLE\_STR} means that no matter what the next input symbols could be, current searching procedure in any case is not able to finish successfully (e.g. searched pattern should match from the start of the string, if start is not matched, not matter what are the other symbols, searching will not succeed).
 Regex DFAs representation stored in Regex class is shown in figure \ref{fig:regex_grid}.
 
 \subsection{Trie class.}
-Trie class is used to store the sequence of symbols and quick search over the input string. Internal structure of the trie was described in \ref{TODO:add ref}. Trie class itself contain only three methods: insert, search and clear. The name of the methods are pretty clear and speaks for themselfs.
+Trie class is used to store the sequence of symbols and quick search over the input string. Internal structure of the trie was described in \ref{chap:design}. Trie class itself contain only three methods: \textbf{insert}, \textbf{search} and \textbf{clear}. The name of the methods are pretty clear and speaks for themselfs.
 
 \lstset{language=C++, label=lst:trie_node_class, captionpos=b, caption={Extract of Trie_node.h}}
 \begin{lstlisting}
@@ -900,10 +917,10 @@ private:
 };
 \end{lstlisting}
 
-More complex is the Trie\_node class which stores information for one trie node (listing \ref{lst:trie_node_class}). The type trie\_transition\_t maps symbol value to the next trie node. Thus the search algorithm is similar to the searching over DFA, but trie node additionally contains range\_next\_ field which is used to store range for IP or port values. If, for example, 192.0-4.*.* is used, than range\_next\_ will contain 0-4 part of the IP address in current trie node. Also any\_next\_ is the pointer to the next trie node, so for * symbol used in IP address any\_next\_ field is filled with pointer to the next trie node. Therefore searching over such kind of the trie is getting next trie node from the next\_ field for each input symbol from the input string. Additionally check if range or any symbol exist in the current node.
+More complex is the Trie\_node class which stores information for one trie node (listing \ref{lst:trie_node_class}). The type trie\_transition\_t maps input symbol value to the next trie node. Thus the search algorithm is similar to the searching over DFA, but trie node additionally contains range\_next\_ field which is used to store range for IP or port values. If, for example, 192.0-4.*.* is used, than range\_next\_ will contain 0-4 part of the IP address in current trie node. Also any\_next\_ is the pointer to the next trie node for * input symbol. Therefore searching over such kind of the trie is getting next trie node from the next\_ field for each input symbol from the input string. Additionally check should be done if range or any symbol exist in the current node.
 
 \subsection{Rule class.}
-For each rule in the rules.txt file one object of Rule class type is created. Rule class stores a text representation of the rule and also all parameters of the rule which are parsed by using Boost.Spirit parser.
+For each rule in the input \textbf{rules.txt} file one object of Rule class type is created. Rule class stores a text representation of the rule and also all parameters of the rule which are parsed by using Boost.Spirit parser.
 
 \lstset{language=C++, label=lst:rule_class, captionpos=b, caption={Extract of Rule.h}}
 \begin{lstlisting}
@@ -919,7 +936,6 @@ public:
 private:
     Rule();
     // ...
-
     // rule as string
     string rule_str;
     // action that should be taken if rule is matched
@@ -937,7 +953,7 @@ private:
 
 \end{lstlisting}
 
-The Rule object is created using static create\_rule method. This method simply parses passed string value and returns pointer to newly created Rule object with filled parameters. Parsing is done by using Boost.Spirit library which allows to write grammar for parsing directly in the C++ code. For parsing rules a RuleRouteGrammar was created and used in a Boost's phrase\_parse function. In case of malformed rule create\_rule function returns NULL. Listing \ref{lst:ip_grammar} contains an example of a simple grammar for parsing IP address. This grammar returns std::vector object with four ip parts represented as unsigned integers.
+The Rule object is created using static \textbf{create\_rule} method. This method simply parses passed string value and returns pointer to newly created Rule object with filled parameters. Parsing is done by using Boost.Spirit library which allows to write grammar for parsing directly in the C++ code. For parsing rules a \textbf{RuleRouteGrammar} was created and used in a Boost's \textbf{phrase\_parse} function. In case of malformed input rule \textbf{create\_rule} function returns null pointer. Listing \ref{lst:ip_grammar} contains an example of a simple grammar for parsing IP address. This grammar returns std::vector object with four ip parts represented as unsigned integers. The whole grammar for parsing rules is more complex. Parsing is done into a \textbf{RuleSpirit} structure and later data from this structure is copied into the Rule class.
 
 \lstset{language=C++, label=lst:ip_grammar, captionpos=b, caption={Boost.Spirit grammar for parsing IP address.}}
 \begin{lstlisting}
@@ -956,7 +972,7 @@ struct IPGrammar : qi::grammar<Iterator, std::vector<unsigned>(), space_type>
 }
 \end{lstlisting}
 
-Grammar could be easily extended to include new parameters by adding qi::rule as a field and include new rules definitions into IPGrammar. Boost.Spirit allows to parse strings directly into C++ structures, so it is possible to create structures layout for parsing very complex expressions.
+Grammar could be easily extended to include new parameters by adding qi::rule as a field and include new rules definitions into IPGrammar. In the same way the RuleRouteGrammar grammar could be extended if new options should be added into the Nids rule. Boost.Spirit allows to parse strings directly into C++ structures, so it is possible to create structures layout for parsing very complex expressions.
 
 \subsection{Nids class.}
 
@@ -1045,37 +1061,86 @@ private:
     friend struct process_results_callable;
 };\end{lstlisting}
 
-When application is started it should read Nids rules first. For this process read\_rules method is used: it creates array of rules in a \textbf{rules} variable and uses these rules for packet analysis.
+When application is started it should read Nids rules first. For this process \textbf{read\_rules} method is used: it creates array of rules in a \textbf{rules} variable and later uses these rules for packet analysis.
 
 Different start\_* methods are used to start monitoring network in different modes:
 \begin{itemize}
-\item \textbf{start\_monitor} is used to start network monitoring in a CPU mode. Number of threads used to process packets is passed as threads\_num parameter.
-\item \textbf{start\_monitor\_gpu} is used to start network monitoring in a CPU+GPU mode. Pararmeter window\_type specifies what kind of flush mechanism is used for transferring packets to GPU: BUF\_SIZE or TIME. Parameter device\_num specifies which GPU device is used for packets analyzing.
-\item \textbf{start\_monitor\_offline} is used to process packets from saved *.cap file in CPU mode. It operates in the same manner as start\_monitor, the only difference that new parameter cap\_filename is used as a name of the file with packets.
-\item \textbf{start\_monitor\_offline\_gpu} is used to process packets from saved *.cap file in CPU+GPU mode. It operates in the same manner as start\_monitor\_gou, the only difference that new parameter cap\_filename is used as a name of the file with packets.
+\item \textbf{start\_monitor} is used to start network monitoring in a CPU mode. Number of threads used to process packets is passed as \textbf{threads\_num} parameter.
+\item \textbf{start\_monitor\_gpu} is used to start network monitoring in a CPU+GPU mode. Pararmeter \textbf{window\_type} specifies what kind of mechanism is used for transferring packets to GPU: \textbf{BUF\_SIZE}(size of the buffer with payloads) or \textbf{TIME}(time based transfer of payloads). Parameter \textbf{device\_num} specifies which GPU device is used for packets analyzing.
+\item \textbf{start\_monitor\_offline} is used to process packets from saved *.cap file in CPU mode. It operates in the same manner as start\_monitor, the only difference that new parameter \textbf{cap\_filename} is used as a name of the file with packets.
+\item \textbf{start\_monitor\_offline\_gpu} is used to process packets from saved *.cap file in CPU+GPU mode. It operates in the same manner as start\_monitor\_gpu, the only difference that new parameter \textbf{cap\_filename} is used as a name of the file with packets.
 \item \textbf{start\_monitor\_dump} is used to start monitoring network and save packets into the *.cap log file. Later this file is used by previously defined methods for analyzing.
 \end{itemize}
 
 Just after starting monitoring network Nids class creates threads for processing packets on CPU or GPU. For this purpose three process\_* structures were created:
 \begin{itemize}
-\item \textbf{process\_on\_gpu\_callable} is a structure with overrided operator (). This way Boost.Thread executes code in operator() in a separate thread. The process\_on\_gpu\_callable thread performs tasks execution on GPU. Because CUDA device should be initialized in the thread where it will be used, process\_on\_gpu\_callable also initializes CUDA device. For synchronization purposes during initialization and processing on GPU Boost.Semaphore and Boost.Mutex is used. For example, after Nids started process\_on\_gpu\_callable thread, it waits on gpu\_init\_finished semaphore until thread finishes initializing CUDA device.
+\item \textbf{process\_on\_gpu\_callable} is a structure with overrided operator (). This way Boost.Thread executes code in operator() in a separate thread. The process\_on\_gpu\_callable thread performs tasks execution on GPU. Because CUDA device should be initialized in the thread where it will be used, process\_on\_gpu\_callable also initializes CUDA device. For synchronization purposes during initialization and processing on GPU Boost.Semaphore and Boost.Mutex are used. For example, after Nids started the process\_on\_gpu\_callable thread, it waits on gpu\_init\_finished semaphore until thread finishes initialization of the CUDA device.
 \item \textbf{process\_on\_cpu\_callable} has similar structure with overrided operator (). Parameter threads\_num defines how many process\_on\_cpu\_callable threads will be created. Every process\_on\_cpu\_callable thread waits on packets\_queue\_sem until new packet appears in the queue. For every packet exactly one thread will seize the packets\_queue\_sem and get packet from the queue.
 \item \textbf{process\_results\_callable} is a thread which process results of the analysis. The thread main task is to insert matched rules into a database. There are also mechanism of the callbacks in Nids class. Callbacks functions can be added to Nids using add\_alert\_callback or add\_log\_callback methods and for every matched rule process\_results\_callable thread will call it.
 \end{itemize}
 
-The \textbf{packet\_received} function is a callback for a pcap library. Pcap call this function every time the new packet arrived into the system. The main responsibility of this function in CPU mode is to check whether new packet is TCP/IP (using Packet::create\_packet() method), create the Packet class object and put it into the queue. For CPU+GPU mode processing of the received packet is slightly different. The Packet class object is created as it is done in CPU mode, but just after creation all parsed parameters are saved into internal vectors (including payload) and Packet object is deleted. This way Nids class gathers all payloads into the one linear buffer and if the buffer size exceeds limit it increases gpu\_task\_ready semaphore to awake process\_on\_gpu\_callable thread to process packets on the GPU. Also CPU+GPU mode manages \textbf{tasks} array. This array is directly copied to the CUDA device and contains tasks that CUDA threads will process. The structure of task is described later in the CUDA code description.
+The \textbf{packet\_received} function is a callback for a Libpcap library. Libpcap call this function every time the new packet arrived into the system. The main responsibility of this function in CPU mode is to check whether new packet is TCP/IP (using Packet::create\_packet() method), create the Packet class object and put it into the queue. For CPU+GPU mode processing of the received packet is slightly different. The Packet class object is created as it is done in CPU mode, but just after creation all parsed parameters are saved into internal vectors (including payload) and Packet object is deleted. This way Nids class gathers all payloads into the one linear buffer and if the buffer size exceeds limit or time for processing packets expired, it increases gpu\_task\_ready semaphore to awake process\_on\_gpu\_callable thread to process packets on the GPU. Also CPU+GPU mode manages \textbf{tasks} array. This array is directly copied to the CUDA device and contains tasks that CUDA threads will process. The structure of task is described later in the CUDA code description.
 
 The Nids class has two vectors for CUDA tasks and two vectors for packet buffer. This way double-buffered mechanism is implemented for packet capturing and CUDA processing. When process\_on\_gpu\_callable thread copies data to the GPU and executes kernel on \textbf{tasks1} vector of tasks, packet\_received adds newly received packets to the \textbf{tasks2} vector of tasks.
 
-Nids class logs a lot of information during its work. To reduce logged information set\_log\_level method is used. It defines six different log levels, but the major ones are: TRACE, DEBUG and INFO.
+Nids class logs a lot of information during its work using Boost.Log library. To reduce logged information \textbf{set\_log\_level} method is used. It defines six different log levels, but the major ones for this application are: TRACE, DEBUG and INFO.
 
 \subsubsection*{Future work.}
 The future work for the Nids class is to implement packet categorization based on the payload size and process different categories of packets separately. There could be several categories of packets: small, medium, large, etc. This way CUDA resources could be used more effectively.
 
-Also problem with TCP stream is not solved in the current version of the application. Packets from the network level of the network stack are split into several TCP packets. It could be a problem if, for example, packet data is compressed and should be uncompressed before analyzing payload. In such a case TCP reassembly of several packets from TCP stream should be performed before analyzing packet payload.
+Also a problem with TCP stream is not solved in the current version of the application. Packets from the network layer of the network stack are split into several TCP packets. It could be a problem if, for example, packet data is compressed and should be uncompressed before analyzing payload. In such a case TCP reassembly of the several packets from TCP stream should be performed before analyzing packet payload.
+
+\subsection{GanidsMainWindow class.}
+GanidsMainWindow class implements a GUI part of the application. It inherits QT's QMainWindow class and creates GUI components when application is started. QT allows to describe all GUI components in the '*.ui' class using QT designer and during compilation QT framework automatically compiles this file into the proper '*.cpp' file to create the whole user interface. GanidsMainWindow just call \textbf{setupUi} method in it constructor to initialize all parts of the user interface.
+
+\lstset{language=C++, label=lst:main_window, captionpos=b, caption={GanidsMainWindow class.}}
+\begin{lstlisting}
+class GanidsMainWindow : public QMainWindow
+{
+// ...    
+private slots:
+    void on_button_start_clicked();
+    void on_check_gpu_toggled(bool checked);
+    void on_check_save_toggled(bool checked);
+    void on_check_load_toggled(bool checked);
+    void on_button_stop_clicked();
+    void on_capture_finished();
+    void on_capture_terminated();
+    void on_nids_alert(const char *message, const char *rule);
+    void on_nids_log(const char *message, const char *rule);
+    void on_button_clear_matched_clicked();
+signals:
+    void nids_alert(const char *message, const char *rule);
+    void nids_log(const char *message, const char *rule);
+
+private:
+    Ui::GanidsMainWindow *ui;
+
+    void update_network_interfaces();
+    void update_cuda_devices();
+    void start_gpu_capture_thread(QString interface_name,
+                                  int cuda_device_num,
+                                  WINDOW_TYPE window_type,
+                                  int flush_buffer_size,
+                                  int flush_time);
+    void start_cpu_capture_thread(QString interface, int threads_num);
+    void stop_capture_thread();
+// ...
+\end{lstlisting}
+
+All slots 'on\_*' are used as a callbacks for user actions. For example \textbf{on\_button\_start\_clicked} starts Nids application to monitor network, \textbf{on\_button\_stop\_clicked} stops monitoring and so on. Signal \textbf{nids\_alert} and \textbf{nids\_log} are emitted when Nids matched some packet to some rule. Methods 'update\_*' are used to update GUI with the currently available CUDA devices and network interfaces.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.3]{images/user_interface.png}
+\caption{User interface.}
+\label{fig:user_interface}
+\end{figure}
+
+The whole user interface in design mode is shown in the figure \ref{fig:user_interface}.
 
 \subsection{CUDA code.}
-The code on the CUDA device is quite simple. It receives array of tasks, pointer to packets buffer and pointer to DFAs buffer. Every CUDA thread gets task from the tasks buffer which contain information about data for processing. The packet processing is just traversing over DFA table for every input byte from the packet payload. If new state is the final one and has \textbf{found} flag  set, CUDA thread sets \textbf{found} flag for the current task. The task structure is described in the figure \ref{fig:cuda_task}.
+The code on the CUDA device is quite simple. It receives array of tasks, pointer to packets buffer and the offset in the DFAs buffer, because all DFAs (including Aho-Corasick one) are copied to the GPU as one linear buffer. Every CUDA thread gets task from the tasks buffer which contain information about payload for processing. The packet processing is just traversing over DFA table for every input byte from the packet payload. If new state is the final one and has \textbf{found} flag  set, CUDA thread sets \textbf{found} flag for the current task. The task structure is described in the figure \ref{fig:cuda_task}. 
 
 \begin{figure}[h]
 \centering
@@ -1084,7 +1149,7 @@ The code on the CUDA device is quite simple. It receives array of tasks, pointer
 \label{fig:cuda_task}
 \end{figure}
 
-When CUDA kernel is starte, every CUDA thread calculates task using formula: \textbf{task\_num = blockIdx.x * blockDim.x + threadIdx.x}. This way every thread process takes task in sequential order. CUDA has limits on the number of threads per block (maximum 512 threads), but the number of tasks could be greather than the maximum number of threads, therefore CUDA code reuses threads to process all tasks. If we are using 4 block with 256 threads in each block, than maximum number of threads is 1024. This way only 1024 threads are logically executed in the same moment and should be reused for tasks that are not processed yet. The mechanism of thread resuing is described in the figure \ref{fig:cuda_thread_reuse}.
+When CUDA kernel is started, every CUDA thread calculates its task number using formula: \textbf{task\_num = blockIdx.x * blockDim.x + threadIdx.x}. This way every thread process takes task in sequential order. CUDA has limits on the number of threads per block (maximum 512 threads), but the number of tasks could be greather than the maximum number of threads, therefore CUDA code reuses threads to process all tasks. If we are using 4 block with 256 threads in each block, than maximum number of threads is 1024. This way only 1024 threads are logically executed in the same moment and should be reused for tasks that are not processed yet. The mechanism of thread resuing is described in the figure \ref{fig:cuda_thread_reuse}.
 
 \lstset{language=C++, label=lst:nids_class, captionpos=b, caption={Extract of my\_nids\_cuda.cu}}
 \begin{lstlisting}
@@ -1133,10 +1198,10 @@ Function \textbf{check\_payload\_part} takes cur\_state and 4 bytes of the paylo
 Thread reusing is implemented with expression \textbf{task\_num += gridDim.x * blockDim.x} which increases the number of task for the current thread by the size of grid dimension multiplied on block dimension.
 
 \subsubsection*{Future work.}
-The future work for the CUDA code is to use texture memory to save DFA and\\or packets payload. Texture memory has the same access time as a global memory: 400-600 cycles. The only difference the Nids application is that texture memory is cached and in case of the cache hit access time is about 1 cycle. On the other side access pattern for the packet analyzing has random structure, therefore using structures may not give desired results.
+The future work for the CUDA code is to use texture memory to save DFA or packets payload. Texture memory has the same access time as a global memory: 400-600 cycles. The only difference is that texture memory is cached and in case of the cache hit access time is about 1 cycle which is very fast. On the other side access pattern for the packet analyzing has random structure, therefore using structures may not give desired results.
 
-\chapter{Evaluation}
-In the experiments NVIDIA GeForce GT 9600M with 512MB of memory videocard and Intel Core 2 T9400 2.53 GHz was used. First the time needed for the transfer batch of pakets to the GPU was measured. For this purposes a synthetic trace of packets was used with each packet about 800 bytes length.
+\section{Evaluation}
+In the experiments NVIDIA GeForce GT 9600M with 512MB of memory videocard and Intel Core 2 T9400 2.53 GHz was used. First the time needed for the transfer batch of pakets to the GPU was measured.
 
 \begin{table}[h]
 \centering
@@ -1154,7 +1219,7 @@ Buffer size (in bytes) & Transfer time for 1 packet (ms) \\ \hline
 \label{fig:packet_transfer_times}
 \end{table}
 
-From the figure \ref{fig:packet_transfer_times} it is visible that packet transfer time is decreasing while size of packets buffer increased. And transfer times for big buffers of packets remains somewhat constant.
+From the figure \ref{fig:packet_transfer_times} it is visible that packet transfer time is decreasing while size of packets buffer increased. And transfer times for big buffers of packets remains somewhat constant. The buffer size about 25000 bytes is enough to get acceptable perfomance for packet transferring to the GPU.
 
 \begin{figure}[h]
 \centering
@@ -1163,7 +1228,7 @@ From the figure \ref{fig:packet_transfer_times} it is visible that packet transf
 \label{fig:graph1}
 \end{figure}
 
-Testing of the online processing mode was done on the 2, 4 and 10 Mb/s network. For all network speeds were created the worst case scenario when all incoming packets should be analyzed by many regular expressions. Figure \ref{fig:graph1} shows the number of rules when pcap starts to drop packets in CPU and CPU+GPU modes. Processing packet on the GPU gives about 20\% more rules. It is also should be noticed that CPU load during processing packets on GPU is quite small. Current implementation doesn't load CPU much, because CPU performs only simple operations of recognizing TCP/IP packets and matching packet header which has small length. In case of TCP stream reassembly and additional protocols for recognizing CPU will have more work to do and more packets will be dropped in CPU mode.
+Testing of the online processing mode was done on the 2, 4 and 10 Mb/s network. For all network speeds were created the worst case scenario when all incoming packets should be analyzed by many regular expressions. Figure \ref{fig:graph1} shows the number of rules when Libpcap starts to drop packets in CPU and CPU+GPU modes. Processing packet on the GPU gives about 20\% more rules which may be under expectations. But it should be noticed that CPU load during processing packets on GPU is quite small. Current implementation doesn't load CPU much, because CPU performs only simple operations of recognizing TCP/IP packets and matching packet header which has small length. In case of TCP stream reassembly and additional protocols for recognizing CPU will have more work to do and more packets will be dropped in CPU mode. Also CUDA code is not optimized because of lack of experience during implementing it, which may give significant reduction in speed.
 
 Figure \ref{fig:graph2} shows dependency between packets buffer size and the number of served rules in CPU+GPU mode. As it was expected when buffer is small more overheads in the copying of data to the GPU and application is able to serve less rules in the same time. Larger buffers gave more perfomance.
 
@@ -1174,15 +1239,22 @@ Figure \ref{fig:graph2} shows dependency between packets buffer size and the num
 \label{fig:graph2}
 \end{figure}
 
+It is also interesting to test database where all rules have \textbf{content} option only. In a such situation only one DFA is created from the Aho-Corasick alrorithm. The result is shown in the figure \ref{fig:graph3}. As it was expected only content rules work much faster than combined rules which have both content and regular expression options.
+
+\begin{figure}[t]
+\centering
+\includegraphics[scale=0.3]{images/graph3.png}
+\caption{Number of served rules with only content option.}
+\label{fig:graph3}
+\end{figure}
+
 The normal scenario is not possible to test in the current version of the application, because a real database of the rules and real traffic with known IP addresses should be developed. Creating a real database of rules is a question of time and experience in finding vulnerabilities.
 
 \setsecnumdepth{part}
 \chapter{Conclusion}
-The Thesis result is an application which is capable of achieving all objectives defined in chapter \ref{}. Application allows monitoring network traffic in two modes: CPU and CPU+GPU. Using GPU gave about 20-30\% of speed increase comparing to CPU mode. The next step for the application is creating or porting large database of the rules. Also introducing more network protocols and more options for rules is a good idea. Such an options could be, for example, TCP stream reassembly and decompressing packet payload, because almost all servers and browsers compress data before sending today.
+The Thesis result is an application which is capable of achieving all objectives defined in chapter \ref{chap:introduction}. Application allows monitoring network traffic in two modes: CPU and CPU+GPU. Using CPU+GPU gave about 20-30\% of speed increase comparing to CPU mode. The next step for the application is creating or porting large database of the rules. Also introducing more network protocols and more options for rules will be a good idea. Such an options could be, for example, TCP stream reassembly and decompressing packet payload, because almost all servers and browsers compress data before sending today. GUI part of the application doesn't accomplish it functionality and was not a good idea. In case PC has only one videocard, CUDA code could take major part of the GPU resources and GUI may have lags in response. Command line based application is better choise for such kind of application.
 
-Creating a GUI part for the application was not a good idea. In case PC has only one videocard CUDA code could take major part of the GPU resources and GUI may have lags in response. Command line based application is better choise in such a case.
-
-During the developing of this application, C++ programming language has been learnt in pair with GPGPU based on CUDA architecture. In addition knowledge about Boost, Libpcap, SQLite and QT has been acquired.
+Writing CUDA code is a simple and hard at the same time. Simple, because C language used for CUDA applications is well known and NVIDIA extensions for it didn't broke it's conciseness. And hard, because writing programs for parallel architectures is something different compared to writing regular applications. Code should be optimized as much as possible, every memory transaction should be taken into account. This thesis was a good point to learn different technologies such as C++ programming language including some templates in pair with GPGPU based on CUDA architecture, Boost synchronization mechanisms and Spirit parser, Libpcap library API, SQLite database, QT and as an extra \LaTeX{} program was used for the first time to create this document.
 
 \bibliographystyle{csn690}
 \bibliography{mybibliographyfile}
