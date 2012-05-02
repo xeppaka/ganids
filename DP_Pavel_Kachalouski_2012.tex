@@ -119,9 +119,9 @@ This thesis approach is to use heterogeneus computing, and more specifically use
 
 Heterogeneous computing is a way of computing some tasks using systems made up by different types of computational units. Computational unit types could be: a general-purpose processors (GPP), also known as central processor units (CPUs), which are usually the main processor of the most of the computing systems, and special-purpose processors (SPP). SPP are, for example, digital signal processors (DSP) or graphics processor units (GPU).
 
-Graphics Processing Unit or GPU is essentially a dedicated hardware device that is responsible for translating data into a 2D image formed by pixels. GPU evolution is connected to the growing popularity and complexity of rendering programs like CAD (Computer Aided Design) programs and to 3D video games. These software required high computing capabilities which have to be satisfied by the GPUs. As a result engineers developed a highly parallel processor structure, which is able to execute many execution threads concurrently, and a high speed memory.
+Graphics Processing Unit or GPU is essentially a dedicated hardware device that is responsible for translating data into a 2D image formed by pixels. GPU evolution came from the growing popularity and complexity of rendering programs like CAD (Computer Aided Design) programs and 3D video games. These software required high computing capabilities and GPUs gave such a possibility to them. GPUs have not only a highgly parallel processor structure and are able to execute many threads of the code concurrently, but also a high speed memory.
 
-The interest to use GPUs to perform calculation tasks that are not suitable for GPUs began to grow in 2005. Developers and investigators were trying to use parallelism and memory bandwidth to enhance complex algorithms perfomance. GPUs are used for computations in molecular dynamics, quantum chemistry, bioinformatics, computational fluid dynamics, weather and climate forecasting and more other fields.
+The interest to use GPUs to perform calculation tasks that are not suitable for GPUs began to grow in 2005. Developers and scientists were trying to use parallel computers and high memory bandwidth to improve complex algorithms perfomance. GPUs are used for computations in molecular dynamics, quantum chemistry, bioinformatics, computational fluid dynamics, weather and climate forecasting and more other fields.
 
 GPGPU (general-purpose computing on graphics processing units) at the beginning used GPUs as they were computing graphics tasks. Input data were encoded into image, then by using graphics libraries some operations were perfomed with an image and result data were decoded from image to its original form. Later companies realised that GPGPU could be an advantage for their business and invested in developing tools to make easier to use their products. NVIDIA developed CUDA (an acronym for Compute Unified Device Architecture) version 1.0 library in 2006, which enabled to run CUDA code written in special manner on some of their GPUs, while AMD developed ATI Stream technology that uses OpenCL language to write code executed on GPUs.
 
@@ -157,14 +157,14 @@ The main stages of the workflow:
 
 \chapter{Background}
 \section{Traffic analyzing: sniffers.}
-Packet sniffer is a program or library which allows to intercept data packets transmitted over a certain network to which the system is connected throught a network card. Most popular known sniffing software is tcpdump[], Wireshark and OmniPeek. These programs are used for obtaining raw network packets and performing analyzing over obtained packets in order to represent them in a some visual form or dump to a file. There are also pure sniffing libraries, such as Libpcap (for UNIX like OS) and Winpcap (for Windows OS).
+Packet sniffer is a program or library which allows to intercept data packets transmitted over a certain network to which the system is connected throught a network card. Most popular known sniffing software is tcpdump, Wireshark and OmniPeek. These programs are used for obtaining raw network packets and performing analyzing over obtained packets in order to represent them in a some visual form or dump to a file. There are also pure sniffing libraries, such as Libpcap (for UNIX like OS) and Winpcap (for Windows OS).
 
 \subsection{How they work.}
-The vast majority of network cards, support what is known as promiscuous mode or monitor mode. Normal operation of network cards when obtaining packets from the network (default configuration), compare the destination layer 2 (link layer) address to the one in use by the network card. If packet destination address and network card address in use match, or if the packet destination address is a broadcast address 1, packets are passed to the operating system, otherwise packets are dropped.
+Most of the network cards, support what is known as promiscuous mode or monitor mode. Normal operation of the network card is to receive packet from the network and compare the destination layer 2 (link layer) address (also known as MAC address) to the one used by the network card. If packet destination address and network card address match or packet destination address is a broadcast address, packet is transferred to the operating system. Not matched packets are dropped.
 
-If promiscuous mode or monitor mode is enabled, network card passes all packets captured from the network to the operating system, even if they are not addressed to the system. Operating system later manages, using the packet filter engine, how to distribute packets to the applications. In the Unix-like systems, root privileges are required to enable promiscuous and monitor operation mode. Sniffer techniques rely on this functionality to do its job.
+In case promiscuous or monitor mode is enabled the behavior is slightly different. In this mode network card transfers all packets received from the network to the operating system, even if their address doesn't match to the network card's one. Operating system later uses packet filtering engine to pass packets to the applications. Enabling promiscuous mode requires root privileges under Linux operating systems.
 
-It is important to remark that capturing packets from a network is highly dependent of the type of the network used and of the topology and configuration of the network. Clear examples of this fact can be found in LAN (Local Area Network) networks based on the IEEE 802.XX (physical and link layer protocols) protocol macro-family, for instance in the IEEE 802.3 protocol based networks, also known as Ethernet networks, and in the IEEE 802.11 based networks, so-called Wifi or Wireless networks. In the following subsections some details over sniffing on both network types are exposed.
+There are also differences in capturing of the network packets in a different types of networks and different network topologies. The following subsection explain some details about sniffing in the 802.3 types of the networks and 802.11 type of the networks.
 
 \subsection{Packet capture in IEEE 802.3 networks.}
 In a typical IEEE 802.3 LAN network, a star topology is used, so all the nodes in the network are connected (through their own cable) to either a hub or a switch.
@@ -175,27 +175,33 @@ In a typical IEEE 802.3 LAN network, a star topology is used, so all the nodes i
 \label{fig:ieee802.3star_topology}
 \end{figure}
 
-Hubs are basically repeaters: packets coming from a certain port are retransmitted over the rest of the ports.
-Switches instead, only send packets to the port where the destination host is connected, by previously identifying all the hosts connected to each port. Switched networks have better performance than not switched networks. Switches may perform other actions over traffic, such as filtering based on different protocol fields (link, network, transport and application protocol fields, depending on the switch), but this is beyond the scope of this thesis.
-That means that if a switched network is used, only packets flowing to or from the particular host running the sniffer or broadcast packets will be captured. Several techniques have been used to overcome this problem:
+Hubs are basically repeaters: signal introduced at the input of any port appears at the output of every port except the original incoming. Switches work in a different way: they identify all the hosts connected to the port. When packet is received on some port switch passes that packet only to the port where destination host is connected. Switched networks has better perfomance, because they do not multiply packets when they are passed to the output port. Switches also may filter traffic on different protocol levels (link, transport, network, etc.).
+
+For the packet sniffer it means that only packets transferred to or from particular host running the sniffer and broadcast packets will be captured. To overcome this problem several techniques may be used:
+
 \begin{itemize}
-\item Using a hub: an obvious but bad solution is to use hubs instead of switches. It is not a valid solution as its performance is very reduced compared to switched networks and their production is practically discontinued.
-\item Placing the sniffer in the gateway links as a bridge/router: this technique is widely used and has the advantage of being able to sniff packets from a lot of sub-networks by only placing one network tap. The disadvantage is that only traffic going through that link is captured, so internal traffic (between nodes in the same subnetwork or between different sub-networks) is not captured, which in some cases, like data centers for instance, is very relevant. 
+\item Using a hub: a simple but not good solution is to replace switches by hubs. This solution is not good because network perfomance built with hubs is very reduced compared to the network built with switches. Also hubs production is practically discontinued.
+\item Put the sniffer in a gateway link as a router: this technique has some advantages and disadvantages at the same time. The advantage is that such a sniffer is able to capture packets from a lot of subnetworks. The disadvantage is that the sniffer captures traffic going only through the link where it was placed. Internal traffic (between subnetworks or between nodes of the same subnetwork) is not captured. 
+
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.6]{images/gateway_sniffering.png}
 \caption{Sniffering traffic in the gateway links.}
 \label{fig:gateway_sniffering}
 \end{figure}
-In those cases the only solution is to use distributed sniffers, port mirroring or a combination of both of them. Figure \ref{fig:gateway_sniffering} illustrates this technique with an example.
-\item Switch port mirroring: some switches have what is called port mirroring or monitoring port 2. If port mirroring is enabled, a copy of all the packets flowing in the switched are transmitted to the mirroring port selected. On networks formed by several switches, obtaining packets in a single host is more complex, and may require to use advanced switch capabilities like Cisco’s RSPAN or combine them with a distributed sniffer.
+
+In case sniffer in a gateway link doesn't satisfy requirements port mirroring or distributed sniffer could be used. Figure \ref{fig:gateway_sniffering} illustrates this technique with an example.
+\item Switch port mirroring: some switches have port mirroring feature or monitoring port 2. When port mirroring is enabled, all packets passed over the switch are transmitted to the mirroring port. If the network contain several switches, obtaining packets on a single host could be more complex and require advanced switch features like Cisco RSPAN. Also distributed sniffer in such case could be used.
+
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.6]{images/mirror_sniffering.png}
 \caption{Sniffering traffic using switch port mirroring.}
 \label{fig:mirror_sniffering}
 \end{figure}
-\item Distributed sniffer: distributed sniffers use a software based architecture to collect traffic in several network taps (hosts), and combine them to obtain them in a unique host. The main advantages of this type of systems are their scalability and flexibility. The drawbacks of this kind of systems are that distributed network sniffers have less performance than port mirroring due to overhead introduced by software architecture and the increase of network traffic. The figure \ref{fig:distributed_sniffering} shows graphically the structure of a distributed sniffer platform.
+
+\item Distributed sniffer: distributed sniffers gather traffic from several hosts using a specialized combination of hardware and software and send it to the unique host. Such type of the sniffer is very flexible and scalable. But there are some drawbacks in this approach. The major drawback is less perfomance comparing to the previous type of the sniffers, caused by increased network traffic due to using software architecture. Distributed sniffer architecture is shown in the figure \ref{fig:distributed_sniffering}.
+
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.6]{images/distributed_sniffering.png}
@@ -204,49 +210,51 @@ In those cases the only solution is to use distributed sniffers, port mirroring 
 \end{figure}
 \end{itemize}
 \subsection{Packet capture in IEEE 802.11 networks.}
-IEEE 802.11 based networks share access medium, so it may be easier than IEEE 802.3 switched networks to capture packets, as having a network card being able to be set to promiscuous mode (actually monitor mode) is all the hardware required.
-Nevertheless, some considerations have to be kept in mind. When placing a sniffer in a wireless network, some packets or even all the packets sent by a certain host may be lost, due to environment conditions (shadowing) and the physical position of the sniffer host and the other hosts in the network (attenuation due to propagation). IEEE 802.11 networks made up by several access points may increase capturing problems, due to the larger coverage area (and therefore the higher reception antenna gain needed when using a unique sniffer host).
+The main advantage of the packet sniffering in the IEEE 802.11 network compared to the IEEE 802.3 is that 802.11 networks all share the same carrier for transferring packets. So the all hardware required to capture packets is a network card in promiscuous mode. However, some considerations have to be kept in mind. IEEE 802.11 network could be made up by a number of access points which could be a problem for capturing packets. The coverage area becomes bigger and therefore higher reception antenna is needed if one sniffer point is used. Also some environment conditions and sniffer physical positionmay have big influence on the quality of sniffering. Because of shadowing packet sent by a some host could be lost at all.
+
 Some approaches to solve these problems are:
 \begin{itemize}
-\item Capture packets in the wired network section: sometimes is preferable to sniff packets in the wired section rather than capturing them in the wireless subnetwork. This is conceptually similar to place a sniffer in the gateway link above mentioned, so the main disadvantage is that internal wireless traffic is not captured. This approach has also the drawback that link layer protocol (level 2) information is lost.
-\item Distributed sniffer: usage of distributed systems. Pros and cons are similar than above mentioned.
+\item Move the capture point to the wired network section. If it's possible, sometimes is better to capture packets in the wired section of the network instead of capturing them in the wireless section. Such approach is similar to the one listed before: placing sniffer in the gateway link, so the disatvantage is the same. Also the drawback of this approach is that internal wireless traffic could not be captured.
+
+\item Distributed sniffer: the same method as listed above with the same advantages and disatvantages.
 \end{itemize}
 
 \subsection{Libpcap.}
-Libpcap is the capture library for Unix systems. Windows systems use a port of Libcap called Winpcap. This library offers the programmer an API to use BSD Packet Filter kernel facilities or any other Packet Filter kernel architecture that is based on Berkeley Packet Filter, to create user-level network capturing programs. Libpcap was released by the tcpdump developers in the Network Research Group at Lawrence Berkeley Laboratory. Libpcap offers the following capabilities: packet capturing from a network card, packet capturing from a file and capturing packets to save them into a file. Libpcap was extracted from the tcpdump program and made into a library. Development of Libpcap is in charge of tcpdump group [TODO: add number].
+Libpcap is a sniffer library for packet capturing in a Unix-like systems. For a Windows systems a port of Libpcap named Winpcap exist. The library provides an API for using kernel resources for packet capturing in kernel architectures that are based on Berkeley Packet Filter. Libpcap was originally developed by the tcpdump developers in the Network Research Group at Lawrence Berkeley Laboratory. The following features are supported by Libpcap: packet capture, saving captured packets to a file, reading files containing saved packets. A capture file saved in the format that Libpcap can be read by applications such as tcpdump, Wireshark, CA NetMaster.
 
 \subsection{Network traffic analysis techniques.}
-In this section a brief introduction of main network traffic analysis techniques currently in use is exposed, focusing on the analysis procedures but also outlining some of the
-analysis purposes which take advantage of them. But first, some considerations over the network traffic analysis inputs (network data) should be sketched out. The main input source of any network traffic analysis is the collection of packets captured from the network, commonly called the dataset or the analysis dataset. From that dataset which may contain all protocol header information as well as application an user information, a process of extracting (mining) the useful pieces of data for every particular analysis has to be carried out.
-Datasets may also be broken up in smaller parts, resulting in data subsets, to later be analysed separately. The reasons of splitting dataset are usually performance issues with non-linear computing cost analysis algorithms, as working with large datasets may increase computing time exponentially, or to achieve a higher time resolution due to the reduced time interval of the datasubset. In these cases analysis are said to be performed over windowed datasets or simply called windowed analysis. Depending on the criteria followed to split the dataset into data subsets, two different types of windowed datasubsets can be obtained:
+This section gives a brief information about network traffic monitoring and analysis process. In the network analysis process a network data is intercepted and examined in order to retrieve information from patterns in communication. Packets collected from the network are called a dataset and contain the raw network data including header information and high level user information. By analysing datasets a useful pieces of information are retrieved and perfomed some manipudations over it.
+
+Collected datasets are often divided into a smaller parts, data subsets, to analyse later separately. It is done because of perfomance reasons: algorithms used for analysis such a data could have non-linear compute time and processing a large amount of data by such algorithms may increase time exponentially. Such technique of dividing large dataset into smaller parts called windowing. Depending on the requrements two types of windowing are used:
+
 \begin{itemize}
-\item Packet windowed datasubsets. Dataset is splitted in portions of equal number of packets each.
-\item Time windowed datasubsets. Dataset is splitted in time intervals. The size of the subsets is unknown, and depends on the amount of traffic collected per second.
+\item Size based windowed datasets. Large set of the data divided into a subset of smaller subset with the same size.
+\item Time windowed datasets. Data is constantly collected and in some time periods collected data is processed. In such a scheme the size of the data subset is unknown and based on the network speed.
 \end{itemize}
 
-The usage and type of dataset windowing may affect to the results of the different analysis performed over it, and hence windowing parameters have to be taken into account when analysis results have to be evaluated and interpreted.
+Using technique of dividing captured data into a subsets of data may affect the results of the analysis performed on it. So windowing parameters should be taken into account during interpreting results of the analysis.
 
-\subsection{Network traffic data inspection techniques.}
-Network data inspection techniques obtain information of network data by inspecting network header fields of each packet, compute them and produce outputs or results.
+\subsection{Network data inspection techniques.}
+Network data inspection is a form of packet filtering based on inspecting each packet header information, compute some calculations on them and produce results.
 
 \textbf{Packet decoding (packet analyzing)}
-The simplest network data inspection possible is packet decoding, also called packet analysis, in which all header’s field are decoded and presented in a human readable way. Network analyzers like tcpdump, Wireshark or OmniPeek are some examples of packet decoding applications.
-Packet decoding is used for the vast majority of purposes, being the most reliable security (intrusion detection, bandwidth abuse...) and network management and failure detection.
-This kind of techniques are specially of interest in network security forensics analysis. Specific packet data extraction and analysis The extraction of pieces of data from the packets contained in the dataset instead of decoding all packet headers information, and processing them is a strategy used when particular aspects of traffic need to studied.
-Different processing tasks can be performed over data collected:
+Packet decoding is the simplest task that could be performed over the gathered data. During this operation all header parameters are analysed and displayed in a human readable way. Examples of such type of the applications are tcpdump and Wireshark.
+
+The fields where packet decoding is usable includes network security (intrusion detection systems, bandwidth abuse, etc.), network management and network failures detection. Network forensics analysis also is very interested in such type of inspection.
+
+The following list presents the different tasks which could be performed over the collected packets:
 \begin{itemize}
 \item Graphical representation of raw data.
-\item Statistical information and pattern extraction
+\item Statistical information and pattern extraction.
 \item Rule based (signature based) analysis, anomaly detection and policies.
 \item Flow based analysis.
 \end{itemize}
-Graphical representation of raw data is of interest in many areas, principally in network monitoring, network management and security. Representations are usually in the form of 2D and 3D scatter plots, time based graphs, histograms, pie charts or diagrams. Network monitoring applications make an extensible usage of graphs like node state monitor graphs, throughputs and link performance graphs, source and destination hosts (IPs) histograms and scatter plots, service usage (TCP and UDP ports) histograms and scatter plots or routing diagrams. Some examples are shown in the figures below.
 
-Statistical information and pattern extraction is a big field in network analysis. First and second order statistical moments, averages, time distributions and probability distributions functions are some of the basic statistical analysis that can be performed over network data. 
-Obtaining interesting statistics over network traffic is widely used primarily in monitoring platforms. Average number of connections to a certain hosts, average inbound and outbound throughputs, transport and application layer protocol distribution, time distribution of connections to servers, time distribution of average network throughput are some examples. These statistics can also be applied for other purposes rather tan monitoring and network management, like security or marketing purposes (specially application level statics).
+Network monitoring, network management and security, all are interested in a data presented in a graphical form. It could be a 2D or 3D scatter plots, time based graphs, histograms or different types of diagrams.
 
-On the other hand, statistical pattern recognition or statistical pattern extraction is an extensive area related to network traffic analysis. They are applicable to security and
-marketing fields. Due to the extension of this field and complexity, further information is given in the 2.2.2.2 section. Rule based (signature based) analysis and policies are all the analysis that inspect traffic searching packets that match a certain rule or signature. Rules or signatures are defined as values of certain headers fields or a combination of several values of certain headers fields. Rules may also define adequate field value intervals or thresholds. Rule based analysis is also frequently called signature pattern matching. There is quite a confusing usage of the term pattern over the network analysis literature, and particularly in network intrusion detection analysis literature: while some authors use the word pattern to designate statistical patterns (statistical user behaviour patterns, statistical usage patterns in general) like W.S. Chen in or Yung Wang in, some others like Richard Bejtlich in several books like use them to refer as rule based analysis. In this thesis be are going to refer to patterns as statistical patterns only. Rule based analysis techniques are used above all for security purposes and specially in signature based intrusion detection systems (NIDS), like Snort. Threshold rules are commonly used in security (for instance to detect DoS attacks and other resource abuse attacks) and also for network management purposes like for example in network link load monitoring.
+A major position in the network analysis has pattern retrival task and calculation of the statistical parameters. Different time distributions, statistical moments of the first and second order, mean values and probability distributions could be calculated over the gathered network data. Also statistics can be used for other kind of the purpose, like marketing. Gathering information about average number of connections, average inbound and outboud speeds, time distributions of connections to servers could give a good picture for some product on the market.
+
+Rule based or signature based analysis is a type of traffic inspection where every packet is matched agains a certain rule or signature. Rules or signatures define specific fields in the packet header or combine several field values in a certain packet. Values may also be defined as an intervals or thresholds. Threshold rules are used all over security, for example, to identify DoS or bandwith abuse attacks. The synonym for the rule based analysis is a signature pattern matching and both two terms are used in a literature about network analysis. But the signature pattern matching is also used for the statistical part of the packets inspection. In this thesis rule based analysis is used to name the packet analysis for matching against rules as it is done in network intrusion detection systems and described later. 
 
 In this sense, rules could be considered as policies, as certainly define the type and amount of traffic permitted and not permitted in the network. Flow based analysis techniques are focused in the treatment of network traffic as flows, as most information exchanged in a computer network is session or connection oriented and not packet oriented, so analysis can take advantage of it. A clear example of a typical network flow is a TCP connection, where data exchanged is ruled by the TCP state machine.
 Their main applications are in the monitoring and security field. Regarding security, most NIDS like Snort, use flow based analysis techniques to detect possible threats, based on anomalies and well known attacks. Monitoring platforms on the other hand, inspect network traffic in search of flows, to generally list them or represent them in a diagram.
@@ -1057,12 +1065,14 @@ Just after starting monitoring network Nids class creates threads for processing
 
 The \textbf{packet\_received} function is a callback for a pcap library. Pcap call this function every time the new packet arrived into the system. The main responsibility of this function in CPU mode is to check whether new packet is TCP/IP (using Packet::create\_packet() method), create the Packet class object and put it into the queue. For CPU+GPU mode processing of the received packet is slightly different. The Packet class object is created as it is done in CPU mode, but just after creation all parsed parameters are saved into internal vectors (including payload) and Packet object is deleted. This way Nids class gathers all payloads into the one linear buffer and if the buffer size exceeds limit it increases gpu\_task\_ready semaphore to awake process\_on\_gpu\_callable thread to process packets on the GPU. Also CPU+GPU mode manages \textbf{tasks} array. This array is directly copied to the CUDA device and contains tasks that CUDA threads will process. The structure of task is described later in the CUDA code description.
 
-The Nids class has two vectors for CUDA tasks and packet buffer. This way double-buffered mechanism is implemented for packet capturing and CUDA processing. When process\_on\_gpu\_callable thread copies data to the GPU and executes kernel on \textbf{tasks1} vector of tasks, packet\_received adds newly received packets to the \textbf{tasks2} vector of tasks.
+The Nids class has two vectors for CUDA tasks and two vectors for packet buffer. This way double-buffered mechanism is implemented for packet capturing and CUDA processing. When process\_on\_gpu\_callable thread copies data to the GPU and executes kernel on \textbf{tasks1} vector of tasks, packet\_received adds newly received packets to the \textbf{tasks2} vector of tasks.
 
 Nids class logs a lot of information during its work. To reduce logged information set\_log\_level method is used. It defines six different log levels, but the major ones are: TRACE, DEBUG and INFO.
 
 \subsubsection*{Future work.}
 The future work for the Nids class is to implement packet categorization based on the payload size and process different categories of packets separately. There could be several categories of packets: small, medium, large, etc. This way CUDA resources could be used more effectively.
+
+Also problem with TCP stream is not solved in the current version of the application. Packets from the network level of the network stack are split into several TCP packets. It could be a problem if, for example, packet data is compressed and should be uncompressed before analyzing payload. In such a case TCP reassembly of several packets from TCP stream should be performed before analyzing packet payload.
 
 \subsection{CUDA code.}
 The code on the CUDA device is quite simple. It receives array of tasks, pointer to packets buffer and pointer to DFAs buffer. Every CUDA thread gets task from the tasks buffer which contain information about data for processing. The packet processing is just traversing over DFA table for every input byte from the packet payload. If new state is the final one and has \textbf{found} flag  set, CUDA thread sets \textbf{found} flag for the current task. The task structure is described in the figure \ref{fig:cuda_task}.
@@ -1079,44 +1089,39 @@ When CUDA kernel is starte, every CUDA thread calculates task using formula: \te
 \lstset{language=C++, label=lst:nids_class, captionpos=b, caption={Extract of my\_nids\_cuda.cu}}
 \begin{lstlisting}
     while (task_num < tasks) {
-        // ...
+        int task_offset = task_num * 4;
+        out_buffer[task_num] = -1;
+
+        unsigned char* payload = packet_buffer + task_buffer[task_offset];
+        unsigned payload_length = task_buffer[task_offset + 1];
+        int *dfa_offset = dfa + pitch_int * task_buffer[task_offset + 2];
+        unsigned result_rule = task_buffer[task_offset + 3];
+        unsigned cur_state = 0;
+        unsigned cur_idx = 0;
+        int ret;
+
         while (cur_idx < payload_length) {
-            if (cache_index >= 64) {
-                for (int i = 0; i < 16 && (cur_idx + i*4 < payload_length); ++i) {
-                    payload_cache[i] = ((unsigned int*)(payload + cur_idx))[i];
-                }
-                cache_index = 0;
-            }
-            __syncthreads();
-
-            if (cur_state == -1)
+            int4 payload_part = *((int4*)(payload + cur_idx));
+            if ((ret = check_payload_part(payload_part.x, cur_state, result_rule, task_num, dfa, dfa_offset, pitch_int, out_buffer)) < 0)
                 break;
+            cur_state = ret;
 
-            if (cur_state == -2) {
-                out_buffer[task_num] = result_rule;
+            if ((ret = check_payload_part(payload_part.y, cur_state, result_rule, task_num, dfa, dfa_offset, pitch_int, out_buffer)) < 0)
                 break;
-            }
+            cur_state = ret;
 
-            if (dfa_state[256] > 0) {
-                if (dfa_offset == dfa)
-                    out_buffer[task_num] = cur_state;
-                else
-                    out_buffer[task_num] = result_rule;
+            // ...
 
-                break;
-            }
-
-            cur_state = dfa_state[((unsigned char *)payload_cache)[cache_index]];
-            ++cur_idx;
-            ++cache_index;
+            cur_idx += 16;
         }
 
-        // next task for the thread
         task_num += gridDim.x * blockDim.x;
     }
 \end{lstlisting}
 
-To speed up the process of analyzing packet on the GPU shared memory is used. Shared GPU memory has less access time than the global memory where all packets are situated. Each thread uses shared memory to copy small part of the payload for analyzing. When thread finishes analyzing part of the payload, it copies next part and so on until whole payload is analyzed. Application uses 64 bytes of a shared memory for each thread, because application mainly tested on Geforce 9600M GT which has 16Kb of shared memory per block.
+To speed up the process of analyzing packet on the GPU packet data is transferred from the global memory using 16 byte structure (int4). This way 16 bytes are transferred to the register memory in the one transaction and processed using register memory which has very fast access time.
+
+Function \textbf{check\_payload\_part} takes cur\_state and 4 bytes of the payload as integer parameter and traverse over regex DFA modifying current state. It returnes new state in case no matches were found or -1 if current payload part was matched against some regex.
 
 \begin{figure}[h]
 \centering
@@ -1125,15 +1130,59 @@ To speed up the process of analyzing packet on the GPU shared memory is used. Sh
 \label{fig:cuda_thread_reuse}
 \end{figure}
 
+Thread reusing is implemented with expression \textbf{task\_num += gridDim.x * blockDim.x} which increases the number of task for the current thread by the size of grid dimension multiplied on block dimension.
+
 \subsubsection*{Future work.}
 The future work for the CUDA code is to use texture memory to save DFA and\\or packets payload. Texture memory has the same access time as a global memory: 400-600 cycles. The only difference the Nids application is that texture memory is cached and in case of the cache hit access time is about 1 cycle. On the other side access pattern for the packet analyzing has random structure, therefore using structures may not give desired results.
 
 \chapter{Evaluation}
-In the experiments 
+In the experiments NVIDIA GeForce GT 9600M with 512MB of memory videocard and Intel Core 2 T9400 2.53 GHz was used. First the time needed for the transfer batch of pakets to the GPU was measured. For this purposes a synthetic trace of packets was used with each packet about 800 bytes length.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{| l | l |}
+\hline
+Buffer size (in bytes) & Transfer time for 1 packet (ms) \\ \hline
+3200 & 0.01688 \\ \hline
+6400 & 0.006219 \\ \hline
+12800 & 0.004908 \\ \hline
+25600 & 0.004835 \\ \hline
+51200 & 0.004628 \\ \hline
+102400 & 0.004592 \\ \hline
+\end{tabular}
+\caption{Packet transfer time.}
+\label{fig:packet_transfer_times}
+\end{table}
+
+From the figure \ref{fig:packet_transfer_times} it is visible that packet transfer time is decreasing while size of packets buffer increased. And transfer times for big buffers of packets remains somewhat constant.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.3]{images/graph1.png}
+\caption{Number of served rules in worst case scenario.}
+\label{fig:graph1}
+\end{figure}
+
+Testing of the online processing mode was done on the 2, 4 and 10 Mb/s network. For all network speeds were created the worst case scenario when all incoming packets should be analyzed by many regular expressions. Figure \ref{fig:graph1} shows the number of rules when pcap starts to drop packets in CPU and CPU+GPU modes. Processing packet on the GPU gives about 20\% more rules. It is also should be noticed that CPU load during processing packets on GPU is quite small. Current implementation doesn't load CPU much, because CPU performs only simple operations of recognizing TCP/IP packets and matching packet header which has small length. In case of TCP stream reassembly and additional protocols for recognizing CPU will have more work to do and more packets will be dropped in CPU mode.
+
+Figure \ref{fig:graph2} shows dependency between packets buffer size and the number of served rules in CPU+GPU mode. As it was expected when buffer is small more overheads in the copying of data to the GPU and application is able to serve less rules in the same time. Larger buffers gave more perfomance.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.3]{images/graph2.png}
+\caption{Number of served rules with different packets buffer size.}
+\label{fig:graph2}
+\end{figure}
+
+The normal scenario is not possible to test in the current version of the application, because a real database of the rules and real traffic with known IP addresses should be developed. Creating a real database of rules is a question of time and experience in finding vulnerabilities.
 
 \setsecnumdepth{part}
 \chapter{Conclusion}
+The Thesis result is an application which is capable of achieving all objectives defined in chapter \ref{}. Application allows monitoring network traffic in two modes: CPU and CPU+GPU. Using GPU gave about 20-30\% of speed increase comparing to CPU mode. The next step for the application is creating or porting large database of the rules. Also introducing more network protocols and more options for rules is a good idea. Such an options could be, for example, TCP stream reassembly and decompressing packet payload, because almost all servers and browsers compress data before sending today.
 
+Creating a GUI part for the application was not a good idea. In case PC has only one videocard CUDA code could take major part of the GPU resources and GUI may have lags in response. Command line based application is better choise in such a case.
+
+During the developing of this application, C++ programming language has been learnt in pair with GPGPU based on CUDA architecture. In addition knowledge about Boost, Libpcap, SQLite and QT has been acquired.
 
 \bibliographystyle{csn690}
 \bibliography{mybibliographyfile}

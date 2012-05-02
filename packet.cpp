@@ -124,7 +124,7 @@ Packet *Packet::create_fake_packet()
     // push TCP dest port
     route.push_back(80);
 
-    const u_char *payload = (const u_char *)"1234lenta.ru12312313";
+    const u_char *payload = (const u_char *)"12345lenta.ru12312313";
 
     p->raw_packet = payload;
     p->payload_size = 20;

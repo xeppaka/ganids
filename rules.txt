@@ -169,6 +169,617 @@ alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
 alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
 alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
 alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* * {content:"!important" pcre:"12345"}
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
+alert tcp *.*.*.* * -> 192.168.0.* *
 alert tcp *.*.*.* * -> 192.168.0.* *
 alert tcp *.*.*.* * -> 192.168.0.* *
 alert tcp *.*.*.* * -> 192.168.0.* *

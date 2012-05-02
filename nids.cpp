@@ -155,6 +155,14 @@ bool Nids::start_monitor(const char *interface, int threads_num, const char *db_
     int res = pcap_loop(handle, 0, packet_received, reinterpret_cast<u_char *>(this));
     BOOST_LOG_TRIVIAL(debug) << "pcap_loop() returned: " << res;
 
+//    while (true) {
+//        Packet *p = Packet::create_fake_packet();
+//        p->save_payload();
+//        packets_queue.push(p);
+//        packets_queue_sem.post();
+//        sleep(200);
+//    }
+
     // set flag that thread should exit
     threads_exit = true;
 
@@ -179,14 +187,6 @@ bool Nids::start_monitor(const char *interface, int threads_num, const char *db_
     for (int i = 0; i < threads_num; ++i)
         delete cpu_exec_threads[i];
     delete [] cpu_exec_threads;
-
-//    while (true) {
-//        Packet *p = Packet::create_fake_packet();
-//        p->save_payload();
-//        packets_queue.push(p);
-//        packets_queue_sem.post();
-//        sleep(200);
-//    }
 
     state = IDLE;
 
@@ -389,8 +389,6 @@ void Nids::process_packet_gpu(Packet *packet)
 
         //cout << "Number of matched rule for received packet: " << matched_rules.size() << endl;
 
-        bool ttt = false;
-
         // locked on gpu_switch_buffer_mutex
         {
             boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(gpu_switch_buffer_mutex);
@@ -404,12 +402,11 @@ void Nids::process_packet_gpu(Packet *packet)
                     continue;
                 }
 
-                if (regex_dfa_offset[*it] != -1 && packet->get_payload_size() >= 1000) {
+                if (regex_dfa_offset[*it] != -1) {
                     tasks->push_back(packet_buffer->size());
-                    tasks->push_back(1000/*packet->get_payload_size()*/);
+                    tasks->push_back(packet->get_payload_size());
                     tasks->push_back(regex_dfa_offset[*it] + ac.count_states());
                     tasks->push_back(*it);
-                    ttt = true;
                 }
 
                 if (r->get_content().size() > 0) {
@@ -418,17 +415,18 @@ void Nids::process_packet_gpu(Packet *packet)
                 }
             }
 
-//            if (ac_analyze_needed) {
-//                tasks->push_back(packet_buffer->size());
-//                tasks->push_back(packet->get_payload_size());
-//                tasks->push_back(0);
-//                tasks->push_back(0);
-//            }
+            if (ac_analyze_needed) {
+                tasks->push_back(packet_buffer->size());
+                tasks->push_back(packet->get_payload_size());
+                tasks->push_back(0);
+                tasks->push_back(0);
+            }
 
-            if (ttt)
             packet_buffer->insert(packet_buffer->end(),
                                  packet->get_raw_packet() + packet->get_payload_offset(),
                                  packet->get_raw_packet() + packet->get_payload_offset() + packet->get_payload_size());
+            int rem = packet->get_payload_size() % 32;
+            packet_buffer->resize(packet_buffer->size() + rem, 0);
 
 //            for (int i = 0; i < packet->get_payload_size(); ++i) {
 //                cout << (packet->get_raw_packet() + packet->get_payload_offset())[i] << ' ';
@@ -588,8 +586,8 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
             nids->switch_buffers();
 
             //BOOST_LOG_TRIVIAL(trace) << "processing buffer of packets on GPU, length = " << nids->packet_buffer->size();
-            cout << "processing buffer of packets on GPU, length = " << nids->gpu_packet_buffer->size() << endl;
-            cout << "tasks count: " << nids->gpu_tasks->size() / 4 << endl;
+//            cout << "processing buffer of packets on GPU, length = " << nids->gpu_packet_buffer->size() << endl;
+//            cout << "tasks count: " << nids->gpu_tasks->size() / 4 << endl;
 
             try {
                 if (cuda_packet_buffer_size < nids->gpu_packet_buffer->size()) {
@@ -618,7 +616,7 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
                     throw 1;
 
                 analyze_payload_cuda(dfa_device, pitch, cuda_packet_buffer, cuda_tasks_buffer, cuda_out_buffer, nids->gpu_tasks->size() / CUDA_TASK_SIZE);
-                if (cudaThreadSynchronize() != cudaSuccess)
+                if (cudaDeviceSynchronize() != cudaSuccess)
                     throw 1;
 
                 if (out_buffer_size < nids->gpu_tasks->size() / CUDA_TASK_SIZE * sizeof(int)) {
@@ -630,8 +628,8 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
                     throw 1;
 
 //                cout << "part of out buffer:" << endl;
-//                for (int i = 0; i < 20; ++i) {
-//                    cout << out_buffer[i] << endl;
+//                for (int i = 0; i < nids->gpu_tasks->size() / CUDA_TASK_SIZE; ++i) {
+//                        cout << out_buffer[i] << endl;
 //                }
 
             } catch (int i) {
@@ -689,8 +687,8 @@ void process_on_gpu_callable::operator ()(Nids *nids, int device_num)
             nids->gpu_tasks->clear();
             nids->gpu_ac_rules->clear();
 
-            if (found)
-                nids->process_result_sem.post();
+//            if (found)
+//                nids->process_result_sem.post();
 
             nids->gpu_task_finished.post();
         }
@@ -768,16 +766,16 @@ void process_on_cpu_callable::operator ()(Nids *nids)
                     }
 
                     if (nids->regex_dfa_offset[*it] != -1) {
+                        ++k;
                         if (nids->analyze_payload_regex(packet, nids->regex_dfa_offset[*it])) {
                             boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> lock(nids->analyzing_result_mutex);
                             nids->analyzing_result.push_back(*it);
                             found = true;
                         }
-                        ++k;
                     }
                 }
 
-                cout << "regex: " << k << endl;
+                cout << "regex analyzed: " << k << " times" << endl;
 
                 if (ac_analyze_needed) {
                     vector<int> result;

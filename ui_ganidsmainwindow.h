@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ganidsmainwindow.ui'
 **
-** Created: Sat Apr 28 18:05:22 2012
+** Created: Tue May 1 12:44:23 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -64,9 +64,6 @@ public:
     QPushButton *button_save_path;
     QPushButton *button_stop;
     QPushButton *button_start;
-    QHBoxLayout *horizontalLayout;
-    QGroupBox *groupBox_3;
-    QGroupBox *groupBox_2;
     QHBoxLayout *horizontalLayout_2;
     QGroupBox *groupBox;
     QFormLayout *formLayout;
@@ -202,22 +199,6 @@ public:
 
         verticalLayout->addWidget(frame);
 
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setSpacing(6);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        groupBox_3 = new QGroupBox(centralWidget);
-        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
-
-        horizontalLayout->addWidget(groupBox_3);
-
-        groupBox_2 = new QGroupBox(centralWidget);
-        groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-
-        horizontalLayout->addWidget(groupBox_2);
-
-
-        verticalLayout->addLayout(horizontalLayout);
-
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
@@ -341,8 +322,6 @@ public:
         button_save_path->setText(QApplication::translate("GanidsMainWindow", "...", 0, QApplication::UnicodeUTF8));
         button_stop->setText(QApplication::translate("GanidsMainWindow", "Stop", 0, QApplication::UnicodeUTF8));
         button_start->setText(QApplication::translate("GanidsMainWindow", "Start capture", 0, QApplication::UnicodeUTF8));
-        groupBox_3->setTitle(QApplication::translate("GanidsMainWindow", "CPU load", 0, QApplication::UnicodeUTF8));
-        groupBox_2->setTitle(QApplication::translate("GanidsMainWindow", "Traffic", 0, QApplication::UnicodeUTF8));
         groupBox->setTitle(QApplication::translate("GanidsMainWindow", "Statistics", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("GanidsMainWindow", "Cur. load (Mb/s):", 0, QApplication::UnicodeUTF8));
         label_7->setText(QString());
