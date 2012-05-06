@@ -50,17 +50,17 @@
 % EDIT THIS
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-\department{Department of \ldots (SPECIFY)}
-\title{Network intrusion detection system\\ accelerated with GPU.}
+\department{Department of Computer Systems}
+\title{Network intrusion detection system accelerated with GPU.}
 \author{Pavel Kachalouski} %author's name without academic degrees
 \authorWithDegrees{Bc. Pavel Kachalouski} %author's name with academic degrees
 \supervisor{Šimeček Ivan Ing., Ph.D.}
 \acknowledgements{}
-\abstractEN{The goal of this thesis is to develop and test application for network intrusion detection accelerated with GPU. Deep packet inspection is a heavy process and consumes a lot of CPU calculation resources, thereby the main application objective is to offload the heaviest operations during analysing network traffic to the GPU. The project is based on Nvidia CUDA architecture and uses standard features provided by CUDA devices with 1.1 version of compute capabilities.}
-\abstractCS{Cílem této práce je vývoj a testování aplikaci pro detekci průniků sítě zrychlené pomoci GPU. Hloubkové prověřování paketů je těžký proces který konzumuje velké množství výpočetních prostředků procesoru, tím hlavním cílem aplikace je zbavit nejtěžší operace v analýze síťového provozu na GPU. Projekt je založen na architektuře NVIDIA CUDA a používá standardní funkce poskytované CUDA zařízení s verzí 1.1 výpočetních schopností.}
+\abstractEN{The goal of this thesis is to develop and test an application for  the network intrusion detection accelerated with the GPU. A deep packet inspection is a heavy process and consumes a lot of CPU calculation resources, thereby the main application objective is to offload the heaviest operations during analysing network traffic to the GPU. The project is based on Nvidia CUDA architecture and uses standard features provided by CUDA devices with 1.1 version of compute capabilities.}
+\abstractCS{Cílem této práce je vývoj a testování aplikaci pro rychlou a včasnou detekci průniků sítě s pomoci GPU. Hloubkové prověřování paketů je složíty proces který konzumuje velké množství výpočetních prostředků procesoru, a proto hlavním cílem aplikace je delegováni nejtěžších operaci v analýze síťového provozu na GPU. Projekt je založen na architektuře Nvidia CUDA a používá standardní funkce poskytované CUDA zařízení s verzí 1.1 výpočetních schopností.}
 \placeForDeclarationOfAuthenticity{Prague}
-\keywordsCS{Síťová analýza, Detekce průniku, GPU, CUDA, Paralelní výpočty.}
-\keywordsEN{Network analysis, Intrusion detection, GPU, CUDA, Parallel computing.}
+\keywordsCS{Síťová analýza, Detekce průniku, GPGPU, CUDA, Paralelní výpočty.}
+\keywordsEN{Network analysis, Intrusion detection, GPGPU, CUDA, Parallel computing.}
 
 \parskip 2mm
 \setcounter{tocdepth}{5}
@@ -72,25 +72,25 @@
 \chapter{Introduction}
 \label{chap:introduction}
 \section{Motivation}
-First major malicious internet-based attack was introduced in 1988 when one of the first Internet worms was released. Referred to as "The Morris Worm", it was written by Robert Tappan Morris and caused major interruptions across large parts of the Internet. Since 1988 Internet has greatly evolved and as a result increased number of internet-based attacks and network security became a really important issue. As an attempt to overcome this problem Intrusion Detection systems were developed. Such systems allow to monitor and possibly prevent attempts to intrude into or compromise the network resources.
+First major malicious internet-based attack was introduced in 1988 when one of the first Internet worms was released. Referred to as "The Morris Worm" \cite{morris_worm}, it was written by Robert Tappan Morris and caused major interruptions across large parts of the Internet. Since 1988 Internet has greatly evolved and as a result increased number of internet-based attacks and network security became a really important issue. As an attempt to overcome this problem Intrusion Detection systems were developed. Such systems allow to monitor and possibly prevent attempts to intrude into or compromise the network resources.
 
 In short it works as follows: you have a computer system. Your computer system is attached to the network and may be even to the Internet. You are willing to allow access from the network, by authorized people, but you are not however willing to allow unauthorized access to the system by anyone else. Typically, a firewall or authentication system is used to prevent unauthorised access. However, sometimes authentication systems and firewalling can be broken. Intrusion Detection is a set of mechanisms that are helps to detect unauthorised access to the system. Also Intrusion Detection systems may take some steps to deny access for intruders. Such systems are placed between firewall and system being secured and provide an extra layer of protection to that system.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.5]{images/Typical_NIDS.png}
-\caption{Typical NIDS scenario.}
+\caption{Typical NIDS scenario. Based on \cite{iatac_tools_report}}
 \label{fig:typical_nids}
 \end{figure}
 Intrusion detection systems fall into two categories:
 \begin{itemize}
 \item Network based system. 
-Such types of systems are placed in the network near the system that should be monitored. They monitor network traffic and examine whether it is withing acceptable boundaries.
+Such types of systems are placed in the network near the system that should be monitored. They monitor network traffic and examine whether it is within acceptable boundaries.
 \item Host based systems. 
 Such types of detection systems are run on the system being monitored and determine if activity on the system is acceptable.
 \end{itemize}
 There are also more recent type of intrusion detection system which reside in the kernel of operation system and monitor on low-level system activity.
 
-Most modern network intrusion detection and prevention systems use a set of rules that are compared to incoming and outcoming packets. Usually, a rule consists of a filter based on packet header information, a data that should be contained in the packet payload and an associated action that is taken in case filter and payload matching conditions are met.
+Most modern network intrusion detection and prevention systems use a set of rules that are compared to incoming and outcoming packets \cite{symantec_nids_intro}. Usually, a rule consists of a filter based on packet header information, a data that should be contained in the packet payload and an associated action that is taken in case filter and payload matching conditions are met.
 Matching payload signatures is a resource-intensive process, accounting for about 75\% of the total CPU processing time of modern Network Intrusion Detection systems. The reason why is it so intensive is in the fact that most of the time, every byte of every network packet should be processed as a part of data searching algorithm that searches for matches along a large set of rules that apply for particular packet. As an example, most widely used open-source NIDS Snort has rule set with about 10000 strings. Searching every packet for all of this strings needs a lot of resources. 
 \begin{figure}[h]
 \centering
@@ -100,7 +100,7 @@ Matching payload signatures is a resource-intensive process, accounting for abou
 \end{figure}
 With increasing number of internet-based attacks rules datasets grow every year creating additional load on NIDS systems. Figure \ref{fig:symantec_report} shows a general trend of the number of web-based attacks on web servers taken from Symantec Corporation report.
 
-The other source of high load on NIDS is constant grow of networks speeds. In the past 6 years, computer networks were characterized by a steady increase in the transfer rate, complexity and number of networked users. In 2009 the Internet traffic growth all over the world amounted to 40-50 \%, and according to Cisco company forecast [TODO:add number] global IP traffic will increase in the next 5 years, reaching by 2015 about 1 zettabyte of data transferred during one year.
+The other source of high load on NIDS is constant grow of networks speeds. In the past 6 years, computer networks were characterized by a steady increase in the transfer rate, complexity and number of networked users. In 2009 the Internet traffic growth all over the world amounted to 40-50 \%, and according to Cisco company forecast \cite{cisco_firecast} global IP traffic will increase in the next 5 years, reaching by 2015 about 1 zettabyte of data transferred during one year.
 
 Problem with high load on NIDS can be solved by using specialized network processing devices such as FPGA, ASIC, Network Processing Unit (NPU), or the TCP Offoading Engine (TOE). Nonetheless, the solutions may not be cost effective and easy to manage because they require special hardware and configurations.
 
@@ -125,7 +125,7 @@ The interest to use GPUs to perform calculation tasks that are not suitable for 
 
 GPGPU (general-purpose computing on graphics processing units) at the beginning used GPUs as they were computing graphics tasks. Input data were encoded into image, then by using graphics libraries some operations were perfomed with an image and result data were decoded from image to its original form. Later companies realised that GPGPU could be an advantage for their business and invested in developing tools to make easier to use their products. NVIDIA developed CUDA (an acronym for Compute Unified Device Architecture) version 1.0 library in 2006, which enabled to run CUDA code written in special manner on some of their GPUs, while AMD developed ATI Stream technology that uses OpenCL language to write code executed on GPUs.
 
-CUDA is the computing engine in Nvidia GPUs that is accessible to software developers through variants of industry standard programming languages. Programmers use 'C for CUDA' (C with Nvidia extensions and certain restrictions), compiled through a PathScale Open64 C compiler to code algorithms for execution on the GPU.
+CUDA is the computing engine in Nvidia GPUs that is accessible to software developers through variants of industry standard programming languages. Programmers use 'C for CUDA' (C with Nvidia extensions and certain restrictions) \cite{cuda_guide}, compiled through a PathScale Open64 C compiler to code algorithms for execution on the GPU.
 The main objective of this thesis is to develop open-source NIDS application which will inspect network traffic using classic CPU mode and heterogeneous CPU+GPU mode and compare perfomance of the two modes. 
 
 In additional, the software should fulfill the following requirements:
@@ -157,7 +157,7 @@ The main stages of the workflow:
 
 \chapter{Background}
 \section{Traffic analyzing: sniffers.}
-Packet sniffer is a program or library which allows to intercept data packets transmitted over a certain network to which the system is connected throught a network card. Most popular known sniffing software is tcpdump and Wireshark. These programs are used for obtaining raw network packets and performing analyzing over obtained packets in order to represent them in a some visual form or dump to a file. There are also pure sniffing libraries, such as Libpcap (for UNIX like OS) and Winpcap (for Windows OS).
+Packet sniffer is a program or library which allows to intercept data packets transmitted over a certain network to which the system is connected throught a network card. Most popular known sniffing software is tcpdump and Wireshark. These programs are used for obtaining raw network packets and performing analyzing over obtained packets in order to represent them in a some visual form or dump to a file. There are also pure sniffing libraries, such as Libpcap (for UNIX like OS) and Winpcap (for Windows OS) \cite{cap_app}.
 
 \subsection{How they work.}
 Most of the network cards, support what is known as promiscuous mode or monitor mode. Normal operation of the network card is to receive packet from the network and compare the destination layer 2 (link layer) address (also known as MAC address) to the one used by the network card. If packet destination address and network card address match or packet destination address is a broadcast address, packet is transferred to the operating system. Not matched packets are dropped.
@@ -167,7 +167,7 @@ In case promiscuous or monitor mode is enabled the behavior is slightly differen
 There are also differences in capturing of the network packets in a different types of networks and different network topologies. The following subsection explain some details about sniffing in the 802.3 types of the networks and 802.11 type of the networks.
 
 \subsection{Packet capture in IEEE 802.3 networks.}
-In a typical IEEE 802.3 LAN network, a star topology is used, so all the nodes in the network are connected (through their own cable) to either a hub or a switch.
+In a typical IEEE 802.3 LAN network \cite{ieee_802_3}, a star topology is used, so all the nodes in the network are connected (through their own cable) to either a hub or a switch.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.45]{images/IEEE802_3_LAN.png}
@@ -177,11 +177,11 @@ In a typical IEEE 802.3 LAN network, a star topology is used, so all the nodes i
 
 Hubs are basically repeaters: signal introduced at the input of any port appears at the output of every port except the original incoming. Switches work in a different way: they identify all the hosts connected to the port. When packet is received on some port switch passes that packet only to the port where destination host is connected. Switched networks has better perfomance, because they do not multiply packets when they are passed to the output port. Switches also may filter traffic on different protocol levels (link, transport, network, etc.).
 
-For the packet sniffer it means that only packets transferred to or from particular host running the sniffer and broadcast packets will be captured. To overcome this problem several techniques may be used:
+For the packet sniffer it means that only packets transferred to or from particular host running the sniffer and broadcast packets will be captured. To overcome this problem several techniques may be used\cite{gpu_framework}:
 
 \begin{itemize}
 \item Using a hub: a simple but not good solution is to replace switches by hubs. This solution is not good because network perfomance built with hubs is very reduced compared to the network built with switches. Also hubs production is practically discontinued.
-\item Put the sniffer in a gateway link as a router: this technique has some advantages and disadvantages at the same time. The advantage is that such a sniffer is able to capture packets from a lot of subnetworks. The disadvantage is that the sniffer captures traffic going only through the link where it was placed. Internal traffic (between subnetworks or between nodes of the same subnetwork) is not captured. 
+\item Put the sniffer in a gateway link as a router: this technique has some advantages and disadvantages at the same time. The advantage is that such a sniffer is able to capture packets from a lot of subnetworks. The disadvantage is that the sniffer captures traffic going only through the link where it was placed. Internal traffic (between subnetworks or between nodes of the same subnetwork) is not captured, which is important in some cases, like data centers \cite{act_defense_model}. 
 
 \begin{figure}[h]
 \centering
@@ -191,7 +191,7 @@ For the packet sniffer it means that only packets transferred to or from particu
 \end{figure}
 
 In case sniffer in a gateway link doesn't satisfy requirements port mirroring or distributed sniffer could be used. Figure \ref{fig:gateway_sniffering} illustrates this technique with an example.
-\item Switch port mirroring: some switches have port mirroring feature or monitoring port 2. When port mirroring is enabled, all packets passed over the switch are transmitted to the mirroring port. If the network contain several switches, obtaining packets on a single host could be more complex and require advanced switch features like Cisco RSPAN. Also distributed sniffer in such case could be used.
+\item Switch port mirroring: some switches have port mirroring feature or monitoring port 2. When port mirroring is enabled, all packets passed over the switch are transmitted to the mirroring port. If the network contain several switches, obtaining packets on a single host could be more complex and require advanced switch features like Cisco RSPAN \cite{cisco_site}. Also distributed sniffer in such case could be used.
 
 \begin{figure}[h]
 \centering
@@ -210,9 +210,9 @@ In case sniffer in a gateway link doesn't satisfy requirements port mirroring or
 \end{figure}
 \end{itemize}
 \subsection{Packet capture in IEEE 802.11 networks.}
-The main advantage of the packet sniffering in the IEEE 802.11 network compared to the IEEE 802.3 is that 802.11 networks all share the same carrier for transferring packets. So the only hardware required to capture packets is a network card in promiscuous mode. However, some considerations have to be kept in mind. IEEE 802.11 network could be made up by a number of access points which could be a problem for capturing packets. The coverage area becomes bigger therefore higher reception antenna is needed if one sniffer point is used. Also some environment conditions and sniffer physical position could have big influence on the quality of sniffering. Because of shadowing packet sent by a some host could be lost at all.
+The main advantage of the packet sniffering in the IEEE 802.11 network compared to the IEEE 802.3 is that 802.11 networks all share the same carrier for transferring packets \cite{ieee_802_11}. So the only hardware required to capture packets is a network card in promiscuous mode. However, some considerations have to be kept in mind. IEEE 802.11 network could be made up by a number of access points which could be a problem for capturing packets. The coverage area becomes bigger therefore higher reception antenna is needed if one sniffer point is used. Also some environment conditions and sniffer physical position could have big influence on the quality of sniffering. Because of shadowing packet sent by some host could be lost at all.
 
-Some approaches to solve these problems are:
+Some approaches to solve these problems are\cite{gpu_framework}:
 \begin{itemize}
 \item Move the capture point to the wired network section. If it's possible, sometimes is better to capture packets in the wired section of the network instead of capturing them in the wireless section. Such approach is similar to the one listed before: placing sniffer in the gateway link, so the disatvantage is the same. Also the drawback of this approach is that internal wireless traffic could not be captured.
 
@@ -220,7 +220,7 @@ Some approaches to solve these problems are:
 \end{itemize}
 
 \subsection{Libpcap.}
-Libpcap is a sniffer library for packet capturing in a Unix-like systems. For a Windows systems a port of Libpcap named Winpcap exist. The library provides an API for using kernel resources for packet capturing in kernel architectures that are based on Berkeley Packet Filter. Libpcap was originally developed by the tcpdump developers in the Network Research Group at Lawrence Berkeley Laboratory. The following features are supported by Libpcap: packet capture, saving captured packets to a file, reading files containing saved packets. A capture file saved in the format that Libpcap can be read by applications such as tcpdump, Wireshark, CA NetMaster.
+Libpcap is a sniffer library for packet capturing in a Unix-like systems. For a Windows systems a port of Libpcap named Winpcap \cite{winpcap_site} exist. The library provides an API for using kernel resources for packet capturing in kernel architectures that are based on Berkeley Packet Filter \cite{bsd_filter}. Libpcap was originally developed by the tcpdump developers in the Network Research Group at Lawrence Berkeley Laboratory. The following features are supported by Libpcap: packet capture, saving captured packets to a file, reading files containing saved packets. A capture file saved in the format that Libpcap can be read by applications such as tcpdump, Wireshark, CA NetMaster.
 
 \subsection{Network traffic analysis techniques.}
 This section gives a brief information about network traffic monitoring and analysis process. In the network analysis process a network data is intercepted and examined in order to retrieve information from patterns in communication. Packets collected from the network are called a dataset and contain the raw network data including header information and high level user information. By analysing datasets a useful pieces of information are retrieved and perfomed some manipulations over it.
@@ -254,11 +254,11 @@ Network monitoring, network management and security, all are interested in a dat
 
 A major position in the network analysis has pattern retrival task and calculation of the statistical parameters. Different time distributions, statistical moments of the first and second order, mean values and probability distributions could be calculated over the gathered network data. Also statistics can be used for other kind of the purpose, like marketing. Gathering information about average number of connections, average inbound and outboud speeds, time distributions of connections to servers could give a good picture for some product on the market.
 
-Rule based or signature based analysis is a type of traffic inspection where every packet is matched agains a certain rule or signature. Rules or signatures define specific fields in the packet header or combine several field values in a certain packet. Values may also be defined as an intervals or thresholds. Threshold rules are used all over security, for example, to identify DoS or bandwith abuse attacks. In this case rules may be treated as policies, which allow or disallow certain amount of traffic in the network.
+Rule based or signature based analysis is a type of traffic inspection where every packet is matched agains a certain rule or signature \cite{rule_based_analysis}. Rules or signatures define specific fields in the packet header or combine several field values in a certain packet. Values may also be defined as an intervals or thresholds. Threshold rules are used all over security, for example, to identify DoS or bandwith abuse attacks. In this case rules may be treated as policies, which allow or disallow certain amount of traffic in the network.
 The synonym for the rule based analysis is a signature pattern matching and both two terms are used in a literature about network analysis. But the signature pattern matching is also used for the statistical part of the packets inspection. In this thesis rule based analysis is used to name the packet analysis for matching against rules as it is done in network intrusion detection systems and described later. 
 
 \section{Intrusion detection.}
-Intrusion detection is a process of detection undesired traffic on a network or device. An Intrusion Detection System is a combination of a physical device with a software which monitors network traffic in order to detect undesired activity and traffic that violates security policies. Different IDS tools are able also to store event information into log for later review or combine events with other information to make decisions about policies and losses. More functionalities provide IPS that can prevent or stop undesired traffic.
+Intrusion detection is a process of detection undesired traffic on a network or device \cite{nids_evolution}. An Intrusion Detection System is a combination of a physical device with a software which monitors network traffic in order to detect undesired activity and traffic that violates security policies. Different IDS tools are able also to store event information into log for later review or combine events with other information to make decisions about policies and losses. More functionalities provide IPS that can prevent or stop undesired traffic.
 
 \textbf{Network-based Intrusion Detection (NID)}
 
@@ -289,7 +289,7 @@ This type of IDS looks at network traffic and detects data that is incorrect, no
 This type of detection is similar to anomaly-based detection, but it additionally inspects traffic on the transport layer and vendor-specific application layer, while anomaly-based detection is not doing it.
 
 \section{Intrusion Detection Systems: A Brief History.}
-The goal of intrusion detection is to monitor network assets to detect anomalous behavior and misuse. This concept has been around for nearly twenty years but only recently has it seen a dramatic rise in popularity and incorporation into the overall information security infrastructure. Beginning in 1980, with James Anderson's paper, Computer Security Threat Monitoring and Surveillance, the notion of intrusion detection was born. Since then, several pivotal events in IDS technology have advanced intrusion detection to its current state.
+Beginning in 1980, with James Anderson's paper, Computer Security Threat Monitoring and Surveillance, the notion of intrusion detection was born. Since then, several pivotal events in IDS technology have advanced intrusion detection to its current state \cite{nids_evolution}.
 
 James Anderson's seminal paper, written for a government organization, introduced the notion that audit trails contained vital information that could be valuable in tracking misuse and understanding user behavior. With the release of this paper, the concept of "detecting" misuse and specific user events emerged. His insight into audit data and its importance led to tremendous improvements in the auditing subsystems of virtually every operating system. Anderson's conjecture also provided the foundation for future intrusion detection system design and development. His work was the start of host-based intrusion detection and IDS in general.
 
@@ -304,7 +304,7 @@ The subsequent iteration of this tool was called the Distributed Intrusion Detec
 To kick off the '90s, UC Davis's Todd Heberlein introduced the idea of network intrusion detection. In 1990, Heberlein was the primary author and developer of Network Security Monitor (NSM), the first network intrusion detection system ( see Heberlein, L. et al. "A Network Security Monitor." Proceedings of the IEEE Computer Society Symposium, Research in Security and Privacy, May 1990, pp. 296-303.) NSM was deployed at major government installations where network traffic analysis provided massive amounts of information. This new awareness generated more interest in the field of intrusion detection and investments in that market increased significantly. Heberlein's contributions also extended to the DIDS project where, along with the Haystack team, he introduced the first idea of hybrid intrusion detection. The work of the Haystack project and the introduction of the Network Security Monitor revolutionized the IDS field and brought it into the commercial world.
 
 Commercial development of intrusion detection technologies began in the early 1990s. Haystack Labs was the first commercial vendor of IDS tools, with its Stalker line of host-based products. SAIC was also developing a form of host-based intrusion detection, called Computer Misuse Detection System (CMDS). Simultaneously, the Air Force's Cryptologic Support Center developed the Automated Security Measurement System (ASIM) to monitor network traffic on the US Air Force's network. ASIM made considerable progress in overcoming scalability and portability issues that previously plagued NID products. Additionally, ASIM was the first solution to incorporate both a hardware and software solution to network intrusion detection. ASIM is still currently in use and managed by the Air Force's Computer Emergency Response Team (AFCERT) at locations all over the world. As often happened, the development group on the ASIM project formed a commercial company in 1994, the Wheel Group. Their product, NetRanger, was the first commercially viable network intrusion detection device. Nonetheless, commercial intrusion detection systems developed slowly during these years and only truly blossomed towards the latter half of the decade.
-The intrusion detection market began to gain in popularity and truly generate revenues around 1997. In that year, the security market leader, ISS, developed a network intrusion detection system called RealSecure. A year later, Cisco recognized the importance of network intrusion detection and purchased the Wheel Group, attaining a security solution they could provide to their customers. Similarly, the first visible host-based intrusion detection company, Centrax Corporation, emerged as a result of a merger of the development staff from Haystack Labs and the departure of the CMDS team from SAIC. From there, the commercial IDS world expanded its market-base and a roller coaster ride of start-up companies, mergers, and acquisitions ensued. (The next section, Players, discusses these developments.)
+The intrusion detection market began to gain in popularity and truly generate revenues around 1997. In that year, the security market leader, ISS, developed a network intrusion detection system called RealSecure. A year later, Cisco recognized the importance of network intrusion detection and purchased the Wheel Group, attaining a security solution they could provide to their customers. Similarly, the first visible host-based intrusion detection company, Centrax Corporation, emerged as a result of a merger of the development staff from Haystack Labs and the departure of the CMDS team from SAIC. From there, the commercial IDS world expanded its market-base and a roller coaster ride of start-up companies, mergers, and acquisitions ensued.
 
 Currently, market statistics show that IDS is amidst the top selling security vendor technologies and should continue to rise. Furthermore, government initiatives, such as the Federal Intrusion Detection Network, (FIDNet) created under Presidential Decision Directive 63, are also adding impetus to the evolution of IDS. Advancements in IDS will ultimately push security technology into a whole new arena of automated security intelligence.
 
@@ -317,19 +317,19 @@ The first graphics system that implemented 2D primirives in hardware was the IBM
 
 In the second half of 1990s only several manufacturers appeared to compete over the GPU market and by the end of 1990s, manufacturers leaders were NVIDIA, ATI and 3dfx. In 1999 NVIDIA launched Geforce 256 which was the first card on the market supported hardware transormations and lighting capabilities. 
 
-In the early 2000s, the OpenGL API appeared. It is a multiplatform and multilanguage API that was created in 1992 by Silicon Graphics Inc. to help programmers draw 3D images. Due to the new API and new hardware architectures that allowed to process each pixel by a short program which is able to include additional textures as inputs and geometric vertex be processed in a similar way, 3D software got a huge capability improvement. NVIDIA's Geforce 3 was the first device that supported vertex shaders programming. In 2000 NVIDIA bought 3dfx and from that point to present, the market of high perfomance GPU is dominated by NVIDIA on one side, with an estimated market share of 59.4\% in June 2011 according to [TODO: add source], and ATI, with an estimated 40.6\% of market share.
+In the early 2000s, the OpenGL API appeared. It is a multiplatform and multilanguage API that was created in 1992 by Silicon Graphics Inc. to help programmers draw 3D images. Due to the new API and new hardware architectures that allowed to process each pixel by a short program which is able to include additional textures as inputs and geometric vertex be processed in a similar way, 3D software got a huge capability improvement. NVIDIA's Geforce 3 was the first device that supported vertex shaders programming. In 2000 NVIDIA bought 3dfx and from that point to present, the market of high perfomance GPU is dominated by NVIDIA on one side, with an estimated market share of 59.4\% in June 2011 according to \cite{gpu_marketshare}, and ATI, with an estimated 40.6\% of market share.
 
 The latest chips of NVIDIA are the GF119 and GF110 chip family (Geforce 500 and 600 series) generation. Recently NVIDIA has published a new architecture for the CUDA enabled chips with the code name Kepler, which has 1536 CUDA cores in the entire GPU. For his part ATI has developed Radeon 7000 family, with the Tahiti graphic chipsets.
 
 \subsection{GPGPU: general-purpose computing on graphics processing units.}
-GPGPU stands for General-Purpose Computing on Graphics Processing Units. Since 2003, several researchers like Harris, Mark J., William V. among others, outlined that current architecture of high performance GPUs in terms of FLOPS (FLoating-point Operations Per Second), with programmable fragment and vertex shaders that enabled the programmers to create more realistic and complex graphics, could be used for other purposes rather than graphic calculations.
+GPGPU stands for General-Purpose Computing on Graphics Processing Units. Since 2003, several researchers like Harris, Mark J., William V. among others \cite{gpgpu}, outlined that current architecture of high performance GPUs in terms of FLOPS (FLoating-point Operations Per Second), with programmable fragment and vertex shaders that enabled the programmers to create more realistic and complex graphics, could be used for other purposes rather than graphic calculations.
 
 The major motivation for the progress of GPGPU was improving perfomance of the algorithms which easily scales for a parallel computations and overcome limitations of traditionally CPU based computing: the instruction-level parallelism wall and the memory wall. On the one side GPUs have a small number of instructions to be performed on the data, however they are able to execute many of this instructions simultaneously over the large amount of data. This became available because of the programmable shaders that were added to the GPU processor's pipelines. GPUs can compute a lot of vertices or fragments of graphics in the same way. Such a computation called stream. The streams is an array of elements required the same calculation performed on it, and kernels are the functions applied to all elements in the stream.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.45]{images/cpuvsgpu.png}
-\caption{GPU vs. CPU processor FLOPS performance gap.}
+\caption{GPU vs. CPU processor FLOPS performance comparison \cite{cuda_guide}.}
 \label{fig:cpuvsgpu}
 \end{figure}
 
@@ -337,7 +337,7 @@ Also, the usage of graphical processor units have another important advantage ov
 
 First attempts of using GPUs with other purposes rather than graphics, required to transform or convert complex algorithms and data into a graphics, to be able to use the GPU through graphics libraries (like OpenGL) to solve them and later revert the transformation. 
 
-NVIDIA, conscious that GPGPU could be an important boost for the GPU market and also knowing that the current approaches for using GPUs for general purpose programming required a high level of knowledge and was a tedious job, started developing an SDK with the purpose of simplifying the task of GPGPU programming. The result of this development was CUDATM (Compute Unified Device Architecture), that was launched in November 2006. 
+NVIDIA, conscious that GPGPU could be an important boost for the GPU market and also knowing that the current approaches for using GPUs for general purpose programming required a high level of knowledge and was a tedious job, started developing an SDK with the purpose of simplifying the task of GPGPU programming. The result of this development was CUDA (Compute Unified Device Architecture), that was launched in November 2006. 
 
 CUDA is a parallel computing architecture that enables programmers to use both CPU and GPU processors to cooperate in a single program, using a computing paradigm known as heterogeneous computing. Software developers are able to program general purpose functions or routines to be run on the GPU by simply use “C for CUDA” (C with NVIDIA extensions) while the rest of the program is still executed in the CPU. 
 
@@ -350,7 +350,7 @@ CUDA is the parallel computing architecture developed by NVIDIA which allows dev
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.4]{images/cuda_threads.png}
-\caption{CUDA thread hierarchy.}
+\caption{CUDA thread hierarchy\cite{cuda_guide}.}
 \label{fig:cuda_threads}
 \end{figure}
 
@@ -360,7 +360,7 @@ Figure \ref{fig:cuda_threads} shows kernel’s thread organization of model. All
 
 During kernel execution code could read current thread ID and current block ID. It is done by using built-in variables blockIdx.x, blockIdx.y for blocks and threadIdx.x, threadIdx.y and threadIdx.z for threads. Dimensions of the grid and block can also be retrieved using built-in variables like blockDim and gridDim. The combination of the blockIdx and threadIdx identify each thread, are used to perform coalesced memory access and execute code for a different input data based in the thread and block IDs. The current restriction for the maximum threads is 65536 with limit over the one dimension of 512 threads/blocks.
 
-\begin{figure}[h]
+\lstset{language=C++, label=lst:cuda_kernel, captionpos=b, caption={Simplified CUDA kernel and associated main() function.}}
 \begin{lstlisting}
 __global__ void vecAdd (float *A , float *B , float *C)
 {
@@ -375,11 +375,8 @@ int main (int argc, char *argv[])
 }
 
 \end{lstlisting}
-\caption{Simplified CUDA kernel and associated main() function.}
-\label{fig:cuda_kernel}
-\end{figure}
 
-The code contained in the figure \ref{fig:cuda_kernel} shows a simplified example of a kernel call, executing vecAdd kernel with a 1D grid organization and 1D thread block organization, throwing NUM\_BLOCKS blocks, with NUM\_THREADS threads per block.
+The code contained in the listing \ref{lst:cuda_kernel} shows a simplified example of a kernel call, executing vecAdd kernel with a 1D grid organization and 1D thread block organization, throwing NUM\_BLOCKS blocks, with NUM\_THREADS threads per block.
 
 \setsecnumdepth{all}
 \chapter{Design}
@@ -391,17 +388,17 @@ The tools and programming languages selected for implementing application are:
 Languages:
 
 \begin{itemize}
-\item \textbf{C++}: due to perfomance requirements and supporting of object oriented features (classes, inheritance), C++ is used for developing the whole application, except of the CUDA device code part, where C dialect for CUDA is used.
-\item \textbf{CUDA}: CUDA uses C language with additional features to perform general purpose calculations in the GPUs.
+\item \textbf{C++}\cite{bjarn_str}: due to perfomance requirements and supporting of object oriented features (classes, inheritance), C++ is used for developing the whole application, except of the CUDA device code part, where C dialect for CUDA is used.
+\item \textbf{CUDA}\cite{cuda_zone}: CUDA uses C language with additional features to perform general purpose calculations in the GPUs.
 \end{itemize}
 
 Libraries:
 
 \begin{itemize}
-\item \textbf{Libpcap}: is packet-capture library for retrieving packets from the Packet Filter.
-\item \textbf{QT}: is a cross-platform application framework for developing application with a rich graphical interface. It is used for building GUI part of the application.
-\item \textbf{Boost}: is a set of libraries that extend the functionality of the C++ programming language. Classes for processes synchronization are used (semaphores and mutexes) and also a Boost.Spirit parser to parse rules dataset.
-\item \textbf{Sqlite}: is a software library that implements a SQL database engine and is used to store results.
+\item \textbf{Libpcap}\cite{cap_app}: is packet-capture library for retrieving packets from the Packet Filter.
+\item \textbf{QT}\cite{qt_project}: is a cross-platform application framework for developing application with a rich graphical interface. It is used for building GUI part of the application.
+\item \textbf{Boost}\cite{boost}: is a set of libraries that extend the functionality of the C++ programming language. Classes for processes synchronization are used (semaphores and mutexes) and also a Boost.Spirit parser to parse rules dataset.
+\item \textbf{Sqlite}\cite{sqlite}: is a software library that implements a SQL database engine and is used to store results.
 \end{itemize}
 
 The methodology used has been the spiral model.
@@ -440,18 +437,18 @@ action protocol src_ip src_port direction dst_ip dst_port {options}
 
 \textbf{Dst\_port} is a destination TCP port written in the same format as a source TCP port.
 
-\textbf{Options} are parameters that specifies payload analysis. Within options should be a \textbf{content} or \textbf{pcre} parameters. Content specifies a string which is searched within a packet payload. Also content string could contain raw bytes which should be written within '\textbar' symbols. Example of the content option with a string and raw bytes: \textbf{content:"stringtosearch\textbar00 01 02\textbar"}.\newline Pcre parameter allows to specify the searched string as a regular expression. Example of pcre option: \textbf{pcre:"\textasciicircum(some)*regex"}. The reason of dividing searched string on content and pcre is that all content strings are compiled into one DFA while each pcre is compiled in its own DFA and could consume much more memory. Therefore, if it's possible, it is preffered to use more content parameters against pcre parameters, because content parameters are using fast searched Aho-Corasick algorithm to search all contents simultaneously, while every pcre expression is searched individually for each packet. Options may contain parameters \textbf{offset} and \textbf{length} which means position in a payload from which searching should be started and number of bytes from the start position to observe. And finally \textbf{msg} parameter can appear withing options. It is a simple string that should be logged or alerted to user when some packet matches against the rule.
+\textbf{Options} are parameters that specifies payload analysis. Within options should be a \textbf{content} or \textbf{pcre} parameters. Content specifies a string which is searched within a packet payload. Also content string could contain raw bytes which should be written within '\textbar' symbols. Example of the content option with a string and raw bytes: \textbf{content:"stringtosearch\textbar00 01 02\textbar"}.\newline Pcre parameter allows to specify the searched string as a regular expression. Example of pcre option: \textbf{pcre:"\textasciicircum(some)*regex"}. The reason of dividing searched string on content and pcre is that all content strings are compiled into one DFA while each pcre is compiled in its own DFA and could consume much more memory. Therefore, if it's possible, it is preffered to use more content parameters against pcre parameters, because content parameters are using fast searched Aho-Corasick algorithm to search all contents simultaneously, while every pcre expression is searched individually for each packet. Options may contain parameters \textbf{offset} and \textbf{length} which means position in a payload from which searching should be started and number of bytes from the start position to observe. And finally \textbf{msg} parameter can appear within options. It is a simple string that should be logged or alerted to user when some packet matches against the rule.
 
 \section{Application design overview.}
 The main objective of this thesis is to design and implement simple NIDS application capable to analyze network traffic using GPUs using CUDA. 
 \subsection*{Pattern matching.}
 Pattern matching is the most heavy operation that affects the NIDS perfomance. Pattern matching algorithms can be classified into single-pattern and multi-pattern algorithms.
 
-Single-pattern algorithms work in a way that each pattern is searched in a given text individually. Therefore for k searched patterns algorithm should be repeated k times. Some of the widely used algorithms are Knuth-Morris-Pratt and Boyer-Moore. Knuth-Morris-Pratt is able to skip characters when a mismatch occurs in the comparison phase using a partial match table for each pattern. Each table is built by preprocessing every pattern separately. Boyer-Moore is the most widely used single-pattern algorithm. Its execution time can be sublinear if the suffix of the string to be searched for appears infrequently in the input stream, due to the skipping heuristics that it uses.
+Single-pattern algorithms work in a way that each pattern is searched in a given text individually. Therefore for k searched patterns algorithm should be repeated k times. Some of the widely used algorithms are Knuth-Morris-Pratt\cite{kmp} and Boyer-Moore\cite{boyermoore}. Knuth-Morris-Pratt is able to skip characters when a mismatch occurs in the comparison phase using a partial match table for each pattern. Each table is built by preprocessing every pattern separately. Boyer-Moore is the most widely used single-pattern algorithm. Its execution time can be sublinear if the suffix of the string to be searched for appears infrequently in the input stream, due to the skipping heuristics that it uses.
 
-Multi-pattern matching algorithms search a set of patterns in a text simultaneously. It is done by preprocessing all patterns that could be searched into an automation which is used during searching phase. The automation may be represented as a trie, a table or combination of the two. Such algorithms searches each byte from the text only once. Also such algorithms scales much better that single-pattern. Example of multi-pattern algorithms: Aho-Corasick, Wu-Manber and Commentz-Walter.
+Multi-pattern matching algorithms search a set of patterns in a text simultaneously. It is done by preprocessing all patterns that could be searched into an automation which is used during searching phase. The automation may be represented as a trie, a table or combination of the two. Such algorithms searches each byte from the text only once. Also such algorithms scales much better that single-pattern. Example of multi-pattern algorithms: Aho-Corasick\cite{aho_corasick}, Wu-Manber and Commentz-Walter\cite{commwalter}.
 
-Previous section introduced NIDS rule which could contain \textbf{content} or \textbf{pcre} patterns that should be searched withing payload. For each regular expression a single DFA will be built and packet payload will be matched against certain DFA. To search content strings it was decided to use Aho-Corasick algorithm, this way all content string are searched simultaneously within the packet payload.
+Previous section introduced NIDS rule which could contain \textbf{content} or \textbf{pcre} patterns that should be searched within payload. For each regular expression a single DFA will be built and packet payload will be matched against certain DFA. To search content strings it was decided to use Aho-Corasick algorithm, this way all content string are searched simultaneously within the packet payload.
 
 The Aho-Corasick algorithm consists of two parts. In the first part we construct from the set of patterns a finiste state machine; in the second part we apply the packet payload as input to the pattern matching machine. The machine signals whenever it has found a match for a keyword. The pattern matching machine consists of a set of states. Each state is represented by a number. The machine processes the text by successively reading symbols from input string, making state transitions and occasionally emitting output. The behaviour of the pattern matching machine is dictated by three functions: a goto function \emph{g}, a failure function \emph{f} and an output function \emph{output}. Figures \ref{fig:goto_function}, \ref{fig:failure_function} and \ref{fig:output_function} shows the functions used by a pattern matching machine for a set of keywords (he, she, his, hers).
 
@@ -580,7 +577,7 @@ To be able to use Aho-Corasick algorithm with a GPU a DFA should be constructed 
 The algorithm for searching through DFA is similar to the regular expression's one and described in the next section.
 
 \subsection*{Regular expression pattern matching.}
-Regular expressions are compiled into a DFA by using external library. As a result a two dimensional array is obtained. Array structure is similar to Aho-Corasick DFA. The dimensions of the array are equal to the number of states and the size of the alphabet (256 in our case) plus one position to store index of the rule if current state signs that regular expression is matched. Therefore the final algorithm for searching pattern withing packet payload is shown in figure \ref{fig:dfa_search}.
+Regular expressions are compiled into a DFA by using external library. As a result a two dimensional array is obtained. Array structure is similar to Aho-Corasick DFA. The dimensions of the array are equal to the number of states and the size of the alphabet (256 in our case) plus one position to store index of the rule if current state signs that regular expression is matched. Therefore the final algorithm for searching pattern within packet payload is shown in figure \ref{fig:dfa_search}.
 
 \begin{figure}[h]
 \textbf{Input.} A text string $x = a_1 a_2 ... a_n$ where each $a_i$ is an input symbol and a next move function \emph{d} \\
@@ -1089,7 +1086,7 @@ Nids class logs a lot of information during its work using Boost.Log library. To
 \subsubsection*{Future work.}
 The future work for the Nids class is to implement packet categorization based on the payload size and process different categories of packets separately. There could be several categories of packets: small, medium, large, etc. This way CUDA resources could be used more effectively.
 
-Also a problem with TCP stream is not solved in the current version of the application. Packets from the network layer of the network stack are split into several TCP packets. It could be a problem if, for example, packet data is compressed and should be uncompressed before analyzing payload. In such a case TCP reassembly of the several packets from TCP stream should be performed before analyzing packet payload.
+Also a problem with TCP stream is not solved in the current version of the application. Packets from the network layer of the network stack are split into several TCP packets. It could be a problem if, for example, packet data is compressed and should be uncompressed before analyzing payload. In such a case TCP reassembly of the several packets from TCP stream should be performed before analyzing packet payload\cite{tcp_ref}.
 
 \subsection{GanidsMainWindow class.}
 GanidsMainWindow class implements a GUI part of the application. It inherits QT's QMainWindow class and creates GUI components when application is started. QT allows to describe all GUI components in the '*.ui' class using QT designer and during compilation QT framework automatically compiles this file into the proper '*.cpp' file to create the whole user interface. GanidsMainWindow just call \textbf{setupUi} method in it constructor to initialize all parts of the user interface.
@@ -1257,7 +1254,7 @@ The Thesis result is an application which is capable of achieving all objectives
 
 Writing CUDA code is a simple and hard at the same time. Simple, because C language used for CUDA applications is well known and NVIDIA extensions for it didn't broke it's conciseness. And hard, because writing programs for parallel architectures is something different compared to writing regular applications. Code should be optimized as much as possible, every memory transaction should be taken into account. This thesis was a good point to learn different technologies such as C++ programming language including some templates in pair with GPGPU based on CUDA architecture, Boost synchronization mechanisms and Spirit parser, Libpcap library API, SQLite database, QT and as an extra \LaTeX{} program was used for the first time to create this document.
 
-\bibliographystyle{csn690}
+\bibliographystyle{plain}
 \bibliography{mybibliographyfile}
 
 \setsecnumdepth{all}
@@ -1267,10 +1264,52 @@ Writing CUDA code is a simple and hard at the same time. Simple, because C langu
 % \printglossaries
 \begin{description}
 	\item[GUI] Graphical user interface
-	\item[XML] Extensible markup language
+	\item[NIDS] Network Intrusion Detection System
+	\item[CPU] Central processing unit
+	\item[IP] Internet Protocol
+	\item[FPGA] Field-programmable gate array
+	\item[ASIC] Application-specific integrated circuit
+	\item[NPU] Network processing unit
+	\item[TCP] Transmission Control Protocol
+	\item[GPP] General-purpose processor
+	\item[SPP] Special-purpose processor
+	\item[DSP] Digital signal processors
+	\item[CAD] Computer aided design
+	\item[GPGPU] General-purpose computing on graphics processing units
+	\item[CUDA] Compute Unified Device Architecture
+	\item[IEEE] Institute of Electrical and Electronics Engineers
+	\item[LAN] Local area network
+	\item[RSPAN] Remote Switched Port Analyzer
+	\item[API] Application programming interface
+	\item[ARPANET] Advanced Research Projects Agency Network
+	\item[IDES] Intrusion Detection Expert System
+	\item[DIDS] Distributed Intrusion Detection System
+	\item[CMDS] Computer Misuse Detection System
+	\item[ASIM] Automated Security Measurement System
+	\item[AFCERT] Air Force’s Computer Emergency Response Team
+	\item[NSM] Network Security Monitor
+	\item[IBM] International Business Machines
+	\item[FLOPS] Floating-point operations per second
+	\item[SQL] Structured Query Language
+	\item[OSI] Open Systems Interconnection
+	\item[DFA] Deterministic finite automaton
+	\item[IDE] Integrated development environment
 \end{description}
 
 
 \chapter{Contents of enclosed CD}
 
+\texttt{\\
+\noindent.\\
+|\\
+|--\ text\\
+|\ \ \ |-- pdf\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ This document content in PDF format.\\
+|\ \ \ \textbackslash--\ tex\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ This document content in LaTeX format.\\
+|\ \ \ \ \ \ \ \ \textbackslash--\ figures\ \ \ \ \ \ \ \ \ \ \ \ \ Figures used in this document.\\
+\textbackslash-- src\\
+.\ \ \ |-- ganids\_gui\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Application source codes.\\
+.\ \ \ \textbackslash--\ test\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rules used for testing application.\\
+
+
+}
 \end{document}
